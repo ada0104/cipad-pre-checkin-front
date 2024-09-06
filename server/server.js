@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000;
 const distFolder = join(process.cwd(), 'dist')
 
 // API呼叫設定

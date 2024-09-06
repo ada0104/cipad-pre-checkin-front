@@ -8,4 +8,7 @@ COPY ./ ./
 
 RUN npm run build
 
+ENV NODE_ENV=production
+ENV PORT=80
+
 CMD ["node", "/usr/app/server/server.js"]
