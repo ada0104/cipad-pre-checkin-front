@@ -63,7 +63,7 @@ steps:
 
 trigger:
   ref:
-    - refs/tags/momo-*
+    - refs/tags/cipad-pre-checkin-front-*
 
 volumes:
 - name: docker
