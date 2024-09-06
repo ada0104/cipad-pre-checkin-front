@@ -1,0 +1,72 @@
+---
+kind: pipeline
+name: build-tool
+clone:
+  skip_verify: true
+  depth: 1
+image_pull_secrets:
+  - dockersecret
+steps:
+- name: build-image-job
+  image: asia-east1-docker.pkg.dev/development2-389802/rd2-tool-docker/deploy-tool
+  pull: if-not-exists
+  commands:
+  - echo "Y" | gcloud auth configure-docker asia-east1-docker.pkg.dev
+  - gcloud auth list
+  - docker build --no-cache --pull --progress=plain --force-rm -t asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:build -f Dockerfile .
+  - gcloud auth configure-docker asia-east1-docker.pkg.dev
+  - docker push asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:build
+  - docker rmi  asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:build
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  privileged: true
+
+volumes:
+- name: docker
+  host:
+   path: /var/run/docker.sock
+trigger:
+  ref:
+    - refs/tags/build-*
+---
+kind: pipeline
+name: default
+clone:
+  skip_verify: true
+  depth: 1
+image_pull_secrets:
+  - dockersecret
+steps:
+- name: gcp_push_image
+  image: asia-east1-docker.pkg.dev/development2-389802/rd2-tool-docker/deploy-tool
+  pull: if-not-exists
+  commands:
+  - echo "Y" | gcloud auth configure-docker asia-east1-docker.pkg.dev
+  - gcloud auth list
+  - docker build --no-cache --pull --force-rm -t asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:latest -f gcp.dockerfile .
+  - gcloud auth configure-docker asia-east1-docker.pkg.dev
+  - docker push asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:latest
+  - gcloud container images add-tag "asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:latest" "asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:${DRONE_TAG}"
+  - docker rmi  asia-east1-docker.pkg.dev/development2-389802/hexa-docker/${DRONE_REPO_NAME}:latest
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  privileged: true
+
+- name: restart_pod
+  image: asia-east1-docker.pkg.dev/development2-389802/rd2-tool-docker/deploy-tool
+  pull: if-not-exists
+  commands:
+    - gcloud container clusters get-credentials hexa-qa2 --region asia-east1 --project development2-389802
+    - kubectl rollout restart deployment/${DRONE_REPO_NAME} --namespace hexa-dev
+
+trigger:
+  ref:
+    - refs/tags/momo-*
+
+volumes:
+- name: docker
+  host:
+   path: /var/run/docker.sock
+
