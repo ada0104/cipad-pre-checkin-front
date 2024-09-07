@@ -2,7 +2,18 @@
 
 標準Vue3架構
 
-## Api Proxy
+## 開發配置
+
+```sh
+npm install
+npm run dev
+```
+
+## 一般開發Api Proxy
+
+vite.config.ts 內指向api proxy
+
+## 本機Api Proxy
 
 ```sh
 npm front-api-proxy
