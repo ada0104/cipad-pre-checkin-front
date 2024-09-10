@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap');
+@import 'variable.scss';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Noto+Sans+TC';
+  background: var(--Body-background);
+}
+
+#app {
+  margin: 0 auto;
+  font-weight: normal;
+}
+
+main {
+  margin-top: 37.6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+// margin
+.m-b-16 {
+  margin-bottom: 16px;
+}
+.m-b-48 {
+  margin-bottom: 48px;
+}
+
+// link styles
+.no-underline {
+  text-decoration: none;
+}
+
+// card
+.card-text-common {
+  text-align: center;
+  font-family: "Noto Sans TC";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.card-title {
+  @extend .card-text-common;
+  color: var(--Primary);
+  font-size: 32px;
+  letter-spacing: 2.56px;
+}
+
+.card-sec-title {
+  @extend .card-text-common;
+  color: var(--Secondary);
+  font-size: 24px;
+  letter-spacing: 1.92px;
+}
+
+.card-text {
+  @extend .card-text-common;
+  color: var(--On-Surface-Var);
+  font-size: 20px;
+  font-weight: 350;
+}
+
+// guidelines button
+.secondary-btn {
+  background: var(--Sec-Cont);
+  color: var(--On-Sec-Cont);
+}
+
+.primary-btn {
+  background: var(--Prim-Cont);
+  color: var(--On-Prim-Cont);
+}
+
+// guidelines font
+.on-surface-color {
+  color: var(--On-Surface-Var);
+}
