@@ -1,13 +1,12 @@
-
 <template>
   <Header />
   <main>
-    <Title :title="'預先登記入住'"/>
+    <Title :title="'預先登記入住'" />
     <Card cardClass="card" cardPadding="48px 96px">
-    <template #header>
-      <p class="card-title on-surface-color">上傳個人證件</p>
-    </template>
-  </Card>
+      <template #header>
+        <p class="card-title on-surface-color">上傳個人證件</p>
+      </template>
+    </Card>
   </main>
 </template>
 

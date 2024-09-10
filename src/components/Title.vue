@@ -1,12 +1,12 @@
 <template>
-<div class="title">
-  <p>{{title}}</p>
-</div>
+  <div class="title">
+    <p>{{ title }}</p>
+  </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
-    title: String,
+  title: String,
 })
 </script>
 

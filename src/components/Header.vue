@@ -1,18 +1,18 @@
 <template>
   <div class="header">
     <div class="logo">
-        <img src="@/assets/logo.svg">
+      <img src="@/assets/logo.svg">
     </div>
     <div class="header-right">
-        <p>中文 / EN</p>
-        <div class="mode">
-          <ThemeToggle />
-        </div>
+      <p>中文 / EN</p>
+      <div class="mode">
+        <ThemeToggle />
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ThemeToggle from '@/components/ThemeToggle.vue';
 </script>
 
