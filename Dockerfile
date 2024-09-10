@@ -1,5 +1,5 @@
 # 第一階段產生dist資料夾
-FROM node:18.19.0-alpine as builder
+FROM node:18.19.0 as builder
 
 # 指定預設/工作資料夾
 WORKDIR /usr/app
@@ -7,7 +7,7 @@ WORKDIR /usr/app
 COPY ./ ./
 
 # 安裝dependencies
-RUN npm install
+RUN npm install -f
 
 # COPY src src
 
