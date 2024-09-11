@@ -27,7 +27,7 @@ app.get('/ready', (req, res) => {
   res.send('ping')
 })
 
-app.get('/api/pre_checkin/:token', async (req, res) => {
+app.get('/dunqian/pre_checkin/:token', async (req, res) => {
   try {
     console.log(`${API_URL}/dunqian/pre_checkin/${req.params.token}`);
     const response = await fetch(`${API_URL}/dunqian/pre_checkin/${req.params.token}`, {
@@ -53,12 +53,9 @@ app.get('/api/pre_checkin/:token', async (req, res) => {
 });
 
 proxyApiList.forEach(path=> {
-  app.use(`/api/${path}`, createProxyMiddleware({
+  app.use(`/dunqian/${path}`, createProxyMiddleware({
     target: `${API_URL}`, // 你的遠端 API 的 URL
     changeOrigin: true,
-    pathRewrite: {
-      ['^/api/'+path]: `/dunqian/${path}`, // rewrite path
-    },
     onProxyReq: (proxyReq, req, res) => {
       // 設定 Authorization header
       proxyReq.setHeader('Authorization', `Bearer ${API_TOKEN}`);
