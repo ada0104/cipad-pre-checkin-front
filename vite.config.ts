@@ -17,7 +17,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
+      '/dunqian': {
         target: 'https://precheckin.hexa.wtf',
         changeOrigin: true,
       }
