@@ -1,7 +1,7 @@
 <template>
 <Header/>
 <main>
-  <Title :title="'登記入住資料'" />
+  <Title title="登記入住資料" />
   <Card cardClass="card" cardPadding="31px 58px">
     <template #header>
       <p class="card-title m-b-16">雀客快捷 台中一中</p>
