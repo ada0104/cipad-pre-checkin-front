@@ -4,10 +4,12 @@
       <img src="@/assets/logo.svg">
     </div>
     <div class="header-right">
-      <p>中文 / EN</p>
-      <div class="mode">
-        <ThemeToggle />
+      <div class="lang">
+        <span class="ch-tw">中文</span>
+        <span class="en">/</span>
+        <span class="en">EN</span>
       </div>
+      <ThemeToggle />
     </div>
   </div>
 </template>
@@ -32,6 +34,19 @@ import ThemeToggle from '@/components/ThemeToggle.vue';
     display: flex;
     align-items: center;
     gap: 20px;
+
+    .lang {
+      display: flex;
+      gap: 10px;
+
+      .ch-tw {
+        color: var(--Primary);
+      }
+
+      .en {
+        color: var(--Sec-Cont);
+      }
+    }
   }
 }
 </style>

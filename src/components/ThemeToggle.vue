@@ -1,11 +1,15 @@
 <template>
-<button @click="toggleTheme" class="theme-toggle-button">
-  <span v-if="isDarkTheme" aria-label="Light Theme" class="icon-container">
-    <img src="../assets/light.svg" alt="Light Theme Icon" class="theme-icon">
-  </span>
-  <span v-else aria-label="Dark Theme" class="icon-container">
-    <img src="../assets/dark.svg" alt="Dark Theme Icon" class="theme-icon">
-  </span>
+<button
+  @click="toggleTheme"
+  class="theme-toggle-button" >
+  <img
+    v-if="isDarkTheme"
+    src="@/assets/light.svg"
+    class="theme-icon" >
+  <img
+    v-else
+    src="@/assets/dark.svg"
+    class="theme-icon" >
 </button>
 </template>
 
@@ -45,45 +49,25 @@
 
 <style lang="scss" scoped>
 .theme-toggle-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.theme-toggle-button img {
-  transition: transform 0.3s ease;
-}
-
-.theme-toggle-button:hover img {
-  transform: scale(1.1);
-}
-
-/* CSS */
-.theme-toggle-button {
   background-color: var(--svg-fill-color);
   border-radius: 50%;
   border: none;
   cursor: pointer;
   padding: 8px;
-}
-
-.icon-container {
+  width: 42px;
+  height: 42px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
+  transition: background-color 0.3s ease;
 
-.theme-icon {
-  width: 24px;
-  height: 24px;
-  transition: transform 0.3s ease;
-}
+  .theme-icon {
+    width: 24px;
+    height: 24px;
+  }
 
-/* Optional: Add hover effect */
-.theme-toggle-button:hover .theme-icon {
-  transform: scale(1.1);
+  &:hover {
+    background-color: var(--Overlay, rgba(54, 56, 70, 0.66));
+  }
 }
-
 </style>

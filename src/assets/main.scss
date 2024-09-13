@@ -1,17 +1,80 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap');
 @import 'variable.scss';
 
+// *************************************
+//
+//   reset
+//
+// *************************************
+* {
+  box-sizing: border-box;
+  word-wrap: break-word;
+}
+a {
+  color: unset;
+}
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+li {
+  margin: 0;
+  padding: 0;
+}
+img {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+input,
+textarea {
+&:focus {
+  outline: none;
+}
+&::placeholder {
+  color: var(--placeholder);
+}
+}
+button {
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  border: none;
+  background: transparent;
+  /* inherit font & color from ancestor */
+  color: inherit;
+  font: inherit;
+  /* Normalize line-height. Cannot be changed from normal in Firefox 4+. */
+  line-height: normal;
+  /* Corrects font smoothing for webkit */
+
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+  /* Corrects inability to style clickable input types in iOS */
+  -webkit-appearance: none;
+  &::-moz-focus-inner {
+      padding: 0;
+      border: 0;
+  }
+}
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   margin: 0;
+  font-family: 'Noto Sans TC';
   font-weight: normal;
 }
 
 body {
   min-height: 100vh;
-  font-family: 'Noto+Sans+TC';
+  font-family: 'Noto Sans TC';
   background: var(--Body-background);
 }
 
@@ -41,37 +104,53 @@ main {
   text-decoration: none;
 }
 
+// text
+.title {
+  width: fit-content;
+  border-radius: 99px;
+  border: 3px solid var(--Primary);
+  margin-bottom: 32px;
+  padding: 16px 32px;
+
+  p {
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 110%;
+    color: var(--Primary);
+  }
+}
+
 // card
-.card-text-common {
-  text-align: center;
-  font-family: "Noto Sans TC";
-  font-style: normal;
-  font-weight: 400;
-  line-height: 140%;
+.card {
+  margin-bottom: 36px;
+  border-radius: 1rem;
+  padding: 48px 96px;
+  background: var(--Card-Background);
+  box-shadow: 0px 421px 118px 0px rgba(150, 150, 150, 0.00),
+  0px 269px 108px 0px rgba(150, 150, 150, 0.01),
+  0px 151px 91px 0px rgba(150, 150, 150, 0.05),
+  0px 67px 67px 0px rgba(150, 150, 150, 0.09),
+  0px 17px 37px 0px rgba(150, 150, 150, 0.10);
 }
 
 .card-title {
-  @extend .card-text-common;
   color: var(--Primary);
+  text-align: center;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
   font-size: 32px;
   letter-spacing: 2.56px;
 }
 
-.card-sec-title {
-  @extend .card-text-common;
-  color: var(--Secondary);
-  font-size: 24px;
-  letter-spacing: 1.92px;
-}
-
-.card-text {
-  @extend .card-text-common;
-  color: var(--On-Surface-Var);
-  font-size: 20px;
-  font-weight: 350;
-}
-
 // guidelines button
+.btn-group {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
 .secondary-btn {
   background: var(--Sec-Cont);
   color: var(--On-Sec-Cont);
@@ -80,9 +159,4 @@ main {
 .primary-btn {
   background: var(--Prim-Cont);
   color: var(--On-Prim-Cont);
-}
-
-// guidelines font
-.on-surface-color {
-  color: var(--On-Surface-Var);
 }

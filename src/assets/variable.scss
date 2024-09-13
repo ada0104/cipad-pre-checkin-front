@@ -26,6 +26,7 @@ $light-theme-variables: (
   --Card-Background: rgba(255, 255, 255, 0.33),
   --Body-background: linear-gradient(44deg, #F1F0F7 -1.03%, #DCE1FF 101.53%),
   --svg-fill-color: rgba(54, 56, 70, 0.22),
+  --svg-icon: #ADB0C3,
 );
 
 $dark-theme-variables: (
@@ -55,7 +56,8 @@ $dark-theme-variables: (
   --On-input-sec: #e0e0e0,
   --Card-Background:rgba(0, 0, 0, 0.66),
   --Body-background: linear-gradient(180deg, #444270 20.67%, #FFDAD6 161.35%),
-  --svg-fill-color: var(--Overlay, rgba(54, 56, 70, 0.66)),
+  --svg-fill-color: rgba(54, 56, 70, 0.22),
+  --svg-icon: #F3F3F3,
 );
 
 [data-theme='dark'] {

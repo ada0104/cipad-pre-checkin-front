@@ -1,7 +1,7 @@
 <template>
-    <button :class="buttonClass" :type="type">
-        <slot></slot>
-    </button>
+<button :class="buttonClass" :type="type">
+    <slot></slot>
+</button>
 </template>
 
 <script setup lang="ts">
@@ -20,7 +20,7 @@ const props = defineProps({
 </script>
 
 <style scoped lang="scss">
-.button {
+.btn {
     display: flex;
     padding: 24px 48px;
     justify-content: center;
