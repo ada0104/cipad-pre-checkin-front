@@ -24,9 +24,9 @@ $light-theme-variables: (
   --On-input-box: #2f3677,
   --On-input-sec: #757577,
   --Card-Background: rgba(255, 255, 255, 0.33),
-  --Body-background: linear-gradient(44deg, #F1F0F7 -1.03%, #DCE1FF 101.53%),
+  --Body-background: linear-gradient(44deg, #f1f0f7 -1.03%, #dce1ff 101.53%),
   --svg-fill-color: rgba(54, 56, 70, 0.22),
-  --svg-icon: #ADB0C3,
+  --svg-icon: #adb0c3
 );
 
 $dark-theme-variables: (
@@ -54,19 +54,19 @@ $dark-theme-variables: (
   --Input-box: #424451,
   --On-input-box: #fff,
   --On-input-sec: #e0e0e0,
-  --Card-Background:rgba(0, 0, 0, 0.66),
-  --Body-background: linear-gradient(180deg, #444270 20.67%, #FFDAD6 161.35%),
+  --Card-Background: rgba(0, 0, 0, 0.66),
+  --Body-background: linear-gradient(180deg, #444270 20.67%, #ffdad6 161.35%),
   --svg-fill-color: rgba(54, 56, 70, 0.22),
-  --svg-icon: #F3F3F3,
+  --svg-icon: #f3f3f3
 );
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   @each $key, $value in $dark-theme-variables {
     #{$key}: #{$value};
   }
 }
 
-[data-theme='light'] {
+[data-theme="light"] {
   @each $key, $value in $light-theme-variables {
     #{$key}: #{$value};
   }

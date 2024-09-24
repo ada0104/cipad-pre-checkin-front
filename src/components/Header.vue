@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="logo">
-      <img src="@/assets/logo.svg">
+      <img src="@/assets/logo.svg" />
     </div>
     <div class="header-right">
       <div class="lang">
@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import ThemeToggle from '@/components/ThemeToggle.vue';
+import ThemeToggle from '@/components/ThemeToggle.vue'
 </script>
 
 <style scoped lang="scss">

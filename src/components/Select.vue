@@ -1,58 +1,60 @@
 <template>
-<div
-    class="form-dropdown"
-    @click="toggleDropdown"
-    >
+  <div class="form-dropdown" ref="dropdown" @click="toggleDropdown">
     <div class="selected-option">
-        {{ selectedOption.label }}
-        <SvgIcon
-            :name="isOpen ? 'up' : 'down'"
-            class="drop-icon"
-            />
+      {{ selectedOption.label }}
+      <SvgIcon :name="isOpen ? 'up' : 'down'" class="drop-icon" />
     </div>
-    <ul
-        v-if="isOpen"
-        class="options-list"
-        >
-    <li
+    <ul v-if="isOpen" class="options-list">
+      <li
         v-for="(option, index) in options"
         :key="index"
         @click.stop="selectOption(option)"
-        :class="['option-item', { 'checked': option.value === selectedOption.value }]"
-        >
+        :class="['option-item', { checked: option.name === selectedOption.name }]"
+      >
         {{ option.label }}
-        <SvgIcon
-            v-if="option.value === selectedOption.value"
-            name="check"
-            class="icon"
-            />
-    </li>
+        <SvgIcon v-if="option.name === selectedOption.name" name="check" class="icon" />
+      </li>
     </ul>
-</div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps<{
-  selectedOption: { value: string; label: string };
-  options: Array<{ value: string; label: string }>;
-}>();
+  selectedOption: { name: string; label: string }
+  options: Array<{ name: string; label: string }>
+}>()
 
 const emit = defineEmits<{
-  (event: 'update:selectedOption', selectedOption: { value: string; label: string }): void;
-}>();
+  (event: 'update:selectedOption', selectedOption: { name: string; label: string }): void
+}>()
 
-const isOpen = ref(false);
+const isOpen = ref(false)
+const dropdown = ref<HTMLElement | null>(null)
 
 const toggleDropdown = () => {
- isOpen.value = !isOpen.value;
-};
+  isOpen.value = !isOpen.value
+}
 
-const selectOption = (option: { value: string; label: string }) => {
-  emit('update:selectedOption', option);
-  isOpen.value = false;
-};
+const selectOption = (option: { name: string; label: string }) => {
+  emit('update:selectedOption', option)
+  isOpen.value = false
+}
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (dropdown.value && !dropdown.value.contains(event.target as Node)) {
+    isOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -65,6 +67,7 @@ const selectOption = (option: { value: string; label: string }) => {
   padding: 20px 24px;
   background: var(--Input-box);
   cursor: pointer;
+  z-index: 1;
 
   .selected-option {
     color: var(--Primary);
@@ -91,7 +94,12 @@ const selectOption = (option: { value: string; label: string }) => {
     background-color: var(--Input-box);
     border-radius: 16px;
     border: none;
-    box-shadow: 0px 68px 19px 0px rgba(0, 0, 0, 0.00), 0px 43px 17px 0px rgba(0, 0, 0, 0.01), 0px 24px 15px 0px rgba(0, 0, 0, 0.02), 0px 11px 11px 0px rgba(0, 0, 0, 0.03), 0px 3px 6px 0px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0px 68px 19px 0px rgba(0, 0, 0, 0),
+      0px 43px 17px 0px rgba(0, 0, 0, 0.01),
+      0px 24px 15px 0px rgba(0, 0, 0, 0.02),
+      0px 11px 11px 0px rgba(0, 0, 0, 0.03),
+      0px 3px 6px 0px rgba(0, 0, 0, 0.04);
     list-style: none;
     border-radius: 16px;
   }
@@ -107,7 +115,7 @@ const selectOption = (option: { value: string; label: string }) => {
     justify-content: space-between;
     align-items: center;
 
-    .icon{
+    .icon {
       color: var(--Primary);
     }
 

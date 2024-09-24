@@ -9,9 +9,14 @@ const router = createRouter({
       component: () => import('@/views/HomeView.vue')
     },
     {
+      path: '/upload',
+      name: 'upload',
+      component: () => import('@/views/OcrIdUploader.vue')
+    },
+    {
       path: '/form',
       name: 'form',
-      component: () => import('@/views/FormView.vue')
+      component: () => import('@/views/CheckInForm.vue')
     }
   ]
 })

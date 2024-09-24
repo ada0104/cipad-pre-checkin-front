@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useCounterStore } from '@/stores/counter';
+import { useCounterStore } from '@/stores/counter'
 const counter = useCounterStore()
 
 const add = () => {
   counter.increment()
 }
 const search = () => {
-  fetch('/dunqian/pre_checkin/HbNjl').then(async res => {
+  fetch('/dunqian/pre_checkin/HbNjl').then(async (res) => {
     const data = await res.json()
-    console.log(data);
+    console.log(data)
   })
 }
 </script>

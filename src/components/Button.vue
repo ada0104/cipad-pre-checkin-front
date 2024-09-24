@@ -1,37 +1,37 @@
 <template>
-<button :class="buttonClass" :type="type">
+  <button :class="buttonClass" :type="type">
     <slot></slot>
-</button>
+  </button>
 </template>
 
 <script setup lang="ts">
-import type { ButtonHTMLAttributes, PropType } from 'vue';
+import type { ButtonHTMLAttributes, PropType } from 'vue'
 
 const props = defineProps({
-    buttonClass: {
-        type: String,
-        default: 'button'
-    },
-    type: {
-        type: String as PropType<ButtonHTMLAttributes['type']>,
-        default: 'button'
-    }
-});
+  buttonClass: {
+    type: String,
+    default: 'button'
+  },
+  type: {
+    type: String as PropType<ButtonHTMLAttributes['type']>,
+    default: 'button'
+  }
+})
 </script>
 
 <style scoped lang="scss">
 .btn {
-    display: flex;
-    padding: 24px 48px;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    border-radius: 16px;
-    font-family: "Noto Sans TC";
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 140%;
-    letter-spacing: 1.92px;
+  display: flex;
+  padding: 24px 48px;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 16px;
+  font-family: 'Noto Sans TC';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 1.92px;
 }
 </style>
