@@ -55,7 +55,7 @@ const triggerFileInput = (side: string) => {
   fileInputs.value[side]?.click();
 };
 
-const handleImageUpload = async (name: string, side: string, event: Event) => {
+const handleImageUpload = async (name: string, side: string, event: any) => {
   const target = event.target as HTMLInputElement;
   const imageFile = target.files?.[0];
 
@@ -77,6 +77,7 @@ const handleImageUpload = async (name: string, side: string, event: Event) => {
     imageSrcs.value[name][side] = base64String;
 
     await uploadToServer(name, side, base64String);
+    event.target.value = '';
   } catch (error) {
     console.error('Error during image compression or upload:', error);
   }
