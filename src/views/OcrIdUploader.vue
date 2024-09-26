@@ -23,7 +23,9 @@
           :labels="computedLabels.labels"
         />
         <router-link to="/form" class="no-underline">
-          <Button buttonClass="btn primary-btn">下一步</Button>
+          <Button buttonClass="btn primary-btn" :disabled="isDisabled">
+            下一步
+          </Button>
         </router-link>
       </div>
     </div>
@@ -31,12 +33,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-
-import Header from '@/components/Header.vue'
-import Button from '@/components/Button.vue'
-import Select from '@/components/Select.vue'
-import Upload from '@/components/Upload.vue'
+import { ref, computed, watch, onMounted } from 'vue';
+import Header from '@/components/Header.vue';
+import Button from '@/components/Button.vue';
+import Select from '@/components/Select.vue';
+import Upload from '@/components/Upload.vue';
+import { useIdImageStore } from '@/stores/idimage';
 
 interface Option {
   name: string;
@@ -50,11 +52,15 @@ interface UploadLabelMap {
   };
 }
 
-const selectedOption = ref<Option>({ name: 'id-card', label: '身分證' });
+const isDisabled = ref<boolean>(true);
+const selectedOption = ref<Option>({
+  name: 'id-card',
+  label: '身分證',
+});
 
 const options = ref<Option[]>([
   { name: 'id-card', label: '身分證' },
-  { name: 'passport', label: '護照' }
+  { name: 'passport', label: '護照' },
 ]);
 
 const uploadLabelMap: UploadLabelMap = {
@@ -69,23 +75,33 @@ const uploadLabelMap: UploadLabelMap = {
 
 const computedLabels = computed(() => {
   const selectedName = selectedOption.value?.name;
-
-  if (selectedName === 'id-card' || selectedName === 'passport') {
-    return {
-      name: selectedName,
-      labels: uploadLabelMap[selectedName]
-    };
-  } else {
-    return {
-      name: 'id-card',
-      labels: uploadLabelMap['id-card']
-    };
-  }
+  return {
+    name: selectedName,
+    labels: uploadLabelMap[selectedName] || {},
+  };
 });
 
 const updateSelectedOption = (option: Option) => {
-  selectedOption.value = { ...option };
+  selectedOption.value = option;
 };
+
+const idImage = useIdImageStore();
+
+const checkIfCanProceed = computed(() => {
+  const selectedName = selectedOption.value.name;
+  const requiredFields = Object.keys(uploadLabelMap[selectedName] || {});
+  const imageData = idImage.idImages[selectedName] || {};
+
+  return requiredFields.every(field => imageData[field]);
+});
+
+watch(checkIfCanProceed, (canProceed) => {
+  isDisabled.value = !canProceed;
+});
+
+onMounted(() => {
+  idImage.clearStore();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -97,7 +113,6 @@ const updateSelectedOption = (option: Option) => {
   font-size: 20px;
   font-weight: 350;
   line-height: 140%;
-
   position: absolute;
   left: 0;
   top: 50%;
@@ -117,7 +132,6 @@ const updateSelectedOption = (option: Option) => {
 .card-content {
   display: inline-block;
   width: auto;
-
 }
 
 .card-content:last-child {

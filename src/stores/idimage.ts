@@ -9,7 +9,6 @@ export const useIdImageStore = defineStore('idImage', () => {
       idImages.value[name] = {};
     }
     idImages.value[name][side] = image64BaseData;
-    console.log(idImages.value)
   }
 
   function clearStore() {

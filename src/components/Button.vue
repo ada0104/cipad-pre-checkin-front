@@ -1,22 +1,26 @@
 <template>
-  <button :class="buttonClass" :type="type">
+  <button
+    :class="[buttonClass, { 'btn-disabled': disabled }]"
+    :disabled="disabled"
+    type="button"
+  >
     <slot></slot>
   </button>
 </template>
 
 <script setup lang="ts">
-import type { ButtonHTMLAttributes, PropType } from 'vue'
+import { defineProps } from 'vue'
 
-const props = defineProps({
-  buttonClass: {
-    type: String,
-    default: 'button'
-  },
-  type: {
-    type: String as PropType<ButtonHTMLAttributes['type']>,
-    default: 'button'
-  }
-})
+interface Props {
+  buttonClass: string
+  disabled?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  buttonClass: 'btn',
+  disabled: false,
+});
+
 </script>
 
 <style scoped lang="scss">
@@ -27,11 +31,16 @@ const props = defineProps({
   align-items: center;
   border: none;
   border-radius: 16px;
-  font-family: 'Noto Sans TC';
   font-size: 24px;
-  font-style: normal;
   font-weight: 400;
   line-height: 140%;
   letter-spacing: 1.92px;
+
+  &.btn-disabled {
+    background: var(--Surface-Dim);
+    color: var(--On-Surface-Var);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 }
 </style>
