@@ -12,7 +12,7 @@
       <p class="card-text">(2024/07/30 - 2024/08/01)</p>
     </div>
     <div class="card card-2">
-      <p class="card-title">訂購人陳小華</p>
+      <p class="card-title">訂購人 - 陳小華</p>
       <p class="card-title m-b-48">是否為本次入住旅客？</p>
       <div class="btn-group">
         <Button buttonClass="btn secondary-btn">否，不同人</Button>
@@ -30,35 +30,63 @@ import Button from '@/components/Button.vue'
 </script>
 
 <style lang="scss" scoped>
-.card {
+@mixin card-base {
   width: 612px;
 }
 
-.card-1 {
-  padding: 31px 58px;
-}
-
-.card-2 {
-  padding: 58px;
-}
-
-.card-sec-title {
-  text-align: center;
-  font-style: normal;
-  font-weight: 400;
+@mixin text-style($weight, $size, $color) {
+  font-weight: $weight;
+  font-size: $size;
+  color: $color;
   line-height: 140%;
-  color: var(--Secondary);
-  font-size: 24px;
-  letter-spacing: 1.92px;
+  text-align: center;
 }
 
-.card-text {
-  text-align: center;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 140%;
-  color: var(--On-Surface-Var);
-  font-size: 20px;
-  font-weight: 350;
+$spacing-large: 58px;
+$spacing-medium: 31px;
+$spacing-small: 16px;
+
+.card {
+  @include card-base;
+
+  &-1 {
+    padding: $spacing-medium $spacing-large;
+  }
+
+  &-2 {
+    padding: $spacing-large;
+  }
+
+  &-title {
+    @include text-style(400, 32px, var(--On-Surface));
+    letter-spacing: 2.56px;
+
+    &.m-b-16 {
+      margin-bottom: $spacing-small;
+    }
+
+    &.m-b-48 {
+      margin-bottom: 48px;
+    }
+  }
+
+  &-sec-title {
+    @include text-style(400, 24px, var(--Secondary));
+    letter-spacing: 2px;
+  }
+
+  &-text {
+    @include text-style(400, 20px, var(--On-Surface-Var));
+  }
+}
+
+.btn-group {
+  display: flex;
+  gap: $spacing-small;
+  justify-content: center;
+}
+
+.no-underline {
+  text-decoration: none;
 }
 </style>

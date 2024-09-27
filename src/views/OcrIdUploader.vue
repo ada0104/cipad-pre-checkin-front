@@ -119,7 +119,7 @@ onMounted(() => {
   transform: translateY(-50%);
 
   .back-icon {
-    color: var(--On-Surface);
+    color: inherit;
   }
 }
 
@@ -127,15 +127,15 @@ onMounted(() => {
   width: 1113px;
   display: flex;
   justify-content: center;
-}
 
-.card-content {
-  display: inline-block;
-  width: auto;
-}
+  .card-content {
+    display: inline-block;
+    width: auto;
 
-.card-content:last-child {
-  margin-bottom: 0;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .card-title {
@@ -151,4 +151,5 @@ onMounted(() => {
   display: flex;
   gap: 24px;
 }
+
 </style>

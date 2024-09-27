@@ -3,30 +3,48 @@
 
 // *************************************
 //
-//   reset
+//   Mixin
+//
+// *************************************
+@mixin text-style($weight, $size, $color) {
+  font-weight: $weight;
+  font-size: $size;
+  color: $color;
+  line-height: 140%;
+  text-align: center;
+}
+
+// *************************************
+//
+//   Reset
 //
 // *************************************
 * {
   box-sizing: border-box;
   word-wrap: break-word;
 }
+
 a {
   color: unset;
 }
+
 ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
+
 li {
   margin: 0;
   padding: 0;
 }
+
 img {
   display: block;
   max-width: 100%;
   width: 100%;
 }
+
 h1,
 h2,
 h3,
@@ -35,15 +53,18 @@ h5,
 h6 {
   margin: 0;
 }
+
 input,
 textarea {
   &:focus {
     outline: none;
   }
+
   &::placeholder {
     color: var(--placeholder);
   }
 }
+
 button {
   overflow: visible;
   margin: 0;
@@ -51,17 +72,13 @@ button {
   width: auto;
   border: none;
   background: transparent;
-  /* inherit font & color from ancestor */
   color: inherit;
   font: inherit;
-  /* Normalize line-height. Cannot be changed from normal in Firefox 4+. */
   line-height: normal;
-  /* Corrects font smoothing for webkit */
-
   -webkit-font-smoothing: inherit;
   -moz-osx-font-smoothing: inherit;
-  /* Corrects inability to style clickable input types in iOS */
   -webkit-appearance: none;
+
   &::-moz-focus-inner {
     padding: 0;
     border: 0;
@@ -96,20 +113,33 @@ main {
   align-items: center;
 }
 
-// margin
+// *************************************
+//
+//   Margin Classes
+//
+// *************************************
 .m-b-16 {
   margin-bottom: 16px;
 }
+
 .m-b-48 {
   margin-bottom: 48px;
 }
 
-// link styles
+// *************************************
+//
+//   Link Styles
+//
+// *************************************
 .no-underline {
   text-decoration: none;
 }
 
-// text
+// *************************************
+//
+//   Text Styles
+//
+// *************************************
 .title-block {
   margin-bottom: 32px;
   width: 1113px;
@@ -126,15 +156,16 @@ main {
   padding: 16px 32px;
 
   p {
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 700;
+    @include text-style(700, 32px, var(--Primary));
     line-height: 110%;
-    color: var(--Primary);
   }
 }
 
-// card
+// *************************************
+//
+//   Card Styles
+//
+// *************************************
 .card {
   margin-bottom: 36px;
   border-radius: 1rem;
@@ -150,15 +181,15 @@ main {
 
 .card-title {
   color: var(--Primary);
-  text-align: center;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 140%;
-  font-size: 32px;
+  @include text-style(400, 32px, var(--Primary));
   letter-spacing: 2.56px;
 }
 
-// guidelines button
+// *************************************
+//
+//   Guidelines Button
+//
+// *************************************
 .btn-group {
   display: flex;
   gap: 24px;

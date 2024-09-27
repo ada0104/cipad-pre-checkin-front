@@ -75,8 +75,6 @@ onBeforeUnmount(() => {
     font-weight: 350;
     line-height: 140%;
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
 
@@ -95,11 +93,11 @@ onBeforeUnmount(() => {
     border-radius: 16px;
     border: none;
     box-shadow:
-      0px 68px 19px 0px rgba(0, 0, 0, 0),
-      0px 43px 17px 0px rgba(0, 0, 0, 0.01),
-      0px 24px 15px 0px rgba(0, 0, 0, 0.02),
-      0px 11px 11px 0px rgba(0, 0, 0, 0.03),
-      0px 3px 6px 0px rgba(0, 0, 0, 0.04);
+      0 68px 19px rgba(0, 0, 0, 0),
+      0 43px 17px rgba(0, 0, 0, 0.01),
+      0 24px 15px rgba(0, 0, 0, 0.02),
+      0 11px 11px rgba(0, 0, 0, 0.03),
+      0 3px 6px rgba(0, 0, 0, 0.04);
     list-style: none;
     border-radius: 16px;
   }
@@ -110,8 +108,6 @@ onBeforeUnmount(() => {
     font-size: 20px;
     color: var(--On-Surface-Var);
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
 
@@ -130,4 +126,5 @@ onBeforeUnmount(() => {
     }
   }
 }
+
 </style>

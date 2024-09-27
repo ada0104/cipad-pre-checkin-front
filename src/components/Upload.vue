@@ -101,11 +101,21 @@ watch(() => props.name, (newName, oldName) => {
 </script>
 
 <style scoped lang="scss">
+@mixin text-style($weight, $size, $color) {
+  font-weight: $weight;
+  font-size: $size;
+  color: $color;
+  line-height: 140%;
+  text-align: center;
+}
+
 .upload-container {
   background: var(--Input-box);
-  color: var(--Outline);
   width: 448px;
   height: 282px;
+  margin-top: 24px;
+  margin-bottom: 32px;
+  padding: 12px;
 
   display: flex;
   flex-direction: column;
@@ -116,13 +126,7 @@ watch(() => props.name, (newName, oldName) => {
   border-radius: 16px;
   cursor: pointer;
 
-  text-align: center;
-  font-size: 20px;
-  font-weight: 350;
-  line-height: 140%;
-  margin-top: 24px;
-  margin-bottom: 32px;
-  padding: 12px;
+  @include text-style(350, 20px, var(--Outline));
 }
 
 .upload-icon {
@@ -138,12 +142,12 @@ watch(() => props.name, (newName, oldName) => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
 
-.image-preview img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: cover;
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
 }
 
 .id-card-container {
