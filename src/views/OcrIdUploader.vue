@@ -22,11 +22,13 @@
           :name="computedLabels.name"
           :labels="computedLabels.labels"
         />
-        <router-link to="/form" class="no-underline">
-          <Button buttonClass="btn primary-btn" :disabled="isDisabled">
-            下一步
-          </Button>
-        </router-link>
+        <Button
+          buttonClass="btn primary-btn"
+          :disabled="isDisabled"
+          @click="handleNextStep"
+        >
+          下一步
+        </Button>
       </div>
     </div>
   </main>
@@ -53,6 +55,7 @@ import Select from '@/components/Select.vue';
 import Upload from '@/components/Upload.vue';
 import ErrorAlert from '@/components/ErrorAlert.vue';
 import { useIdImageStore } from '@/stores/idimage';
+import { useRouter } from 'vue-router';
 
 interface Option {
   name: string;
@@ -67,6 +70,7 @@ interface UploadLabelMap {
 }
 
 const idImage = useIdImageStore();
+const router = useRouter();
 
 const isDisabled = ref<boolean>(true);
 const selectedOption = ref<Option>({
@@ -109,6 +113,12 @@ watch(checkIfCanProceed, (canProceed) => {
 onMounted(() => {
   idImage.clearStore();
 });
+
+function handleNextStep() {
+  if (!isDisabled.value) {
+    router.push('/form');
+  }
+}
 
 enum ErrorType {
   RecognitionFailed = 0, // 證件辨識失敗
