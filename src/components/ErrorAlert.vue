@@ -144,11 +144,5 @@ const closeAlert = (): void => {
       border-bottom: 1px solid var(--On-input-sec);
     }
   }
-
-
-}
-
-.purple {
-  gap: 24px;
 }
 </style>
