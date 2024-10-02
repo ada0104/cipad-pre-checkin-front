@@ -10,7 +10,7 @@
         <p>預先登記入住</p>
       </div>
     </div>
-    <div class="card">
+    <div v-if="!showContact" class="card">
       <div class="card-content">
         <p class="card-title">填寫資料</p>
         <div class="form-block">
@@ -160,14 +160,15 @@
             <input type="checkbox" id="accept-terms" class="checkbox-input" />
             <span class="checkbox-custom"></span>
             <span class="label-text">我同意CIPAD GUEST平臺之</span>
-            <a href="">隱私權使用條款</a>
+            <button type="button" class="link-button" @click="showPrivacyPolicy">隱私權使用條款</button>
           </label>
         </div>
         <router-link to="/form" class="no-underline">
-          <Button buttonClass="btn primary-btn" :disabled="isDisabled"> 送出 </Button>
+          <Button buttonClass="btn primary-btn" :disabled="isDisabled">送出</Button>
         </router-link>
       </div>
     </div>
+    <PrivacyPolicy v-if="showContact" @close="hidePrivacyPolicy"/>
   </main>
 </template>
 
@@ -176,6 +177,7 @@ import { ref } from 'vue'
 import Header from '@/components/Header.vue'
 import Select from '@/components/Select.vue'
 import Button from '@/components/Button.vue'
+import PrivacyPolicy from '@/components/PrivacyPolicy.vue';
 
 const isReadonly = ref<boolean>(true)
 const hasEdited = ref<boolean>(false)
@@ -185,10 +187,19 @@ const nameInput = ref<HTMLInputElement | null>(null)
 const emailInput = ref<HTMLInputElement | null>(null)
 const imageSrcs = ref<string>('')
 const isDisabled = ref<boolean>(true)
+const showContact = ref<boolean>(false)
 const selectedInvoiceType = ref<'two-step' | 'three-step'>('two-step')
 const cloudCarrier = ref<string>('')
 const companyId = ref<string>('')
 const companyName = ref<string>('')
+
+const showPrivacyPolicy = () => {
+  showContact.value = true
+}
+
+const hidePrivacyPolicy = () => {
+  showContact.value = false
+}
 
 const enableInput = () => {
   isReadonly.value = false
@@ -204,7 +215,6 @@ const selectedOption = ref<Option>({
   name: 'tw',
   label: '+886'
 })
-
 const options = ref<Option[]>([
   { name: 'tw', label: '+886' },
   { name: 'ch', label: '+887' }
@@ -263,6 +273,16 @@ const updateSelectedOption = (option: Option) => {
   &-title {
     @include text-style(400, 20px, var(--On-Surface-Var));
   }
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--Primary);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
 }
 
 .form-block {
@@ -473,11 +493,15 @@ const updateSelectedOption = (option: Option) => {
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-size: 16px;
-    gap: 10px;
+    gap: 8px 4px;
+
+    color: var(--On-input-sec, #E0E0E0);
+    font-size: 20px;
+    font-weight: 350;
+    line-height: 140%;
 
     .checkbox-input {
-      display: none; // 隱藏原生 checkbox
+      display: none;
     }
 
     .checkbox-custom {

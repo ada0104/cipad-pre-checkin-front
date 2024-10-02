@@ -30,6 +30,19 @@
       </div>
     </div>
   </main>
+  <Button buttonClass="primary-btn" @click="() => updateErrorMessages(ErrorType.RecognitionFailed)">測試證件阻擋</Button>
+  <Button buttonClass="primary-btn" @click="() => updateErrorMessages(ErrorType.MinorAccessDenied)">測試未成年阻擋</Button>
+  <Button buttonClass="primary-btn" @click="() => updateErrorMessages(ErrorType.UnsupportedFormat)">測試證件格式錯誤</Button>
+  <ErrorAlert
+    v-if="showError"
+    :title="errorTitle"
+    :content="errorContent"
+    :buttonText="errorButtonText"
+    :subText="errorSubText"
+    :class="errorClass"
+    @close="handleErrorClose"
+    @buttonClick="handleRetryUpload"
+  />
 </template>
 
 <script setup lang="ts">
@@ -38,6 +51,7 @@ import Header from '@/components/Header.vue';
 import Button from '@/components/Button.vue';
 import Select from '@/components/Select.vue';
 import Upload from '@/components/Upload.vue';
+import ErrorAlert from '@/components/ErrorAlert.vue';
 import { useIdImageStore } from '@/stores/idimage';
 
 interface Option {
@@ -52,17 +66,17 @@ interface UploadLabelMap {
   };
 }
 
+const idImage = useIdImageStore();
+
 const isDisabled = ref<boolean>(true);
 const selectedOption = ref<Option>({
   name: 'id-card',
   label: '身分證',
 });
-
 const options = ref<Option[]>([
   { name: 'id-card', label: '身分證' },
   { name: 'passport', label: '護照' },
 ]);
-
 const uploadLabelMap: UploadLabelMap = {
   'id-card': {
     front: '身分證正面',
@@ -72,7 +86,6 @@ const uploadLabelMap: UploadLabelMap = {
     front: '護照個人頁',
   },
 };
-
 const computedLabels = computed(() => {
   const selectedName = selectedOption.value?.name;
   return {
@@ -80,13 +93,9 @@ const computedLabels = computed(() => {
     labels: uploadLabelMap[selectedName] || {},
   };
 });
-
 const updateSelectedOption = (option: Option) => {
   selectedOption.value = option;
 };
-
-const idImage = useIdImageStore();
-
 const checkIfCanProceed = computed(() => {
   const selectedName = selectedOption.value.name;
   const requiredFields = Object.keys(uploadLabelMap[selectedName] || {});
@@ -94,35 +103,73 @@ const checkIfCanProceed = computed(() => {
 
   return requiredFields.every(field => imageData[field]);
 });
-
 watch(checkIfCanProceed, (canProceed) => {
   isDisabled.value = !canProceed;
 });
-
 onMounted(() => {
   idImage.clearStore();
 });
-</script>
 
-<style lang="scss" scoped>
-.back-route {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--On-Surface);
-  font-size: 20px;
-  font-weight: 350;
-  line-height: 140%;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-
-  .back-icon {
-    color: inherit;
-  }
+enum ErrorType {
+  RecognitionFailed = 0, // 證件辨識失敗
+  UnsupportedFormat = 1, // 證件格式錯誤
+  MinorAccessDenied = 2, // 未成年阻擋
+  UnknownError = 3       // 未知錯誤
 }
 
+const showError = ref<boolean>(false);
+const errorTitle = ref<string>('');
+const errorContent = ref<string>('');
+const errorButtonText = ref<string>('');
+const errorClass = ref<string>('');
+const errorSubText = ref<string>('');
+
+function updateErrorMessages(type: ErrorType): void {
+  errorClass.value = '';
+  errorSubText.value = '';
+
+  switch (type) {
+    case ErrorType.RecognitionFailed:
+      errorTitle.value = '證件辨識失敗';
+      errorContent.value = '證件圖片無法辨識<br>請重新選擇';
+      errorButtonText.value = '重新上傳';
+      break;
+    case ErrorType.MinorAccessDenied:
+      errorTitle.value = '未成年阻擋';
+      errorContent.value = '辨識您為未滿18歲身分，<br>無法使用線上登記，<br>請協同監護人於旅店櫃檯辦理入住。';
+      errorButtonText.value = '我瞭解了';
+      errorSubText.value = '我已成年，重新嘗試';
+      errorClass.value = 'purple';
+      break;
+    case ErrorType.UnsupportedFormat:
+      errorTitle.value = '證件格式錯誤';
+      errorContent.value = '{身分證反面}<br>圖片格式不符<br>請重新上傳';
+      errorButtonText.value = '重新上傳';
+      break;
+    default:
+      errorTitle.value = '未知錯誤';
+      errorContent.value = '發生未知錯誤<br>請稍後再試';
+      errorButtonText.value = '關閉';
+      break;
+  }
+
+  showError.value = true;
+}
+
+const handleErrorClose = (): void => {
+  showError.value = false;
+};
+const handleRetryUpload = (): void => {
+  console.log('重試按鈕被點擊');
+  showError.value = false;
+};
+const triggerError = (): void => {
+  showError.value = true;
+};
+</script>
+
+
+<style lang="scss" scoped>
 .card {
   width: 1113px;
   display: flex;
