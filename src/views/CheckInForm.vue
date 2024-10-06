@@ -14,6 +14,7 @@
       <div class="card-content">
         <p class="card-title">填寫資料</p>
         <div class="form-block">
+          <!----- 基本資料 ----->
           <div class="block-content">
             <div class="form-title">
               <p class="form-title-text">個人證件資料</p>
@@ -22,12 +23,15 @@
             <div class="image-preview-block">
               <div v-for="i in 2" :key="i" class="image-preview-container">
                 <div class="image-preview">
-                  <img :src="imageSrcs" />
+                  <img :src="imageSrcs[i - 1]" />
                 </div>
               </div>
             </div>
             <div class="input-wrapper">
-              <label for="name-input" class="input-label">姓名</label>
+              <div>
+                <label for="name-input" class="input-label">姓名</label>
+                <label v-if="v$.name.$error" class="error-message">{{ nameErrorMessage }}</label>
+              </div>
               <div class="input-container">
                 <input
                   type="text"
@@ -35,7 +39,9 @@
                   ref="nameInput"
                   v-model="name"
                   class="input-field"
+                  :class="{'error-border': v$.name.$error}"
                   :readonly="isReadonly"
+                  @blur="v$.name.$touch()"
                 />
                 <button v-if="!hasEdited" @click="enableInput" class="clear-button" type="button">
                   <SvgIcon name="close" class="theme-icon" />
@@ -56,25 +62,35 @@
               </div>
             </div>
           </div>
+          <!----- 聯絡方式 ----->
           <div class="block-content">
             <div class="form-title">
               <p class="form-title-text">聯絡方式</p>
             </div>
+            <!----- 電子信箱 ----->
             <div class="input-wrapper">
-              <label for="name-input" class="input-label">電子信箱</label>
+              <div>
+                <label for="email-input" class="input-label">電子信箱</label>
+                <label v-if="v$.email.$error" class="error-message">{{ emailErrorMessage }}</label>
+              </div>
               <div class="input-container">
                 <input
                   type="text"
                   id="email-input"
-                  ref="emailInput"
-                  :email
+                  v-model="email"
                   class="input-field"
+                  :class="{'error-border': v$.email.$error}"
                   placeholder="輸入電子信箱"
+                  @blur="v$.email.$touch()"
                 />
               </div>
             </div>
+            <!----- 手機號碼 ----->
             <div class="input-wrapper">
-              <label for="name-input" class="input-label">手機號碼</label>
+              <div>
+                <label for="name-input" class="input-label">手機號碼</label>
+                <label v-if="v$.phone.$error" class="error-message">{{ phoneErrorMessage }}</label>
+              </div>
               <div class="input-container phone-input">
                 <Select
                   :selectedOption="selectedOption"
@@ -83,16 +99,18 @@
                   class="phone-select"
                 />
                 <input
-                  type="text"
-                  id="email-input"
-                  ref="emailInput"
-                  :email
+                  type="tel"
+                  id="phone-input"
+                  v-model="phone"
                   class="input-field"
+                  :class="{'error-border': v$.phone.$error}"
                   placeholder="輸入手機號碼"
+                  @blur="v$.phone.$touch()"
                 />
               </div>
             </div>
           </div>
+          <!----- 發票格式 ----->
           <div>
             <div class="form-title">
               <p class="form-title-text">發票格式</p>
@@ -122,107 +140,311 @@
             </div>
             <!-- 二聯式個人發票時顯示 -->
             <div v-if="selectedInvoiceType === 'two-step'">
+              <p v-if="v$.cloudCarrier.$error" class="error-message">{{ cloudCarrierErrorMessage }}</p>
               <div class="input-container">
                 <input
                   type="text"
                   id="cloud-carrier-input"
                   v-model="cloudCarrier"
                   class="input-field"
+                  :class="{'error-border': v$.cloudCarrier.$error}"
                   placeholder="輸入雲端載具(選填)"
+                  @blur="v$.cloudCarrier.$touch()"
                 />
               </div>
             </div>
             <!-- 三聯式個人發票時顯示 -->
             <div v-if="selectedInvoiceType === 'three-step'">
+              <p v-if="v$.companyId.$error" class="error-message">{{ companyIdErrorMessage }}</p>
               <div class="input-container">
                 <input
                   type="text"
                   id="company-id-input"
                   v-model="companyId"
                   class="input-field"
+                  :class="{'error-border': v$.companyId.$error}"
                   placeholder="輸入公司統一編號"
+                  @blur="v$.companyId.$touch()"
                 />
               </div>
               <div class="input-container invoice-co-name">
+                <p v-if="v$.companyName.$error" class="error-message">{{ companyNameErrorMessage }}</p>
                 <input
                   type="text"
                   id="company-name-input"
                   v-model="companyName"
                   class="input-field"
+                  :class="{'error-border': v$.companyName.$error}"
                   placeholder="輸入公司行號抬頭(選填)"
                 />
               </div>
             </div>
           </div>
         </div>
+        <!----- 隱私條款 ----->
         <div class="checkbox-group">
           <label class="checkbox-label">
-            <input type="checkbox" id="accept-terms" class="checkbox-input" />
+            <input
+              type="checkbox"
+              id="accept-terms"
+              class="checkbox-input"
+              v-model="acceptTerms"
+              />
             <span class="checkbox-custom"></span>
             <span class="label-text">我同意CIPAD GUEST平臺之</span>
-            <button type="button" class="link-button" @click="showPrivacyPolicy">隱私權使用條款</button>
+            <button type="button" class="link-button" @click="togglePrivacyPolicy">
+              隱私權使用條款
+            </button>
+            <span v-if="v$.acceptTerms.$error" class="error-message">{{acceptTermsErrorMessage}}</span>
           </label>
         </div>
-        <router-link to="/form" class="no-underline">
-          <Button buttonClass="btn primary-btn" :disabled="isDisabled">送出</Button>
-        </router-link>
+        <Button
+          buttonClass="btn primary-btn"
+          :disabled="isDisabled"
+          @click="handleNextStep"
+        >
+          送出
+        </Button>
       </div>
     </div>
-    <PrivacyPolicy v-if="showContact" @close="hidePrivacyPolicy"/>
+    <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" />
   </main>
+  <ErrorAlert
+    v-if="showError"
+    :title="errorTitle"
+    :content="errorContent"
+    :buttonText="errorButtonText"
+    :subText="errorSubText"
+    :class="errorClass"
+    @buttonClick="handleRetryUpload"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
 import Header from '@/components/Header.vue'
 import Select from '@/components/Select.vue'
 import Button from '@/components/Button.vue'
-import PrivacyPolicy from '@/components/PrivacyPolicy.vue';
+import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
+import ErrorAlert from '@/components/ErrorAlert.vue'
+import { useRouter } from 'vue-router';
+import { useVuelidate } from '@vuelidate/core'
+import { required, email as emailValidator, minLength, maxLength } from '@vuelidate/validators'
 
-const isReadonly = ref<boolean>(true)
-const hasEdited = ref<boolean>(false)
+const router = useRouter();
+
+// 表單動作
+const isDisabled = ref<boolean>(true)
+const showError = ref<boolean>(false)
+const selectedInvoiceType = ref<'two-step' | 'three-step'>('two-step')
+
+// 表單資料
+const imageSrcs = ref<string[]>(['', '']);
 const name = ref<string>('陳筱玲')
 const email = ref<string>('')
-const nameInput = ref<HTMLInputElement | null>(null)
-const emailInput = ref<HTMLInputElement | null>(null)
-const imageSrcs = ref<string>('')
-const isDisabled = ref<boolean>(true)
-const showContact = ref<boolean>(false)
-const selectedInvoiceType = ref<'two-step' | 'three-step'>('two-step')
+const phone = ref<string>('')
 const cloudCarrier = ref<string>('')
 const companyId = ref<string>('')
 const companyName = ref<string>('')
+const acceptTerms = ref(false);
 
-const showPrivacyPolicy = () => {
-  showContact.value = true
-}
-
-const hidePrivacyPolicy = () => {
-  showContact.value = false
-}
-
+// 姓名欄位可編輯
+const nameInput = ref<HTMLInputElement | null>(null)
+const isReadonly = ref<boolean>(true)
+const hasEdited = ref<boolean>(false)
 const enableInput = () => {
   isReadonly.value = false
   name.value = ''
   hasEdited.value = true
   nameInput.value?.focus()
 }
+
+// 手機國碼下拉清單
 interface Option {
   name: string
   label: string
 }
 const selectedOption = ref<Option>({
-  name: 'tw',
+  name: 'Taiwan',
   label: '+886'
 })
 const options = ref<Option[]>([
-  { name: 'tw', label: '+886' },
-  { name: 'ch', label: '+887' }
+  { name: 'Taiwan', label: '+886' },
+  { name: 'Tainan', label: '+887' }
 ])
 
 const updateSelectedOption = (option: Option) => {
   selectedOption.value = option
 }
+
+// 顯示/關閉 隱私條款
+const showContact = ref<boolean>(false)
+const togglePrivacyPolicy = () => {
+  showContact.value = !showContact.value
+}
+
+// 驗證規則
+const rules = {
+  name: { required },
+  email: {
+    required,
+    email: emailValidator
+  },
+  phone: {
+    required,
+    minLength: minLength(10),
+    maxLength: maxLength(10),
+    numeric: (value: string) => /^\d+$/.test(value)
+  },
+  cloudCarrier: {},
+  companyId: {
+    required: (value: string) => selectedInvoiceType.value === 'three-step' ? !!value : true,
+    minLength: minLength(8)
+  },
+  companyName: {},
+  acceptTerms: { required },
+}
+
+const v$ = useVuelidate(rules, {
+    name,
+    email,
+    phone,
+    cloudCarrier,
+    companyId,
+    companyName,
+    acceptTerms
+  });
+
+watch(
+  () => v$.value.$invalid,
+  (isInvalid) => {
+    isDisabled.value = isInvalid;
+  }
+);
+
+const nameErrorMessage = computed(() => {
+  if (!v$.value.name.required.$response) return '*必填';
+
+  return '';
+});
+
+const emailErrorMessage = computed(() => {
+  if (!v$.value.email.required.$response) return '*必填';
+  if (!v$.value.email.email.$response) return '請輸入有效的電子信箱';
+
+  return ''
+})
+
+const phoneErrorMessage = computed(() => {
+  if (!v$.value.phone.required.$response) return '*必填';
+  if (!v$.value.phone.numeric.$response) return '手機號碼只能包含數字';
+  if (!v$.value.phone.minLength.$response ||
+      !v$.value.phone.maxLength.$response)
+      return '手機號碼必須為10位數字';
+
+  return '';
+});
+
+const cloudCarrierErrorMessage = computed(() => {
+  return ''
+})
+
+const companyIdErrorMessage = computed(() => {
+  if (!v$.value.companyId.required.$response) return '*必填';
+  if (!v$.value.companyId.minLength.$response) return '公司統一編號至少需要8個字符'
+
+  return ''
+})
+
+const companyNameErrorMessage = computed(() => {
+  return ''
+})
+
+const acceptTermsErrorMessage = computed(() => {
+  if (!v$.value.acceptTerms.required.$response) return '*必填';
+  return ''
+})
+
+const handleNextStep = () => {
+  router.push('/checkin');
+}
+
+// 照片浮水印
+// function addTextToImage(base64Image, text) {
+//     // 創建一個 Image 物件
+//     const img = new Image();
+//     img.src = base64Image;
+
+//     img.onload = function() {
+//         // 創建 canvas
+//         const canvas = document.createElement('canvas');
+//         const ctx = canvas.getContext('2d');
+
+//         // 設定 canvas 大小
+//         canvas.width = img.width;
+//         canvas.height = img.height + 50; // 在圖片下方預留空間加文字
+
+//         // 將圖片繪製到 canvas 上
+//         ctx.drawImage(img, 0, 0);
+
+//         // 設定文字樣式
+//         ctx.font = '20px Arial';
+//         ctx.fillStyle = 'black';
+//         ctx.textAlign = 'center';
+
+//         // 將文字添加到圖片下方
+//         ctx.fillText(text, canvas.width / 2, img.height + 30);
+
+//         // 將 canvas 轉換為 Base64 圖片
+//         const resultBase64Image = canvas.toDataURL('image/png');
+
+//         // 在這裡可以將 resultBase64Image 進行後續處理或顯示
+//         console.log(resultBase64Image);
+//     };
+// }
+
+// 使用範例
+// const base64Image = '你的Base64圖片';
+// const text = 'Pre Check-in 用於限制檢查';
+// addTextToImage(base64Image, text);
+
+// 錯誤訊息
+enum ErrorType {
+  UploadFailed = 0 // 資料上傳失敗
+}
+
+const errorTitle = ref<string>('')
+const errorContent = ref<string>('')
+const errorButtonText = ref<string>('')
+const errorClass = ref<string>('')
+const errorSubText = ref<string>('')
+
+const updateErrorMessages = (type: ErrorType): void => {
+  errorClass.value = ''
+  errorSubText.value = ''
+
+  switch (type) {
+    case ErrorType.UploadFailed:
+      errorTitle.value = '資料上傳失敗'
+      errorContent.value = '請確認網路穩定後<br>重新嘗試'
+      errorButtonText.value = '重新上傳'
+      break
+    default:
+      errorTitle.value = '未知錯誤'
+      errorContent.value = '發生未知錯誤<br>請稍後再試'
+      errorButtonText.value = '關閉'
+      break
+  }
+
+  showError.value = true
+}
+
+const handleRetryUpload = (): void => {
+  showError.value = false;
+}
+
+// api error call method
+// updateErrorMessages(ErrorType.UploadFailed);
 </script>
 
 <style lang="scss" scoped>
@@ -271,7 +493,7 @@ const updateSelectedOption = (option: Option) => {
   }
 
   &-title {
-    @include text-style(400, 20px, var(--On-Surface-Var));
+    @include text-style(400, 32px, var(--On-Surface-Var));
   }
 }
 
@@ -386,6 +608,10 @@ const updateSelectedOption = (option: Option) => {
       background: var(--Surface-Dim);
       color: var(--On-input-sec);
     }
+
+    &.error-border {
+      border: 2px solid var(--Error);
+    }
   }
 }
 
@@ -433,7 +659,6 @@ const updateSelectedOption = (option: Option) => {
   &-group {
     display: flex;
     gap: 20px;
-    font-family: Arial, sans-serif;
     height: 70px;
   }
 
@@ -495,7 +720,7 @@ const updateSelectedOption = (option: Option) => {
     cursor: pointer;
     gap: 8px 4px;
 
-    color: var(--On-input-sec, #E0E0E0);
+    color: var(--On-input-sec);
     font-size: 20px;
     font-weight: 350;
     line-height: 140%;
@@ -528,5 +753,11 @@ const updateSelectedOption = (option: Option) => {
       transform: scale(1);
     }
   }
+}
+
+.error-message {
+  float:right;
+  @include text-style(400, 14px, var(--Error));
+  vertical-align: middle;
 }
 </style>

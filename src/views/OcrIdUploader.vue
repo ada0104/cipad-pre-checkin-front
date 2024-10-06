@@ -32,9 +32,6 @@
       </div>
     </div>
   </main>
-  <Button buttonClass="primary-btn" @click="() => updateErrorMessages(ErrorType.RecognitionFailed)">測試證件阻擋</Button>
-  <Button buttonClass="primary-btn" @click="() => updateErrorMessages(ErrorType.MinorAccessDenied)">測試未成年阻擋</Button>
-  <Button buttonClass="primary-btn" @click="() => updateErrorMessages(ErrorType.UnsupportedFormat)">測試證件格式錯誤</Button>
   <ErrorAlert
     v-if="showError"
     :title="errorTitle"
@@ -42,7 +39,6 @@
     :buttonText="errorButtonText"
     :subText="errorSubText"
     :class="errorClass"
-    @close="handleErrorClose"
     @buttonClick="handleRetryUpload"
   />
 </template>
@@ -166,16 +162,12 @@ function updateErrorMessages(type: ErrorType): void {
   showError.value = true;
 }
 
-const handleErrorClose = (): void => {
-  showError.value = false;
-};
 const handleRetryUpload = (): void => {
   console.log('重試按鈕被點擊');
   showError.value = false;
 };
-const triggerError = (): void => {
-  showError.value = true;
-};
+// api error call method
+// updateErrorMessages(ErrorType.RecognitionFailed);
 </script>
 
 
