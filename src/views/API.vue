@@ -6,7 +6,7 @@ const add = () => {
   counter.increment()
 }
 const search = () => {
-  fetch('/dunqian/pre_checkin/HbNjl').then(async (res) => {
+  fetch('/dunqian/pre_checkin/61Q80K').then(async (res) => {
     const data = await res.json()
     console.log(data)
   })

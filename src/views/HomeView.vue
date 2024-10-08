@@ -7,12 +7,12 @@
       </div>
     </div>
     <div class="card card-1">
-      <p class="card-title m-b-16">雀客快捷 臺中一中</p>
-      <p class="card-sec-title">訂單編號 SCE355</p>
-      <p class="card-text">(2024/07/30 - 2024/08/01)</p>
+      <p class="card-title m-b-16">{{ orderDomain }}</p>
+      <p class="card-sec-title">訂單編號 {{ orderId }}</p>
+      <p class="card-text">({{ orderCheckInDate }} - {{ orderCheckOutDate }})</p>
     </div>
     <div class="card card-2">
-      <p class="card-title">訂購人 - 陳小華</p>
+      <p class="card-title">訂購人 - {{ orderName }}</p>
       <p class="card-title m-b-48">是否為本次入住旅客？</p>
       <div class="btn-group">
         <Button buttonClass="btn secondary-btn">否，不同人</Button>
@@ -25,8 +25,37 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { getData } from '@/api/api';
+import { useOrderStore } from '@/stores/order';
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
+
+const orderId = ref<string>('');
+const orderName = ref<string>('');
+const orderDomain = ref<string>('');
+const orderCheckInDate = ref<string>('');
+const orderCheckOutDate = ref<string>('');
+
+const orderStore = useOrderStore();
+
+const getOrderData = async () => {
+  const data = await getData();
+  orderStore.setOrderData(data);
+
+  orderId.value = data.orderData.order_number;
+  orderName.value = data.orderData.name;
+  orderDomain.value = data.orderData.domain;
+
+  const [orderDetail] = data.orderDetailData.data;
+  orderCheckInDate.value = orderDetail.check_in;
+  orderCheckOutDate.value = orderDetail.check_out;
+};
+
+onMounted(() => {
+  orderStore.clearStore();
+  getOrderData();
+});
 </script>
 
 <style lang="scss" scoped>

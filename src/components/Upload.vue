@@ -76,14 +76,14 @@ const handleImageUpload = async (name: string, side: string, event: any) => {
     }
     imageSrcs.value[name][side] = base64String;
 
-    await uploadToServer(name, side, base64String);
+    await saveToStore(name, side, base64String);
     event.target.value = '';
   } catch (error) {
     console.error('Error during image compression or upload:', error);
   }
 };
 
-const uploadToServer = (name: string, side: string, base64String: string) => {
+const saveToStore = (name: string, side: string, base64String: string) => {
   idImage.setImage64BaseData(name, side, base64String);
 };
 

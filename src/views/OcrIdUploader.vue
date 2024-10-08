@@ -51,7 +51,9 @@ import Select from '@/components/Select.vue';
 import Upload from '@/components/Upload.vue';
 import ErrorAlert from '@/components/ErrorAlert.vue';
 import { useIdImageStore } from '@/stores/idimage';
+import { useOrderStore } from '@/stores/order';
 import { useRouter } from 'vue-router';
+import { getOcrData } from '@/api/api';
 
 interface Option {
   name: string;
@@ -70,15 +72,15 @@ const router = useRouter();
 
 const isDisabled = ref<boolean>(true);
 const selectedOption = ref<Option>({
-  name: 'id-card',
+  name: 'id',
   label: '身分證',
 });
 const options = ref<Option[]>([
-  { name: 'id-card', label: '身分證' },
+  { name: 'id', label: '身分證' },
   { name: 'passport', label: '護照' },
 ]);
 const uploadLabelMap: UploadLabelMap = {
-  'id-card': {
+  'id': {
     front: '身分證正面',
     back: '身分證反面',
   },
@@ -112,6 +114,7 @@ onMounted(() => {
 
 function handleNextStep() {
   if (!isDisabled.value) {
+    getOcrImageData();
     router.push('/form');
   }
 }
@@ -120,7 +123,7 @@ enum ErrorType {
   RecognitionFailed = 0, // 證件辨識失敗
   UnsupportedFormat = 1, // 證件格式錯誤
   MinorAccessDenied = 2, // 未成年阻擋
-  UnknownError = 3       // 未知錯誤
+  UnknownError = 3 // 未知錯誤
 }
 
 const showError = ref<boolean>(false);
@@ -180,8 +183,26 @@ const handleRetryUpload = (): void => {
   console.log('重試按鈕被點擊');
   showError.value = false;
 };
-// api error call method
-// updateErrorMessages(ErrorType.UnsupportedFormat);
+
+// 完成上傳後開始進行OCR辨識
+const getOcrImageData = async () => {
+  // 取得訂單編號
+  const orderStore = useOrderStore();
+  const orderNumber = orderStore.orderData.orderData.order_number;
+  const idImageStore = useIdImageStore();
+  const images = idImageStore.idImages;
+  console.log(orderNumber);
+  console.log(Object.keys(images));
+  console.log(Object.values(images));
+
+  // 取得imageStore資料
+
+  // 將資料整理成api格式
+  // const data = await getOcrData();
+  // console.log(data);
+  // error
+  // updateErrorMessages(ErrorType.UnsupportedFormat);
+};
 </script>
 
 
