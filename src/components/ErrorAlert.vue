@@ -1,15 +1,27 @@
 <template>
   <Teleport to="body">
     <div v-if="show" class="error-alert-overlay">
-      <div :class="['error-alert',errorClass]" v-bind="$attrs">
+      <div :class="['error-alert', errorClass]" v-bind="$attrs">
         <div class="alert-text">
           <p class="alert-title">{{ title }}</p>
-          <p class="alert-content" v-html="content"></p>
+          <div class="alert-content">
+            <div
+              v-for="(line, index) in content"
+              :key="index"
+              :class="line.class"
+            >
+              {{ line.text }}
+              <br v-if="index < content.length - 1">
+            </div>
+          </div>
         </div>
         <div class="alert-footer">
-          <button class="alert-button" @click="handleButtonClick">
-            {{ buttonText }}
-          </button>
+          <div class="btn-group">
+            <slot name="extra-button"></slot>
+            <button class="alert-button" @click="handleButtonClick">
+              {{ buttonText }}
+            </button>
+          </div>
           <div class="alert-subtext" v-if="subText">{{ subText }}</div>
         </div>
       </div>
@@ -20,11 +32,17 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, withDefaults } from 'vue'
 
+interface ContentLine {
+  text: string;
+  class?: string;
+}
+
 interface Props {
   title?: string
-  content: string
+  content: ContentLine[]
   buttonText?: string
   subText?: string
+  extraButton?: boolean
   errorClass?: string
 }
 
@@ -77,6 +95,25 @@ const closeAlert = (): void => {
         background: var(--Prim-Cont);
         color: var(--On-Prim);
       }
+
+      :slotted(button) {
+        margin-left: 10px;
+      }
+    }
+    &.extra {
+      width: 800px;
+
+      .btn-group {
+        height: 82px;
+        display: flex;
+        width: 100%;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+      }
+      .alert-button {
+        width: 307px;
+      }
     }
     width: 592px;
     padding: 48px;
@@ -111,6 +148,17 @@ const closeAlert = (): void => {
       font-weight: 400;
       line-height: 140%;
       letter-spacing: 1.92px;
+
+      .fz-20 {
+        font-size: 20px;
+        font-weight: 350;
+      }
+      .mt-20 {
+        margin-top: 12px;
+      }
+      .fc-p {
+        color: var(--Secondary);
+      }
     }
     .alert-footer {
       display: flex;
@@ -119,6 +167,12 @@ const closeAlert = (): void => {
       flex-direction: column;
       align-items: center;
     }
+
+    .btn-group {
+      display: flex;
+      width: 100%;
+    }
+
     .alert-button {
       width: 100%;
       padding: 24px 48px;
