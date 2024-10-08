@@ -81,9 +81,7 @@ $spacing-small: 16px;
 }
 
 .btn-group {
-  display: flex;
   gap: $spacing-small;
-  justify-content: center;
 }
 
 .no-underline {

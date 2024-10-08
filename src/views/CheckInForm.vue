@@ -199,21 +199,36 @@
           </div>
         </div>
         <!----- 隱私條款 ----->
-        <div class="custom-checkbox"  @blur="v$.acceptTerms.$touch()">
+        <div class="custom-checkbox">
           <input
             type="checkbox"
             id="checkbox"
             class="checkbox-input"
             v-model="acceptTerms"
+            @change="handleCheckboxChange"
           />
-          <label for="checkbox">
-            <SvgIcon v-if="acceptTerms" name="check" class="check-icon" />
+          <label
+            for="checkbox"
+            :class="{ 'error-checkbox': showErrorMessage }"
+            >
+            <SvgIcon
+            v-if="acceptTerms"
+            name="check"
+            class="check-icon"
+            />
           </label>
-          <span class="label-text">我同意CIPAD GUEST平臺之</span>
-          <button type="button" class="link-button" @click="togglePrivacyPolicy">
+          <span
+            class="label-text"
+            :class="{ 'error-label': showErrorMessage }"
+            >我同意CIPAD GUEST平臺之
+          </span>
+          <button type="button"
+            class="link-button"
+            :class="{ 'error-label': showErrorMessage }"
+            @click="togglePrivacyPolicy">
             隱私權使用條款
           </button>
-          <span v-if="v$.acceptTerms.$error" class="error-message">
+          <span v-if="showErrorMessage" class="error-message">
             {{ acceptTermsErrorMessage }}
           </span>
         </div>
@@ -229,10 +244,17 @@
     :title="errorTitle"
     :content="errorContent"
     :buttonText="errorButtonText"
-    :subText="errorSubText"
     :class="errorClass"
     @buttonClick="handleRetryUpload"
-  />
+  >
+    <template #extra-button v-if="showExtraButton" >
+      <div class="no-underline back-edit">
+        <SvgIcon name="back" class="back-icon" />
+        <span>返回編輯</span>
+      </div>
+      <Button buttonClass="btn secondary-btn pass-btn" @click="handleExtraAction">略過不存取</Button>
+    </template>
+  </ErrorAlert>
 </template>
 
 <script setup lang="ts">
@@ -264,6 +286,8 @@ const cloudCarrier = ref<string>('')
 const companyId = ref<string>('')
 const companyName = ref<string>('')
 const acceptTerms = ref(false)
+const hasBeenChecked = ref(false)
+const showErrorMessage = ref(false)
 
 // 證件照浮水印處理
 const idImageArray = computed(() => {
@@ -397,7 +421,6 @@ const rules = {
     required: (value: boolean) => value === true
   }
 }
-
 const v$ = useVuelidate(rules, {
   name,
   email,
@@ -407,27 +430,31 @@ const v$ = useVuelidate(rules, {
   companyName,
   acceptTerms
 })
-
 watch(
   () => v$.value.$invalid,
   (isInvalid) => {
     isDisabled.value = isInvalid
   }
 )
-
+const handleCheckboxChange = () => {
+  if (acceptTerms.value) {
+    hasBeenChecked.value = true
+    showErrorMessage.value = false
+  } else if (hasBeenChecked.value) {
+    showErrorMessage.value = true
+  }
+}
 const nameErrorMessage = computed(() => {
   if (!v$.value.name.required.$response) return '*必填'
 
   return ''
 })
-
 const emailErrorMessage = computed(() => {
   if (!v$.value.email.required.$response) return '*必填'
   if (!v$.value.email.email.$response) return '請輸入有效的電子信箱'
 
   return ''
 })
-
 const phoneErrorMessage = computed(() => {
   if (!v$.value.phone.required.$response) return '*必填'
   if (!v$.value.phone.numeric.$response) return '手機號碼只能包含數字'
@@ -436,55 +463,67 @@ const phoneErrorMessage = computed(() => {
 
   return ''
 })
-
 const cloudCarrierErrorMessage = computed(() => {
   return ''
 })
-
 const companyIdErrorMessage = computed(() => {
   if (!v$.value.companyId.required.$response) return '*必填'
   if (!v$.value.companyId.minLength.$response) return '至少需要8個字符'
 
   return ''
 })
-
 const companyNameErrorMessage = computed(() => {
   return ''
 })
-
 const acceptTermsErrorMessage = computed(() => {
   if (!v$.value.acceptTerms.required.$response) return '*必填'
   return ''
 })
-
 const handleNextStep = () => {
   router.push('/checkin')
 }
 
 // 錯誤訊息
 enum ErrorType {
-  UploadFailed = 0 // 資料上傳失敗
+  UploadFailed = 0, // 資料上傳失敗
+  SaveDataNotification = 1 // 資料儲存
 }
 
 const errorTitle = ref<string>('')
-const errorContent = ref<string>('')
+const errorContent = ref<Array<{ text: string; class?: string }>>([])
 const errorButtonText = ref<string>('')
 const errorClass = ref<string>('')
-const errorSubText = ref<string>('')
+const showExtraButton = ref<boolean>(false)
 
 const updateErrorMessages = (type: ErrorType): void => {
   errorClass.value = ''
-  errorSubText.value = ''
 
   switch (type) {
     case ErrorType.UploadFailed:
       errorTitle.value = '資料上傳失敗'
-      errorContent.value = '請確認網路穩定後<br>重新嘗試'
+      errorContent.value = [
+        { text: '請確認網路穩定後'},
+        { text: '重新嘗試', class: 'mt-20' },
+      ]
       errorButtonText.value = '重新上傳'
+      break
+    case ErrorType.SaveDataNotification:
+      errorTitle.value = '存取預設資料'
+      errorContent.value = [
+        { text: '是否將本次資料設為陳筱玲的預設？'},
+        { text: '(abcd12340000@gmail.com)', class: 'fz-20 mt-20' },
+        { text: '未來使用此信箱訂房，即可自動帶入登記資料！', class: 'fz-20 fc-p mt-20' },
+      ]
+      showExtraButton.value = true;
+      errorButtonText.value = '存為預設'
+      errorClass.value = 'purple extra';
       break
     default:
       errorTitle.value = '未知錯誤'
-      errorContent.value = '發生未知錯誤<br>請稍後再試'
+      errorContent.value = [
+        { text: '發生未知錯誤'},
+        { text: '請稍後再試' },
+      ]
       errorButtonText.value = '關閉'
       break
   }
@@ -495,6 +534,11 @@ const updateErrorMessages = (type: ErrorType): void => {
 const handleRetryUpload = (): void => {
   showError.value = false
 }
+
+const handleExtraAction = () => {
+  // 處理額外按鈕點擊
+  console.log('額外按鈕被點擊');
+};
 
 // api error call method
 // updateErrorMessages(ErrorType.UploadFailed);
@@ -617,6 +661,24 @@ const handleRetryUpload = (): void => {
 
 .btn {
   width: 100%;
+}
+
+.back-edit {
+  display: flex;
+  gap: 6px;
+  color: var(--On-Surface-Var);
+  align-items: center;
+  font-size: 20px;
+  font-weight: 350;
+  line-height: 140%;
+}
+
+.pass-btn {
+  border-radius: 16px;
+  background: var(--Sec-Cont);
+  width: 224px;
+  font-size: 24px;
+  letter-spacing: 1px;
 }
 
 .block-content {
@@ -796,6 +858,12 @@ const handleRetryUpload = (): void => {
     display: none;
   }
 
+  .error-message {
+    margin-top: auto;
+    margin-bottom: 8px;
+    margin-left: auto;
+  }
+
   label {
     display: flex;
     align-items: center;
@@ -807,6 +875,11 @@ const handleRetryUpload = (): void => {
     cursor: pointer;
     margin-right: 8px;
 
+    &.error-checkbox {
+      border: 1px solid var(--Error);
+      background: #ffcec6;
+    }
+
     .check-icon {
       color: var(--On-Prim);
     }
@@ -814,6 +887,10 @@ const handleRetryUpload = (): void => {
   .label-text {
     @include text-style(350, 20px, var(--On-input-sec));
     margin-right: 4px;
+
+  }
+  .error-label {
+    color: var(--Error);
   }
 
   input:checked + label {

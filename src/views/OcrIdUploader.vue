@@ -125,7 +125,7 @@ enum ErrorType {
 
 const showError = ref<boolean>(false);
 const errorTitle = ref<string>('');
-const errorContent = ref<string>('');
+const errorContent = ref<Array<{ text: string; class?: string }>>([])
 const errorButtonText = ref<string>('');
 const errorClass = ref<string>('');
 const errorSubText = ref<string>('');
@@ -137,24 +137,38 @@ function updateErrorMessages(type: ErrorType): void {
   switch (type) {
     case ErrorType.RecognitionFailed:
       errorTitle.value = '證件辨識失敗';
-      errorContent.value = '證件圖片無法辨識<br>請重新選擇';
+      errorContent.value = [
+        { text: '證件圖片無法辨識'},
+        { text: '請重新選擇' },
+      ];
       errorButtonText.value = '重新上傳';
       break;
     case ErrorType.MinorAccessDenied:
       errorTitle.value = '未成年阻擋';
-      errorContent.value = '辨識您為未滿18歲身分，<br>無法使用線上登記，<br>請協同監護人於旅店櫃檯辦理入住。';
+      errorContent.value = [
+        { text: '辨識您為未滿18歲身分，'},
+        { text: '無法使用線上登記，' },
+        { text: '請協同監護人於旅店櫃檯辦理入住。' },
+      ];
       errorButtonText.value = '我瞭解了';
       errorSubText.value = '我已成年，重新嘗試';
       errorClass.value = 'purple';
       break;
     case ErrorType.UnsupportedFormat:
       errorTitle.value = '證件格式錯誤';
-      errorContent.value = '{身分證反面}<br>圖片格式不符<br>請重新上傳';
+      errorContent.value = [
+        { text: '{身分證反面}'},
+        { text: '圖片格式不符' },
+        { text: '請重新上傳' },
+      ];
       errorButtonText.value = '重新上傳';
       break;
     default:
       errorTitle.value = '未知錯誤';
-      errorContent.value = '發生未知錯誤<br>請稍後再試';
+      errorContent.value = [
+        { text: '發生未知錯誤'},
+        { text: '請稍後再試' },
+      ];
       errorButtonText.value = '關閉';
       break;
   }
@@ -167,7 +181,7 @@ const handleRetryUpload = (): void => {
   showError.value = false;
 };
 // api error call method
-// updateErrorMessages(ErrorType.RecognitionFailed);
+// updateErrorMessages(ErrorType.UnsupportedFormat);
 </script>
 
 
