@@ -26,6 +26,7 @@ const fetchApi = async <T>(url: string, options: RequestOptions = {}): Promise<T
   }
 };
 
+// 取得訂單基本資料
 interface OrderDataResponse {
   order_number: string;
   name: string;
@@ -33,6 +34,17 @@ interface OrderDataResponse {
   domain: string;
 }
 
+const fetchOrderData = async (): Promise<OrderDataResponse> => {
+  try {
+    const data = await fetchApi<OrderDataResponse>('/dunqian/pre_checkin/CsUOj');
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch order data:", error);
+    throw error;
+  }
+};
+
+// 取得訂單詳細資料
 interface OrderDetailDataResponse {
   code: string;
   message: string;
@@ -49,6 +61,36 @@ interface OrderDetailDataResponse {
   }>;
 }
 
+const fetchOrderDetailData = async (
+  pms: string,
+  domain: string,
+  order_number: string,
+): Promise<OrderDetailDataResponse> => {
+  try {
+    const params = new URLSearchParams({
+      pms,
+      domain,
+      order_number
+    });
+    console.log(params.toString());
+    const data = await fetchApi<OrderDetailDataResponse>(
+      `/dunqian/pms/get_order_data?${params.toString()}`
+    );
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch order detail data:", error);
+    throw error;
+  }
+};
+
+// 傳送ＯＣＲ辨識
+type OcrDataRequest = {
+  order_number: string;
+  image_type: string;
+  image1: string;
+  image2?: string;
+};
+
 interface OcrDataResponse {
   code: string;
   message: string;
@@ -59,61 +101,28 @@ interface OcrDataResponse {
   }>;
 }
 
-const fetchOrderData = async (): Promise<OrderDataResponse> => {
+const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResponse> => {
   try {
-    const data = await fetchApi<OrderDataResponse>('/dunqian/pre_checkin/DsMEA');
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch order data:", error);
-    throw error;
-  }
-};
-
-const fetchOrderDetailData = async (
-  pms: string,
-  domain: string,
-  order_number: string,
-): Promise<OrderDetailDataResponse> => {
-  try {
-    const data = await fetchApi<OrderDetailDataResponse>(
-      `/dunqian/pms/get_order_data?pms=${pms}&domain=${domain}&order_number=${order_number}`
+    const postResponse = await fetchApi<OcrDataResponse>(
+      '/dunqian/pre_checkin/upload_image',
+      {
+        method: 'POST',
+        body: ocrRequestData,
+      }
     );
-    return data;
+    return postResponse;
   } catch (error) {
-    console.error("Failed to fetch order detail data:", error);
+    console.error("Failed to fetch OCR data:", error);
     throw error;
   }
 };
-
-// const fetchOcrData = async (
-//   orderId: string,
-//   image_type:string,
-//   image1:string,
-//   image2?:string
-// ): Promise<OcrDataResponse> => {
-//   try {
-//     const postResponse = await fetchApi<OcrDataResponse>('/dunqian/pre_checkin/upload_image', {
-//       method: 'POST',
-//       body: {
-//         orderId,
-//         image_type,
-//         image1,
-//         image2,
-//       }
-//     });
-
-//     return postResponse;
-//   } catch (error) {
-//     console.error("Failed to fetch another data:", error);
-//     throw error;
-//   }
-// };
 
 const getData = async () => {
   try {
     const orderData = await fetchOrderData();
     const { pms, domain, order_number } = orderData;
     const orderDetailData = await fetchOrderDetailData(pms, domain, order_number);
+    console.log("orderDetailData:", orderDetailData);
 
     return { orderData, orderDetailData };
   } catch (error) {
@@ -122,24 +131,17 @@ const getData = async () => {
   }
 };
 
-// const getOcrData = async (
-//   image_type:string,
-//   image1:string,
-//   image2?:string
-// ) => {
-//   try {
-//     const orderData = await fetchOrderData();
-//     const { order_number } = orderData;
-//     const ocrData = await fetchOcrData(order_number , image_type, image1, image2);
-
-//     return { ocrData };
-//   } catch (error) {
-//     console.error("Error in getData:", error);
-//     throw error;
-//   }
-// }
+const getOcrData = async ({ order_number, image_type, image1, image2 }: OcrDataRequest) => {
+  try {
+    const ocrData = await fetchOcrData({ order_number, image_type, image1, image2 });
+    return { ocrData };
+  } catch (error) {
+    console.error("Error in getData:", error);
+    throw error;
+  }
+};
 
 export {
   getData,
-  // getOcrData,
+  getOcrData,
 };

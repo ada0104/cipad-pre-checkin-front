@@ -35,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
   font-weight: 400;
   line-height: 140%;
   letter-spacing: 1.92px;
+  cursor: pointer;
 
   &.btn-disabled {
     background: var(--Surface-Dim);

@@ -189,19 +189,41 @@ const getOcrImageData = async () => {
   // 取得訂單編號
   const orderStore = useOrderStore();
   const orderNumber = orderStore.orderData.orderData.order_number;
-  const idImageStore = useIdImageStore();
-  const images = idImageStore.idImages;
-  console.log(orderNumber);
-  console.log(Object.keys(images));
-  console.log(Object.values(images));
 
   // 取得imageStore資料
+  const idImageStore = useIdImageStore();
+  const images = idImageStore.idImages;
 
   // 將資料整理成api格式
-  // const data = await getOcrData();
-  // console.log(data);
-  // error
-  // updateErrorMessages(ErrorType.UnsupportedFormat);
+  const imageType = Object.keys(images)[0];
+  const { front, back } = Object.values(images)[0]; // 取得第一個（也是唯一的）image對象
+
+  type OcrDataRequest = {
+    order_number: string;
+    image_type: string;
+    image1: string;
+    image2?: string;
+  };
+
+  const ocrRequestData: OcrDataRequest = {
+    order_number: orderNumber,
+    image_type: imageType,
+    image1: front,
+    ...(back && { image2: back })
+  };
+
+  // 輸出日誌
+  console.log('order_number:', orderNumber);
+  console.log('image_type:', imageType);
+  console.log('formatted images:', ocrRequestData);
+
+  try {
+    const { ocrData } = await getOcrData(ocrRequestData);
+    console.log('OCR Data:', ocrData);
+  } catch (error) {
+    // updateErrorMessages(ErrorType.UnsupportedFormat);
+    console.error('Error getting OCR data:', error);
+  }
 };
 </script>
 
