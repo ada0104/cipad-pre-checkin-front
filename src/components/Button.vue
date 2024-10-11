@@ -1,13 +1,8 @@
 <template>
-  <button
-    :class="[buttonClass, { 'btn-disabled': disabled }]"
-    :disabled="disabled"
-    type="button"
-  >
+  <button :class="[buttonClass, { 'btn-disabled': disabled }]" :disabled="disabled" type="button">
     <slot></slot>
   </button>
 </template>
-
 <script setup lang="ts">
 import { defineProps } from 'vue'
 
@@ -18,11 +13,9 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   buttonClass: 'btn',
-  disabled: false,
-});
-
+  disabled: false
+})
 </script>
-
 <style scoped lang="scss">
 .btn {
   display: flex;

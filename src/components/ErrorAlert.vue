@@ -5,13 +5,9 @@
         <div class="alert-text">
           <p class="alert-title">{{ title }}</p>
           <div class="alert-content">
-            <div
-              v-for="(line, index) in content"
-              :key="index"
-              :class="line.class"
-            >
+            <div v-for="(line, index) in content" :key="index" :class="line.class">
               {{ line.text }}
-              <br v-if="index < content.length - 1">
+              <br v-if="index < content.length - 1" />
             </div>
           </div>
         </div>
@@ -28,13 +24,12 @@
     </div>
   </Teleport>
 </template>
-
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, withDefaults } from 'vue'
 
 interface ContentLine {
-  text: string;
-  class?: string;
+  text: string
+  class?: string
 }
 
 interface Props {
@@ -70,7 +65,6 @@ const closeAlert = (): void => {
   emit('close')
 }
 </script>
-
 <style lang="scss" scoped>
 .error-alert-overlay {
   position: fixed;

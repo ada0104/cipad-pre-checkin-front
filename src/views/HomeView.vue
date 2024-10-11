@@ -22,42 +22,50 @@
       </div>
     </div>
   </main>
+  <p v-if="isLoading">Loading...</p>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getData } from '@/api/api';
-import { useOrderStore } from '@/stores/order';
+import { getData } from '@/api/api'
+import { useOrderStore } from '@/stores/order'
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
 
-const orderId = ref<string>('');
-const orderName = ref<string>('');
-const orderDomain = ref<string>('');
-const orderCheckInDate = ref<string>('');
-const orderCheckOutDate = ref<string>('');
+const orderId = ref<string>('')
+const orderName = ref<string>('')
+const orderDomain = ref<string>('')
+const orderCheckInDate = ref<string>('')
+const orderCheckOutDate = ref<string>('')
+const isLoading = ref<boolean>(false)
 
-const orderStore = useOrderStore();
+const orderStore = useOrderStore()
 
 const getOrderData = async () => {
-  const data = await getData();
-  orderStore.setOrderData(data);
+  isLoading.value = true
 
-  orderId.value = data.orderData.order_number;
-  orderName.value = data.orderData.name;
-  orderDomain.value = data.orderData.domain;
+  try {
+    const data = await getData()
+    orderStore.setOrderData(data)
 
-  const [orderDetail] = data.orderDetailData.data;
-  orderCheckInDate.value = orderDetail.check_in;
-  orderCheckOutDate.value = orderDetail.check_out;
-};
+    orderId.value = data.orderData.order_number
+    orderName.value = data.orderData.name
+    orderDomain.value = data.orderData.domain
 
-onMounted(() => {
-  orderStore.clearStore();
-  getOrderData();
-});
+    const [orderDetail] = data.orderDetailData.data
+    orderCheckInDate.value = orderDetail.check_in
+    orderCheckOutDate.value = orderDetail.check_out
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(async () => {
+  orderStore.clearStore()
+  await getOrderData()
+})
 </script>
-
 <style lang="scss" scoped>
 @mixin card-base {
   width: 612px;

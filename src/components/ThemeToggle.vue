@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import $ from 'jquery';
 
 const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)')
 const localTheme = localStorage.getItem('theme')
@@ -13,10 +14,10 @@ const isDarkTheme = ref(localTheme === 'dark' || (localTheme === null && prefers
 
 const setTheme = (isDark: boolean) => {
   if (isDark) {
-    document.documentElement.setAttribute('data-theme', 'dark')
+    $('html').attr('data-theme', 'dark');
     localStorage.setItem('theme', 'dark')
   } else {
-    document.documentElement.setAttribute('data-theme', 'light')
+    $('html').attr('data-theme', 'light');
     localStorage.setItem('theme', 'light')
   }
 }

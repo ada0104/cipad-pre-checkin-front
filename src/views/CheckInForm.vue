@@ -293,9 +293,11 @@ const showErrorMessage = ref(false)
 const idImageArray = computed(() => {
   return idImage.idImages[Object.keys(idImage.idImages)[0]]
 })
+
 type CanvasRefs = {
   [key: string]: HTMLCanvasElement | null
 }
+
 const canvasRefs = ref<CanvasRefs>({})
 const addWatermark = (canvas: HTMLCanvasElement, imageUrl: string) => {
   const ctx = canvas.getContext('2d')
@@ -333,8 +335,8 @@ const addWatermark = (canvas: HTMLCanvasElement, imageUrl: string) => {
     // 計算浮水印間距和位置
     const textWidth = ctx.measureText(watermarkText).width
     const textHeight = 0.3
-    const xOffset = 15 // x 軸間距
-    const yOffset = 25 // y 軸間距
+    const xOffset = 15
+    const yOffset = 25
 
     // 使用雙重循環來繪製浮水印
     for (let y = -canvas.height; y < canvas.height * 2; y += textHeight + yOffset) {
@@ -343,7 +345,6 @@ const addWatermark = (canvas: HTMLCanvasElement, imageUrl: string) => {
         ctx.fillText(watermarkText, x + offsetX, y)
       }
     }
-
     // 恢復畫布到初始狀態
     ctx.restore()
   }
@@ -361,6 +362,7 @@ const applyWatermarks = () => {
     })
   })
 }
+
 onMounted(applyWatermarks)
 watch([idImageArray, canvasRefs], applyWatermarks)
 
@@ -421,6 +423,7 @@ const rules = {
     required: (value: boolean) => value === true
   }
 }
+
 const v$ = useVuelidate(rules, {
   name,
   email,
@@ -430,12 +433,14 @@ const v$ = useVuelidate(rules, {
   companyName,
   acceptTerms
 })
+
 watch(
   () => v$.value.$invalid,
   (isInvalid) => {
     isDisabled.value = isInvalid
   }
 )
+
 const handleCheckboxChange = () => {
   if (acceptTerms.value) {
     hasBeenChecked.value = true
@@ -444,17 +449,20 @@ const handleCheckboxChange = () => {
     showErrorMessage.value = true
   }
 }
+
 const nameErrorMessage = computed(() => {
   if (!v$.value.name.required.$response) return '*必填'
 
   return ''
 })
+
 const emailErrorMessage = computed(() => {
   if (!v$.value.email.required.$response) return '*必填'
   if (!v$.value.email.email.$response) return '請輸入有效的電子信箱'
 
   return ''
 })
+
 const phoneErrorMessage = computed(() => {
   if (!v$.value.phone.required.$response) return '*必填'
   if (!v$.value.phone.numeric.$response) return '手機號碼只能包含數字'
@@ -463,20 +471,25 @@ const phoneErrorMessage = computed(() => {
 
   return ''
 })
+
 const cloudCarrierErrorMessage = computed(() => {
   return ''
 })
+
 const companyIdErrorMessage = computed(() => {
   if (!v$.value.companyId.required.$response) return '*必填'
   if (!v$.value.companyId.minLength.$response) return '至少需要8個字符'
 
   return ''
 })
+
 const companyNameErrorMessage = computed(() => {
   return ''
 })
+
 const acceptTermsErrorMessage = computed(() => {
   if (!v$.value.acceptTerms.required.$response) return '*必填'
+
   return ''
 })
 const handleNextStep = () => {
@@ -543,7 +556,6 @@ const handleExtraAction = () => {
 // api error call method
 // updateErrorMessages(ErrorType.UploadFailed);
 </script>
-
 <style lang="scss" scoped>
 @mixin flex-center {
   display: flex;

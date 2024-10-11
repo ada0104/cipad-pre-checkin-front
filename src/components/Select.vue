@@ -17,9 +17,9 @@
     </ul>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from 'vue'
+import $ from 'jquery';
 
 const props = defineProps<{
   selectedOption: { name: string; label: string }
@@ -49,14 +49,13 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  $(document).on('click', handleClickOutside);
 })
 
 onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
+  $(document).off('click', handleClickOutside);
 })
 </script>
-
 <style lang="scss" scoped>
 .form-dropdown {
   position: relative;
@@ -126,5 +125,4 @@ onBeforeUnmount(() => {
     }
   }
 }
-
 </style>

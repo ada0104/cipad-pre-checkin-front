@@ -44,14 +44,10 @@
     <Button buttonClass="btn primary-btn" @click="$emit('close')">關閉</Button>
   </div>
 </template>
-
 <script setup lang="ts">
-import Header from '@/components/Header.vue';
-import Button from '@/components/Button.vue';
+import Button from '@/components/Button.vue'
 </script>
-
 <style lang="scss" scoped>
-
 @mixin flex-center {
   display: flex;
   justify-content: center;
@@ -89,5 +85,4 @@ import Button from '@/components/Button.vue';
   word-wrap: break-word;
   line-height: 1.6;
 }
-
 </style>

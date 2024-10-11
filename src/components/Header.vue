@@ -13,11 +13,9 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import ThemeToggle from '@/components/ThemeToggle.vue'
 </script>
-
 <style scoped lang="scss">
 .header {
   display: flex;
