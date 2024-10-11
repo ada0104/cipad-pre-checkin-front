@@ -36,7 +36,7 @@ interface OrderDataResponse {
 
 const fetchOrderData = async (): Promise<OrderDataResponse> => {
   try {
-    const data = await fetchApi<OrderDataResponse>('/dunqian/pre_checkin/CsUOj');
+    const data = await fetchApi<OrderDataResponse>('/dunqian/pre_checkin/ogymE');
     return data;
   } catch (error) {
     console.error("Failed to fetch order data:", error);
@@ -103,14 +103,21 @@ interface OcrDataResponse {
 
 const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResponse> => {
   try {
-    const postResponse = await fetchApi<OcrDataResponse>(
+    const formData = new FormData();
+    formData.set('order_number', ocrRequestData.order_number);
+    formData.set('image_type', ocrRequestData.image_type);
+    formData.set('image1', ocrRequestData.image1);
+    if(ocrRequestData.image2) {
+      formData.set('image2', ocrRequestData.image2);
+    }
+    const postResponse = await fetch(
       '/dunqian/pre_checkin/upload_image',
       {
         method: 'POST',
-        body: ocrRequestData,
+        body: formData,
       }
     );
-    return postResponse;
+    return await postResponse.json()
   } catch (error) {
     console.error("Failed to fetch OCR data:", error);
     throw error;
