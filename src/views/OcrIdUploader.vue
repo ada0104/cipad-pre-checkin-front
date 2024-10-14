@@ -46,7 +46,7 @@ import ErrorAlert from '@/components/ErrorAlert.vue'
 import { useIdImageStore } from '@/stores/idimage'
 import { useOrderStore } from '@/stores/order'
 import { useRouter } from 'vue-router'
-import { getOcrData } from '@/api/api'
+import { getOcrData, type OcrDataResponse } from '@/api/api'
 
 interface Option {
   name: string
@@ -63,7 +63,7 @@ interface UploadLabelMap {
 const idImage = useIdImageStore()
 const router = useRouter()
 
-const uploadRef = ref(null)
+const uploadRef = ref<any>(null)
 const isLoading = ref<boolean>(false)
 const isDisabled = ref<boolean>(true)
 
@@ -229,6 +229,13 @@ const getOcrImageData = async () => {
     }
 
     if (ocrData.code === '0') {
+      const response: OcrDataResponse = {
+        code: ocrData.code,
+        message: ocrData.message,
+        data: ocrData.data
+      };
+
+      idImage.setIdOcrResult(response);
       router.push('/form')
     }
   } catch (error) {

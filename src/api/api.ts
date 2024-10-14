@@ -94,14 +94,14 @@ type OcrDataRequest = {
   image2?: string;
 };
 
-interface OcrDataResponse {
+export interface OcrDataResponse {
   code: string;
   message: string;
-  data: Array<{
+  data: {
     name: string;
     age: string;
     birthday: string;
-  }>;
+  };
 }
 
 const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResponse> => {
@@ -132,18 +132,18 @@ const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResp
 };
 
 // 新增會員資料
-type NewMemberDataRequest = {
-  source: string;
-  country_codes: string;
+export type NewMemberDataRequest = {
+  source: string; // 來源，從哪個PMS來的
+  country_codes: string; // 手機國碼
   phone: string;
   name: string;
   email: string;
   birthday: string;
-  barcode: string;
-  compiled: string;
-  company: string;
   order_number: string;
-  is_default: boolean;
+  is_default: boolean; // 是否為預設資料
+  compiled?: string; // 公司統編
+  company?: string; // 公司抬頭
+  barcode?: string; // 手機載具
 };
 
 interface NewMemberDataResponse {
@@ -151,13 +151,36 @@ interface NewMemberDataResponse {
   message: string;
 }
 
-const fetchMemberData = async (NewMemberDataRequest: NewMemberDataRequest): Promise<NewMemberDataResponse> => {
+const fetchMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promise<NewMemberDataResponse> => {
+  const formData = new FormData();
+  formData.set('source', newMemberDataRequest.source);
+  formData.set('country_codes', newMemberDataRequest.country_codes);
+  formData.set('phone', newMemberDataRequest.phone);
+  formData.set('name', newMemberDataRequest.name);
+  formData.set('email', newMemberDataRequest.email);
+  formData.set('birthday', newMemberDataRequest.birthday);
+  formData.set('order_number', newMemberDataRequest.order_number);
+
+  if (newMemberDataRequest.barcode) {
+    formData.set('barcode', newMemberDataRequest.barcode);
+  }
+
+  if (newMemberDataRequest.compiled) {
+    formData.set('compiled', newMemberDataRequest.compiled);
+  }
+
+  if (newMemberDataRequest.company) {
+    formData.set('company', newMemberDataRequest.company);
+  }
+
+  formData.set('is_default', String(newMemberDataRequest.is_default));
+
   try {
     const postResponse = await fetch(
-      '/dunqian/pre_checkin/upload_image',
+      '/dunqian/pre_checkin/add_member_data',
       {
         method: 'POST',
-        body: JSON.stringify(NewMemberDataRequest),
+        body: formData,
       }
     );
 
@@ -252,4 +275,5 @@ export {
   getOcrData,
   setMemberData,
   getQRcodeData,
+  fetchMemberData
 };

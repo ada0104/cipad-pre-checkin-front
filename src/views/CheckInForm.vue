@@ -41,18 +41,20 @@
             <div class="input-wrapper">
               <div>
                 <label for="name-input" class="input-label">姓名</label>
-                <label v-if="v$.name.$error" class="error-message">{{ nameErrorMessage }}</label>
+                <label v-if="v$.userName.$error" class="error-message">{{
+                  userNameErrorMessage
+                }}</label>
               </div>
               <div class="input-container">
                 <input
                   type="text"
                   id="name-input"
-                  ref="nameInput"
-                  v-model="name"
+                  ref="userNameInput"
+                  v-model="userName"
                   class="input-field"
-                  :class="{ 'error-border': v$.name.$error }"
+                  :class="{ 'error-border': v$.userName.$error }"
                   :readonly="isReadonly"
-                  @blur="v$.name.$touch()"
+                  @blur="v$.userName.$touch()"
                 />
                 <button v-if="!hasEdited" @click="enableInput" class="clear-button" type="button">
                   <SvgIcon name="close" class="clear-icon" />
@@ -66,8 +68,8 @@
                   type="text"
                   id="date-input"
                   ref="dateInput"
+                  v-model="birthday"
                   class="input-field date"
-                  value="1968/06/05"
                   readonly
                 />
               </div>
@@ -207,25 +209,18 @@
             v-model="acceptTerms"
             @change="handleCheckboxChange"
           />
-          <label
-            for="checkbox"
-            :class="{ 'error-checkbox': showErrorMessage }"
-            >
-            <SvgIcon
-            v-if="acceptTerms"
-            name="check"
-            class="check-icon"
-            />
+          <label for="checkbox" :class="{ 'error-checkbox': showErrorMessage }">
+            <SvgIcon v-if="acceptTerms" name="check" class="check-icon" />
           </label>
-          <span
-            class="label-text"
-            :class="{ 'error-label': showErrorMessage }"
+          <span class="label-text" :class="{ 'error-label': showErrorMessage }"
             >我同意CIPAD GUEST平臺之
           </span>
-          <button type="button"
+          <button
+            type="button"
             class="link-button"
             :class="{ 'error-label': showErrorMessage }"
-            @click="togglePrivacyPolicy">
+            @click="togglePrivacyPolicy"
+          >
             隱私權使用條款
           </button>
           <span v-if="showErrorMessage" class="error-message">
@@ -245,46 +240,58 @@
     :content="errorContent"
     :buttonText="errorButtonText"
     :class="errorClass"
-    @buttonClick="handleRetryUpload"
+    @buttonClick="handleRetryUpload(currentErrorType)"
   >
-    <template #extra-button v-if="showExtraButton" >
-      <div class="no-underline back-edit">
+    <template #extra-button v-if="showExtraButton">
+      <div class="no-underline back-edit" @click="handleBackAction">
         <SvgIcon name="back" class="back-icon" />
         <span>返回編輯</span>
       </div>
-      <Button buttonClass="btn secondary-btn pass-btn" @click="handleExtraAction">略過不存取</Button>
+      <Button buttonClass="btn secondary-btn pass-btn" @click="handleExtraAction"
+        >略過不存取</Button
+      >
     </template>
   </ErrorAlert>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, nextTick } from 'vue'
+
 import Header from '@/components/Header.vue'
 import Select from '@/components/Select.vue'
 import Button from '@/components/Button.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
+
 import { useRouter } from 'vue-router'
 import { useVuelidate } from '@vuelidate/core'
-import { useIdImageStore } from '@/stores/idimage'
 import { required, email as emailValidator, minLength, maxLength } from '@vuelidate/validators'
-import SvgIcon from '@/components/SvgIcon.vue'
+import { fetchMemberData, type NewMemberDataRequest } from '@/api/api'
+
+import { useOrderStore } from '@/stores/order'
+import { useIdImageStore } from '@/stores/idimage'
 
 const router = useRouter()
 const idImage = useIdImageStore()
+const orderStore = useOrderStore()
 
 // 表單動作
+const isLoading = ref<boolean>(false)
 const isDisabled = ref<boolean>(true)
 const showError = ref<boolean>(false)
 const selectedInvoiceType = ref<'two-step' | 'three-step'>('two-step')
 
 // 表單資料
-const name = ref<string>('陳筱玲')
+const userName = ref<string>('')
+const birthday = ref<string>('')
 const email = ref<string>('')
 const phone = ref<string>('')
 const cloudCarrier = ref<string>('')
 const companyId = ref<string>('')
 const companyName = ref<string>('')
+const pmsSource = ref<string>('')
+const orderNumber = ref<string>('')
 const acceptTerms = ref(false)
 const hasBeenChecked = ref(false)
 const showErrorMessage = ref(false)
@@ -363,18 +370,34 @@ const applyWatermarks = () => {
   })
 }
 
-onMounted(applyWatermarks)
+
+onMounted(() => {
+  // 若有資料/dunqian/pre_checkin/pms_get_member_data
+  // is_default: true 並且 將對應的資料丟給ref
+  // 如果沒有 帶入 ocr資料
+
+  const orderOriginData = orderStore.orderData.orderData
+  pmsSource.value = orderOriginData.pms
+  orderNumber.value = orderOriginData.order_number
+
+  const ocrResult = idImage.idOcrResult.data
+  userName.value = ocrResult.name
+  birthday.value = ocrResult.birthday
+
+  applyWatermarks()
+})
+
 watch([idImageArray, canvasRefs], applyWatermarks)
 
 // 姓名欄位可編輯
-const nameInput = ref<HTMLInputElement | null>(null)
+const userNameInput = ref<HTMLInputElement | null>(null)
 const isReadonly = ref<boolean>(true)
 const hasEdited = ref<boolean>(false)
 const enableInput = () => {
   isReadonly.value = false
-  name.value = ''
+  userName.value = ''
   hasEdited.value = true
-  nameInput.value?.focus()
+  userNameInput.value?.focus()
 }
 
 // 手機國碼下拉清單
@@ -402,7 +425,7 @@ const togglePrivacyPolicy = () => {
 
 // 驗證規則
 const rules = {
-  name: { required },
+  userName: { required },
   email: {
     required,
     email: emailValidator
@@ -425,7 +448,7 @@ const rules = {
 }
 
 const v$ = useVuelidate(rules, {
-  name,
+  userName,
   email,
   phone,
   cloudCarrier,
@@ -441,6 +464,7 @@ watch(
   }
 )
 
+// 驗證-錯誤訊息
 const handleCheckboxChange = () => {
   if (acceptTerms.value) {
     hasBeenChecked.value = true
@@ -450,8 +474,8 @@ const handleCheckboxChange = () => {
   }
 }
 
-const nameErrorMessage = computed(() => {
-  if (!v$.value.name.required.$response) return '*必填'
+const userNameErrorMessage = computed(() => {
+  if (!v$.value.userName.required.$response) return '*必填'
 
   return ''
 })
@@ -492,11 +516,8 @@ const acceptTermsErrorMessage = computed(() => {
 
   return ''
 })
-const handleNextStep = () => {
-  router.push('/checkin')
-}
 
-// 錯誤訊息
+// API-回傳成功/錯誤訊息
 enum ErrorType {
   UploadFailed = 0, // 資料上傳失敗
   SaveDataNotification = 1 // 資料儲存
@@ -507,36 +528,32 @@ const errorContent = ref<Array<{ text: string; class?: string }>>([])
 const errorButtonText = ref<string>('')
 const errorClass = ref<string>('')
 const showExtraButton = ref<boolean>(false)
+const currentErrorType = ref<ErrorType | null>(null)
 
 const updateErrorMessages = (type: ErrorType): void => {
   errorClass.value = ''
+  currentErrorType.value = type
 
   switch (type) {
     case ErrorType.UploadFailed:
       errorTitle.value = '資料上傳失敗'
-      errorContent.value = [
-        { text: '請確認網路穩定後'},
-        { text: '重新嘗試', class: 'mt-20' },
-      ]
+      errorContent.value = [{ text: '請確認網路穩定後' }, { text: '重新嘗試', class: 'mt-20' }]
       errorButtonText.value = '重新上傳'
       break
     case ErrorType.SaveDataNotification:
       errorTitle.value = '存取預設資料'
       errorContent.value = [
-        { text: '是否將本次資料設為陳筱玲的預設？'},
-        { text: '(abcd12340000@gmail.com)', class: 'fz-20 mt-20' },
-        { text: '未來使用此信箱訂房，即可自動帶入登記資料！', class: 'fz-20 fc-p mt-20' },
+        { text: `是否將本次資料設為${userName.value}的預設？`  },
+        { text: `${email.value}`, class: 'fz-20 mt-20' },
+        { text: '未來使用此信箱訂房，即可自動帶入登記資料！', class: 'fz-20 fc-p mt-20' }
       ]
-      showExtraButton.value = true;
+      showExtraButton.value = true
       errorButtonText.value = '存為預設'
-      errorClass.value = 'purple extra';
+      errorClass.value = 'purple extra'
       break
     default:
       errorTitle.value = '未知錯誤'
-      errorContent.value = [
-        { text: '發生未知錯誤'},
-        { text: '請稍後再試' },
-      ]
+      errorContent.value = [{ text: '發生未知錯誤' }, { text: '請稍後再試' }]
       errorButtonText.value = '關閉'
       break
   }
@@ -544,17 +561,55 @@ const updateErrorMessages = (type: ErrorType): void => {
   showError.value = true
 }
 
-const handleRetryUpload = (): void => {
-  showError.value = false
+const handleNextStep = () => {
+  submitFormData()
+}
+
+const handleRetryUpload = (errorType: ErrorType | null) => {
+  if (errorType === ErrorType.UploadFailed || errorType === ErrorType.SaveDataNotification) {
+    saveFormData();
+  }
 }
 
 const handleExtraAction = () => {
-  // 處理額外按鈕點擊
-  console.log('額外按鈕被點擊');
-};
+  showError.value = false
+  router.push('/checkin')
+}
 
-// api error call method
-// updateErrorMessages(ErrorType.UploadFailed);
+const handleBackAction = () => {
+  showError.value = false
+}
+
+const saveFormData = async () => {
+  const newMemberData: NewMemberDataRequest = {
+    source: pmsSource.value,
+    country_codes: '+886',
+    phone: phone.value,
+    name: userName.value,
+    email: email.value,
+    birthday: birthday.value,
+    barcode: cloudCarrier.value,
+    compiled: companyId.value,
+    company: companyName.value,
+    order_number: orderNumber.value,
+    is_default: false
+  }
+
+  try {
+    const data = await fetchMemberData(newMemberData)
+    if (data.code === '0') {
+      router.push('/checkin')
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const submitFormData = async () => {
+  updateErrorMessages(ErrorType.SaveDataNotification)
+}
 </script>
 <style lang="scss" scoped>
 @mixin flex-center {
@@ -899,7 +954,6 @@ const handleExtraAction = () => {
   .label-text {
     @include text-style(350, 20px, var(--On-input-sec));
     margin-right: 4px;
-
   }
   .error-label {
     color: var(--Error);

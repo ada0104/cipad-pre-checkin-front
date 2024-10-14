@@ -13,12 +13,13 @@ const router = createRouter({
     {
       path: '/upload',
       name: 'upload',
-      component: () => import('@/views/OcrIdUploader.vue')
+      component: () => import('@/views/OcrIdUploader.vue'),
     },
     {
       path: '/form',
       name: 'form',
-      component: () => import('@/views/CheckInForm.vue')
+      component: () => import('@/views/CheckInForm.vue'),
+      props: true
     },
     {
       path: '/checkin',
