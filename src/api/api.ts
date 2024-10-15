@@ -243,18 +243,18 @@ const getOcrData = async ({ order_number, image_type, image1, image2 }: OcrDataR
 
     return { ocrData };
   } catch (error) {
-    console.error("Error in getData:", error);
+    console.error("Error in getOcrData:", error);
     throw error;
   }
 };
 
-const setMemberData = async ({memberData: NewMemberDataRequest}) => {
+const setMemberData = async (newMemberDataRequest: NewMemberDataRequest) => {
   try {
-    const newMember = await fetchMemberData(memberData);
+    const newMember = await fetchMemberData(newMemberDataRequest);
 
     return newMember;
   } catch (error) {
-    console.error("Error in getData:", error);
+    console.error("Error in setMemberData:", error);
     throw error;
   }
 };
@@ -275,5 +275,4 @@ export {
   getOcrData,
   setMemberData,
   getQRcodeData,
-  fetchMemberData
 };

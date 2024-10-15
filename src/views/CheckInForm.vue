@@ -233,6 +233,7 @@
       </div>
     </div>
     <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" />
+    <p v-if="isLoading">Loading...</p>
   </main>
   <ErrorAlert
     v-if="showError"
@@ -253,7 +254,6 @@
     </template>
   </ErrorAlert>
 </template>
-
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, nextTick } from 'vue'
 
@@ -267,7 +267,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 import { useRouter } from 'vue-router'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email as emailValidator, minLength, maxLength } from '@vuelidate/validators'
-import { fetchMemberData, type NewMemberDataRequest } from '@/api/api'
+import { setMemberData, type NewMemberDataRequest } from '@/api/api'
 
 import { useOrderStore } from '@/stores/order'
 import { useIdImageStore } from '@/stores/idimage'
@@ -519,8 +519,20 @@ const acceptTermsErrorMessage = computed(() => {
 
 // API-回傳成功/錯誤訊息
 enum ErrorType {
-  UploadFailed = 0, // 資料上傳失敗
-  SaveDataNotification = 1 // 資料儲存
+  UploadFailed, // 資料上傳失敗
+  SaveDataNotification, // 資料儲存
+  hasQRNotification, // 已有 pre-checkin 圖片
+  noOcrImage, // 沒有 OCR 資料
+  UnknownError // 未知錯誤
+}
+
+const setMemberDataErrorCodeMap: { [key: string]: ErrorType } = {
+  '1000': ErrorType.UploadFailed,
+  '1001': ErrorType.hasQRNotification,
+  '1002': ErrorType.UploadFailed,
+  '1003': ErrorType.noOcrImage,
+  '5003': ErrorType.UploadFailed,
+  '5004': ErrorType.UploadFailed,
 }
 
 const errorTitle = ref<string>('')
@@ -530,7 +542,7 @@ const errorClass = ref<string>('')
 const showExtraButton = ref<boolean>(false)
 const currentErrorType = ref<ErrorType | null>(null)
 
-const updateErrorMessages = (type: ErrorType): void => {
+function updateErrorMessages (type: ErrorType): void {
   errorClass.value = ''
   currentErrorType.value = type
 
@@ -539,6 +551,16 @@ const updateErrorMessages = (type: ErrorType): void => {
       errorTitle.value = '資料上傳失敗'
       errorContent.value = [{ text: '請確認網路穩定後' }, { text: '重新嘗試', class: 'mt-20' }]
       errorButtonText.value = '重新上傳'
+      break
+    case ErrorType.hasQRNotification:
+      errorTitle.value = '資料上傳失敗'
+      errorContent.value = [{ text: '已有 pre-checkin 圖片' }]
+      errorButtonText.value = '取得pre-checkin 圖片'
+      break
+    case ErrorType.noOcrImage:
+      errorTitle.value = '資料上傳失敗'
+      errorContent.value = [{ text: '請先完成證件驗證' }]
+      errorButtonText.value = '返回證件上傳'
       break
     case ErrorType.SaveDataNotification:
       errorTitle.value = '存取預設資料'
@@ -566,9 +588,23 @@ const handleNextStep = () => {
 }
 
 const handleRetryUpload = (errorType: ErrorType | null) => {
-  if (errorType === ErrorType.UploadFailed || errorType === ErrorType.SaveDataNotification) {
+  if (
+    errorType === ErrorType.UploadFailed ||
+    errorType === ErrorType.SaveDataNotification
+  ) {
+    showExtraButton.value = false
     saveFormData();
   }
+
+  if (errorType === ErrorType.hasQRNotification) {
+    router.push('/checkin')
+  }
+
+  if (errorType === ErrorType.noOcrImage) {
+    router.push('/upload')
+  }
+
+  showError.value = false
 }
 
 const handleExtraAction = () => {
@@ -595,13 +631,21 @@ const saveFormData = async () => {
     is_default: false
   }
 
+  isLoading.value = true
+
   try {
-    const data = await fetchMemberData(newMemberData)
-    if (data.code === '0') {
+    const res = await setMemberData(newMemberData)
+    const errorType = setMemberDataErrorCodeMap[res.code]
+
+    if (res.code !== '0') {
+      updateErrorMessages(errorType)
+    }
+
+    if (res.code === '0') {
       router.push('/checkin')
     }
   } catch (error) {
-    console.error('Error fetching data:', error)
+    updateErrorMessages(ErrorType.UnknownError)
   } finally {
     isLoading.value = false
   }

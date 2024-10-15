@@ -1,4 +1,5 @@
 <template>
+<div>
   <Teleport to="body">
     <div v-if="show" class="error-alert-overlay">
       <div :class="['error-alert', errorClass]" v-bind="$attrs">
@@ -23,6 +24,7 @@
       </div>
     </div>
   </Teleport>
+</div>
 </template>
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, withDefaults } from 'vue'
