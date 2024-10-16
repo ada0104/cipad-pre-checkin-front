@@ -19,7 +19,6 @@
 </template>
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from 'vue'
-import $ from 'jquery';
 
 const props = defineProps<{
   selectedOption: { name: string; label: string }
@@ -49,11 +48,11 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  $(document).on('click', handleClickOutside);
+  document.addEventListener('click', handleClickOutside)
 })
 
 onBeforeUnmount(() => {
-  $(document).off('click', handleClickOutside);
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 <style lang="scss" scoped>

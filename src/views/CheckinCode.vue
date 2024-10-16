@@ -49,7 +49,6 @@ import Button from '@/components/Button.vue'
 
 import { useOrderStore } from '@/stores/order'
 import { getQRcodeData, type QRcodeDataRequest } from '@/api/api'
-import { getData, type OrderDataRequest } from '@/api/api'
 
 const isLoading = ref<boolean>(false)
 const orderDomain = ref<string>('')
@@ -66,21 +65,23 @@ if (orderStore.orderData.orderDetailData) {
   orderCheckInDate.value = orderStore.orderData.orderDetailData.data[0].check_in
   orderCheckOutDate.value = orderStore.orderData.orderDetailData.data[0].check_out
 }
-const orderUrlToken = 'dmUlc';
 
 const getQRcodeImage = async () => {
   isLoading.value = true
-
+  const orderUrlToken = 'dmUlc';
   const qrcodeDataRequest: QRcodeDataRequest = {
     order_number: orderNumber.value,
     url_token: orderUrlToken,
-    check_out: `${orderCheckOutDate.value}11:00:00`
+    check_out: `${orderCheckOutDate.value} 11:00:00`
   }
-  console.log(qrcodeDataRequest)
 
   try {
     const qrcodeData = await getQRcodeData(qrcodeDataRequest)
-
+    if (qrcodeData.code === '0' && qrcodeData.img) {
+      qrCodeImage.value = qrcodeData.img
+    } else {
+      console.log(qrcodeData);
+    }
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {
@@ -94,14 +95,8 @@ const formattedQrCodeImage = computed(() => {
 
 onMounted(async () => {
   if (orderStore.orderData.orderData.img) {
-    const orderDataRequest: OrderDataRequest = {
-      url_token: 'dmUlc',
-    }
-    const data = await getData(orderDataRequest)
-    console.log(data)
     qrCodeImage.value = orderStore.orderData.orderData.img
   } else {
-
     await getQRcodeImage()
   }
 })
