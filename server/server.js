@@ -27,6 +27,19 @@ app.use(compression())
 app.get('/ready', (req, res) => {
   res.send('ping')
 })
+proxyApiList.forEach(path=> {
+  app.use(`/dunqian/${path}`, createProxyMiddleware({
+    target: `${API_URL}`, // 你的遠端 API 的 URL
+    changeOrigin: true,
+    onProxyReq: (proxyReq, req, res) => {
+      // 設定 Authorization header
+      proxyReq.setHeader('Authorization', `Bearer ${API_TOKEN}`);
+    },
+    onError: (err, req, res) => {
+      res.status(500).json({ error: 'Proxy error', details: err.message });
+    }
+  }));
+})
 
 app.get('/dunqian/pre_checkin/:token', async (req, res) => {
   try {
@@ -53,19 +66,6 @@ app.get('/dunqian/pre_checkin/:token', async (req, res) => {
   }
 });
 
-proxyApiList.forEach(path=> {
-  app.use(`/dunqian/${path}`, createProxyMiddleware({
-    target: `${API_URL}`, // 你的遠端 API 的 URL
-    changeOrigin: true,
-    onProxyReq: (proxyReq, req, res) => {
-      // 設定 Authorization header
-      proxyReq.setHeader('Authorization', `Bearer ${API_TOKEN}`);
-    },
-    onError: (err, req, res) => {
-      res.status(500).json({ error: 'Proxy error', details: err.message });
-    }
-  }));
-})
 
 
 app.use(history())
