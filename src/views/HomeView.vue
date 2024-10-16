@@ -10,9 +10,9 @@
     <div class="card card-1">
       <p class="card-title m-b-16">{{ orderDomain }}</p>
       <p class="card-sec-title">訂單編號 {{ orderId }}</p>
-      <p class="card-text">({{ orderCheckInDate }} - {{ orderCheckOutDate }})</p>
+      <p v-if="!showError" class="card-text">({{ orderCheckInDate }} - {{ orderCheckOutDate }})</p>
     </div>
-    <div class="card card-2">
+    <div v-if="!showError" class="card card-2">
       <p class="card-title">訂購人 - {{ orderName }}</p>
       <p class="card-title m-b-48">是否為本次入住旅客？</p>
       <div class="btn-group">
@@ -21,6 +21,15 @@
           <Button buttonClass="btn primary-btn">是，同一人</Button>
         </router-link>
       </div>
+    </div>
+    <div v-if="showError" class="card card-2">
+      <p class="error-title">預先登記權限關閉</p>
+      <p class="error-text">
+        因您的訂單內容變更<br>
+        暫時無法使用【預先登記入住】服務<br>
+        請改於旅館現場辦理入住<br><br>
+        造成您的困擾，敬請見諒
+      </p>
     </div>
   </main>
 </template>
@@ -38,6 +47,7 @@ const orderDomain = ref<string>('')
 const orderCheckInDate = ref<string>('')
 const orderCheckOutDate = ref<string>('')
 const isLoading = ref<boolean>(false)
+const showError = ref<boolean>(false)
 
 const orderStore = useOrderStore()
 const router = useRouter()
@@ -46,30 +56,33 @@ const getOrderData = async () => {
   isLoading.value = true
 
   const orderDataRequest: OrderDataRequest = {
-    url_token: 'dmUlc',
+    url_token: 'MGQUJ',
   }
 
   try {
     const data = await getData(orderDataRequest)
-    const dataStatus = data.orderData.code;
+    const dataStatus = data.orderData?.code;
 
-    if (dataStatus === '0') {
-      orderId.value = data.orderData.order_number
-      orderName.value = data.orderData.name
-      orderDomain.value = data.orderData.domain
+    if (dataStatus === '0' && data.orderDetailData?.code === '0') {
+      orderId.value = data.orderData.order_number;
+      orderName.value = data.orderData.name;
+      orderDomain.value = data.orderData.domain;
 
-      if (data.orderDetailData) {
-        const [orderDetail] = data.orderDetailData.data
-        orderCheckInDate.value = orderDetail.check_in
-        orderCheckOutDate.value = orderDetail.check_out
+      if (data.orderDetailData?.data?.length > 0) {
+        const [orderDetail] = data.orderDetailData.data;
+        orderCheckInDate.value = orderDetail.check_in;
+        orderCheckOutDate.value = orderDetail.check_out;
       }
 
-      orderStore.setOrderData(data)
-    }
-
-    if (dataStatus === '1001') {
-      orderStore.setOrderData(data)
-      router.push('/checkin')
+      orderStore.setOrderData(data);
+    } else if (dataStatus === '1001') {
+      orderStore.setOrderData(data);
+      router.push('/checkin');
+    } else if (data.orderDetailData?.code === '1002') {
+      orderId.value = data.orderData.order_number;
+      orderName.value = data.orderData.name;
+      orderDomain.value = data.orderData.domain;
+      showError.value = true;
     }
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -131,6 +144,15 @@ $spacing-small: 16px;
 
   &-text {
     @include text-style(400, 20px, var(--On-Surface-Var));
+  }
+
+  .error-title {
+    @include text-style(700, 32px, var(--Prim-Cont));
+    margin-bottom: 24px;
+  }
+  .error-text {
+    @include text-style(400, 24px, var(--On-input-sec));
+    letter-spacing: 1.92px;
   }
 }
 

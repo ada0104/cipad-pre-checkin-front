@@ -68,11 +68,10 @@ if (orderStore.orderData.orderDetailData) {
 
 const getQRcodeImage = async () => {
   isLoading.value = true
-  const orderUrlToken = 'dmUlc';
+  const orderUrlToken = 'MGQUJ';
   const qrcodeDataRequest: QRcodeDataRequest = {
     order_number: orderNumber.value,
     url_token: orderUrlToken,
-    check_out: `${orderCheckOutDate.value} 11:00:00`
   }
 
   try {

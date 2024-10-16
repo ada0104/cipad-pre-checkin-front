@@ -39,10 +39,42 @@ const buildQueryParams = <T extends Record<string, any>>(params: T): string => {
   return new URLSearchParams(params).toString();
 };
 
-// 取得訂單資料
 export type OrderDataRequest = {
   url_token: string;
 };
+
+export interface QRcodeDataRequest {
+  order_number: string,
+  url_token: string,
+  barcode?: string,
+  compiled?: string,
+  company?: string,
+}
+
+export interface QRcodeDataResponse {
+  code: string;
+  message: string;
+  img?: string;
+}
+
+export type NewMemberDataRequest = {
+  source: string; // 來源，從哪個PMS來的
+  country_codes: string; // 手機國碼
+  phone: string;
+  name: string;
+  email: string;
+  birthday: string;
+  order_number: string;
+  is_default: boolean; // 是否為預設資料
+  compiled?: string; // 公司統編
+  company?: string; // 公司抬頭
+  barcode?: string; // 手機載具
+};
+
+export interface NewMemberDataResponse {
+  code: string;
+  message: string;
+}
 
 export interface OrderDataResponse {
   code: string;
@@ -75,6 +107,23 @@ export interface OrderDetailDataResponse {
   }>;
 }
 
+export type OcrDataRequest = {
+  order_number: string;
+  image_type: string;
+  image1: string;
+  image2?: string;
+};
+
+export interface OcrDataResponse {
+  code: string;
+  message: string;
+  data: {
+    name: string;
+    age: string;
+    birthday: string;
+  };
+}
+
 const fetchOrderData = async (orderDataRequest: OrderDataRequest): Promise<OrderDataResponse> => {
   try {
     const { url_token } = orderDataRequest;
@@ -104,24 +153,6 @@ const fetchOrderDetailData = async (orderDetailDataRequest: OrderDetailDataReque
   }
 };
 
-// 傳送ＯＣＲ辨識
-export type OcrDataRequest = {
-  order_number: string;
-  image_type: string;
-  image1: string;
-  image2?: string;
-};
-
-export interface OcrDataResponse {
-  code: string;
-  message: string;
-  data: {
-    name: string;
-    age: string;
-    birthday: string;
-  };
-}
-
 const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResponse> => {
   try {
     // 再請後端改為json格式
@@ -148,26 +179,6 @@ const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResp
     throw error;
   }
 };
-
-// 新增會員資料
-export type NewMemberDataRequest = {
-  source: string; // 來源，從哪個PMS來的
-  country_codes: string; // 手機國碼
-  phone: string;
-  name: string;
-  email: string;
-  birthday: string;
-  order_number: string;
-  is_default: boolean; // 是否為預設資料
-  compiled?: string; // 公司統編
-  company?: string; // 公司抬頭
-  barcode?: string; // 手機載具
-};
-
-interface NewMemberDataResponse {
-  code: string;
-  message: string;
-}
 
 const fetchMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promise<NewMemberDataResponse> => {
   const formData = new FormData();
@@ -208,21 +219,6 @@ const fetchMemberData = async (newMemberDataRequest: NewMemberDataRequest): Prom
     throw error;
   }
 };
-
-export interface QRcodeDataRequest {
-  order_number: string,
-  url_token: string,
-  check_out: string,
-  barcode?: string,
-  compiled?: string,
-  company?: string,
-}
-
-export interface QRcodeDataResponse {
-  code: string;
-  message: string;
-  img?: string;
-}
 
 const fetchQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest): Promise<QRcodeDataResponse> => {
   try {
