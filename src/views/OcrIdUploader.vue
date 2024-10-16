@@ -33,7 +33,8 @@
     :buttonText="errorButtonText"
     :subText="errorSubText"
     :class="errorClass"
-    @buttonClick="handleRetryUpload"
+    @buttonClick="handleRetryUpload(currentErrorType)"
+    @subTextClick="handleSubTextClick(currentErrorType)"
   />
 </template>
 <script setup lang="ts">
@@ -46,7 +47,7 @@ import ErrorAlert from '@/components/ErrorAlert.vue'
 import { useIdImageStore } from '@/stores/idimage'
 import { useOrderStore } from '@/stores/order'
 import { useRouter } from 'vue-router'
-import { getOcrData, type OcrDataResponse } from '@/api/api'
+import { getOcrData, type OcrDataResponse, type OcrDataRequest } from '@/api/api'
 
 interface Option {
   name: string
@@ -146,10 +147,12 @@ const errorContent = ref<Array<{ text: string; class?: string }>>([])
 const errorButtonText = ref<string>('')
 const errorClass = ref<string>('')
 const errorSubText = ref<string>('')
+const currentErrorType = ref<ErrorType | null>(null)
 
 function updateErrorMessages(type: ErrorType): void {
   errorClass.value = ''
   errorSubText.value = ''
+  currentErrorType.value = type
 
   switch (type) {
     case ErrorType.RecognitionFailed:
@@ -187,8 +190,20 @@ function updateErrorMessages(type: ErrorType): void {
   showError.value = true
 }
 
-const handleRetryUpload = (): void => {
+const handleRetryUpload = (errorType: ErrorType | null) => {
+  if (errorType === ErrorType.MinorAccessDenied) {
+    router.push('/')
+  }
+
   uploadRef.value.clearUploadData()
+  showError.value = false
+}
+
+const handleSubTextClick = (errorType: ErrorType | null) => {
+  if (errorType === ErrorType.MinorAccessDenied) {
+    uploadRef.value.clearUploadData()
+  }
+
   showError.value = false
 }
 
@@ -204,13 +219,6 @@ const getOcrImageData = async () => {
   // 將資料整理成api格式
   const imageType = Object.keys(images)[0]
   const { front, back } = Object.values(images)[0]
-
-  type OcrDataRequest = {
-    order_number: string
-    image_type: string
-    image1: string
-    image2?: string
-  }
 
   const removeBase64Prefix = (image: string) => image.replace(/^data:image\/\w+;base64,/, '')
   const ocrRequestData: OcrDataRequest = {

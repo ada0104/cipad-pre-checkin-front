@@ -46,11 +46,6 @@ router.beforeEach((to, from, next) => {
     return next({ name: 'upload' });
   }
 
-  // 如果check_pre_checkin以有照片時
-  // if (hadPreCheckin) {
-  //   return next({ name: 'checkin' });
-  // }
-
   next();
 });
 

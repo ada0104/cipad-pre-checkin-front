@@ -27,27 +27,39 @@ const fetchApi = async <T>(url: string, options: RequestOptions = {}): Promise<T
   }
 };
 
-// 取得訂單基本資料
-interface OrderDataResponse {
+const buildQueryParams = <T extends Record<string, any>>(params: T): string => {
+  const missingParams = Object.entries(params)
+    .filter(([key, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingParams.length > 0) {
+    throw new Error(`Missing required parameters: ${missingParams.join(", ")} are required.`);
+  }
+
+  return new URLSearchParams(params).toString();
+};
+
+// 取得訂單資料
+export type OrderDataRequest = {
+  url_token: string;
+};
+
+export interface OrderDataResponse {
+  code: string;
   order_number: string;
   name: string;
   pms: string;
   domain: string;
+  img?: string;
 }
 
-const fetchOrderData = async (): Promise<OrderDataResponse> => {
-  try {
-    const data = await fetchApi<OrderDataResponse>('/dunqian/pre_checkin/ogymE');
-
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch order data:", error);
-    throw error;
-  }
+export type OrderDetailDataRequest = {
+  pms: string,
+  domain: string,
+  order_number: string,
 };
 
-// 取得訂單詳細資料
-interface OrderDetailDataResponse {
+export interface OrderDetailDataResponse {
   code: string;
   message: string;
   data: Array<{
@@ -63,20 +75,26 @@ interface OrderDetailDataResponse {
   }>;
 }
 
-const fetchOrderDetailData = async (
-  pms: string,
-  domain: string,
-  order_number: string,
-): Promise<OrderDetailDataResponse> => {
+const fetchOrderData = async (orderDataRequest: OrderDataRequest): Promise<OrderDataResponse> => {
   try {
-    const params = new URLSearchParams({
-      pms,
-      domain,
-      order_number
-    });
+    const { url_token } = orderDataRequest;
 
+    const data = await fetchApi<OrderDataResponse>(
+      `/dunqian/pre_checkin/${url_token}`
+    );
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch order data:", error);
+    throw error;
+  }
+};
+
+const fetchOrderDetailData = async (orderDetailDataRequest: OrderDetailDataRequest): Promise<OrderDetailDataResponse> => {
+  try {
+    const queryParams = buildQueryParams(orderDetailDataRequest);
     const data = await fetchApi<OrderDetailDataResponse>(
-      `/dunqian/pms/get_order_data?${params.toString()}`
+      `/dunqian/pms/get_order_data?${queryParams}`
     );
 
     return data;
@@ -87,7 +105,7 @@ const fetchOrderDetailData = async (
 };
 
 // 傳送ＯＣＲ辨識
-type OcrDataRequest = {
+export type OcrDataRequest = {
   order_number: string;
   image_type: string;
   image1: string;
@@ -186,60 +204,80 @@ const fetchMemberData = async (newMemberDataRequest: NewMemberDataRequest): Prom
 
     return await postResponse.json()
   } catch (error) {
-    console.error("Failed to fetch order detail data:", error);
+    console.error("Failed to fetch add member data:", error);
     throw error;
   }
 };
 
-interface QRcodeDataResponse {
+export interface QRcodeDataRequest {
+  order_number: string,
+  url_token: string,
+  check_out: string,
+  barcode?: string,
+  compiled?: string,
+  company?: string,
+}
+
+export interface QRcodeDataResponse {
   code: string;
   message: string;
   img?: string;
 }
 
-const fetchQRcodeData = async (
-  order_number: string,
-  url_token: string,
-  barcode?: string,
-  compiled?: string,
-  company?: string,
-): Promise<QRcodeDataResponse> => {
+const fetchQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest): Promise<QRcodeDataResponse> => {
   try {
-    const params = new URLSearchParams({
-      order_number,
-      url_token,
-      ...(barcode && { barcode }),
-      ...(compiled && { compiled }),
-      ...(company && { company }),
-    });
 
+    const queryParams = buildQueryParams(qrcodeDataRequest);
+    console.log(queryParams);
     const data = await fetchApi<QRcodeDataResponse>(
-      `/dunqian/pre_checkin/get_checkin_qr?${params.toString()}`
+      `/dunqian/pre_checkin/get_checkin_qr?${queryParams}`
     );
 
     return data;
   } catch (error) {
-    console.error("Failed to fetch order detail data:", error);
+    console.error("Failed to fetch QRcode data:", error);
     throw error;
   }
 };
 
-const getData = async () => {
+const getData = async (orderDataRequest: OrderDataRequest) => {
   try {
-    const orderData = await fetchOrderData();
-    const { pms, domain, order_number } = orderData;
-    const orderDetailData = await fetchOrderDetailData(pms, domain, order_number);
+    const orderData = await fetchOrderData(orderDataRequest);
 
-    return { orderData, orderDetailData };
+    if (orderData.code === '0') {
+      const { pms, domain, order_number } = orderData;
+      const orderDetailDataRequest: OrderDetailDataRequest = {
+        pms: pms,
+        domain: domain,
+        order_number: order_number,
+      };
+      const orderDetailData = await fetchOrderDetailData(orderDetailDataRequest);
+
+      return { orderData, orderDetailData };
+    }
+
+    if (orderData.code === '1001') {
+      const { pms, domain, order_number } = orderData;
+      const orderDetailDataRequest: OrderDetailDataRequest = {
+        pms: pms,
+        domain: domain,
+        order_number: order_number,
+      };
+      const orderDetailData = await fetchOrderDetailData(orderDetailDataRequest);
+
+      return { orderData, orderDetailData };
+    }
+
+    return { orderData }
   } catch (error) {
     console.error("Error in getData:", error);
     throw error;
   }
 };
 
-const getOcrData = async ({ order_number, image_type, image1, image2 }: OcrDataRequest) => {
+const getOcrData = async (ocrDataRequest: OcrDataRequest) => {
   try {
-    const ocrData = await fetchOcrData({ order_number, image_type, image1, image2 });
+    const ocrData = await fetchOcrData(ocrDataRequest);
 
     return { ocrData };
   } catch (error) {
@@ -259,13 +297,13 @@ const setMemberData = async (newMemberDataRequest: NewMemberDataRequest) => {
   }
 };
 
-const getQRcodeData = async () => {
+const getQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest) => {
   try {
-    const QRcodeData = await fetchQRcodeData();
+    const QRcodeData = await fetchQRcodeData(qrcodeDataRequest);
 
     return QRcodeData;
   } catch (error) {
-    console.error("Error in getData:", error);
+    console.error("Error in getQRcodeData:", error);
     throw error;
   }
 };

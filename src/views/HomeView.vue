@@ -1,6 +1,7 @@
 <template>
   <Header />
-  <main>
+  <div v-if="isLoading">Loading...</div>
+  <main v-else>
     <div class="title-block">
       <div class="title">
         <p>登記入住資料</p>
@@ -22,12 +23,12 @@
       </div>
     </div>
   </main>
-  <p v-if="isLoading">Loading...</p>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getData } from '@/api/api'
+import { getData, type OrderDataRequest } from '@/api/api'
 import { useOrderStore } from '@/stores/order'
+import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
 
@@ -39,21 +40,37 @@ const orderCheckOutDate = ref<string>('')
 const isLoading = ref<boolean>(false)
 
 const orderStore = useOrderStore()
+const router = useRouter()
 
 const getOrderData = async () => {
   isLoading.value = true
 
+  const orderDataRequest: OrderDataRequest = {
+    url_token: 'dmUlc',
+  }
+
   try {
-    const data = await getData()
-    orderStore.setOrderData(data)
+    const data = await getData(orderDataRequest)
+    const dataStatus = data.orderData.code;
 
-    orderId.value = data.orderData.order_number
-    orderName.value = data.orderData.name
-    orderDomain.value = data.orderData.domain
+    if (dataStatus === '0') {
+      orderId.value = data.orderData.order_number
+      orderName.value = data.orderData.name
+      orderDomain.value = data.orderData.domain
 
-    const [orderDetail] = data.orderDetailData.data
-    orderCheckInDate.value = orderDetail.check_in
-    orderCheckOutDate.value = orderDetail.check_out
+      if (data.orderDetailData) {
+        const [orderDetail] = data.orderDetailData.data
+        orderCheckInDate.value = orderDetail.check_in
+        orderCheckOutDate.value = orderDetail.check_out
+      }
+
+      orderStore.setOrderData(data)
+    }
+
+    if (dataStatus === '1001') {
+      orderStore.setOrderData(data)
+      router.push('/checkin')
+    }
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {

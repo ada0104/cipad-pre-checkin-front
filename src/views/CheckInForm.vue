@@ -370,7 +370,6 @@ const applyWatermarks = () => {
   })
 }
 
-
 onMounted(() => {
   // 若有資料/dunqian/pre_checkin/pms_get_member_data
   // is_default: true 並且 將對應的資料丟給ref
@@ -565,7 +564,7 @@ function updateErrorMessages (type: ErrorType): void {
     case ErrorType.SaveDataNotification:
       errorTitle.value = '存取預設資料'
       errorContent.value = [
-        { text: `是否將本次資料設為${userName.value}的預設？`  },
+        { text: `是否將本次資料設為${userName.value}的預設？` },
         { text: `${email.value}`, class: 'fz-20 mt-20' },
         { text: '未來使用此信箱訂房，即可自動帶入登記資料！', class: 'fz-20 fc-p mt-20' }
       ]
@@ -589,11 +588,9 @@ const handleNextStep = () => {
 
 const handleRetryUpload = (errorType: ErrorType | null) => {
   if (
-    errorType === ErrorType.UploadFailed ||
-    errorType === ErrorType.SaveDataNotification
-  ) {
+    errorType === ErrorType.UploadFailed || errorType === ErrorType.SaveDataNotification) {
     showExtraButton.value = false
-    saveFormData();
+    saveFormData()
   }
 
   if (errorType === ErrorType.hasQRNotification) {

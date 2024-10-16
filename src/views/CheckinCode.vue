@@ -1,6 +1,7 @@
 <template>
   <Header />
-  <main>
+  <div v-if="isLoading">Loading...</div>
+  <main v-else>
     <div class="title-block">
       <div class="title">
         <p>預先登記完成</p>
@@ -8,17 +9,17 @@
     </div>
     <div class="card">
       <div>
-        <p class="card-title">雀客快捷 臺中一中</p>
+        <p class="card-title">{{ orderDomain }}</p>
         <p class="sub-title">訂單憑證</p>
       </div>
       <div class="qr-card">
-        <img class="qr-code" src="@/assets/QR.svg" alt="QRcode" />
+        <img class="qr-code" :src="formattedQrCodeImage" alt="QRcode" />
         <p class="order-id">訂單編號</p>
-        <p class="order-id">SCE355</p>
+        <p class="order-id">{{ orderNumber }}</p>
       </div>
       <div>
         <p class="sub-title">開放入住時間</p>
-        <p class="check-in-time">2024/7/30 15:00</p>
+        <p class="check-in-time">{{ orderCheckInDate }} 15:00</p>
       </div>
     </div>
     <div class="card download">
@@ -41,9 +42,70 @@
   </main>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
+
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
+
+import { useOrderStore } from '@/stores/order'
+import { getQRcodeData, type QRcodeDataRequest } from '@/api/api'
+import { getData, type OrderDataRequest } from '@/api/api'
+
+const isLoading = ref<boolean>(false)
+const orderDomain = ref<string>('')
+const orderCheckInDate = ref<string>('')
+const orderCheckOutDate = ref<string>('')
+const orderNumber =ref<string>('')
+const qrCodeImage =ref<string>('')
+
+const orderStore = useOrderStore()
+orderNumber.value = orderStore.orderData.orderData.order_number
+orderDomain.value = orderStore.orderData.orderData.domain
+
+if (orderStore.orderData.orderDetailData) {
+  orderCheckInDate.value = orderStore.orderData.orderDetailData.data[0].check_in
+  orderCheckOutDate.value = orderStore.orderData.orderDetailData.data[0].check_out
+}
+const orderUrlToken = 'dmUlc';
+
+const getQRcodeImage = async () => {
+  isLoading.value = true
+
+  const qrcodeDataRequest: QRcodeDataRequest = {
+    order_number: orderNumber.value,
+    url_token: orderUrlToken,
+    check_out: `${orderCheckOutDate.value}11:00:00`
+  }
+  console.log(qrcodeDataRequest)
+
+  try {
+    const qrcodeData = await getQRcodeData(qrcodeDataRequest)
+
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const formattedQrCodeImage = computed(() => {
+  return `data:image/png;base64,${qrCodeImage.value}`;
+});
+
+onMounted(async () => {
+  if (orderStore.orderData.orderData.img) {
+    const orderDataRequest: OrderDataRequest = {
+      url_token: 'dmUlc',
+    }
+    const data = await getData(orderDataRequest)
+    console.log(data)
+    qrCodeImage.value = orderStore.orderData.orderData.img
+  } else {
+
+    await getQRcodeImage()
+  }
+})
+
 </script>
 <style lang="scss" scoped>
 .card {

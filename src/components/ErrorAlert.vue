@@ -19,7 +19,7 @@
               {{ buttonText }}
             </button>
           </div>
-          <div class="alert-subtext" v-if="subText">{{ subText }}</div>
+          <div class="alert-subtext" v-if="subText" @click="handleSubTextClick">{{ subText }}</div>
         </div>
       </div>
     </div>
@@ -53,12 +53,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'buttonClick'): void
+  (e: 'subTextClick'): void
 }>()
 
 const show = ref<boolean>(true)
 
 const handleButtonClick = (): void => {
   emit('buttonClick')
+  closeAlert()
+}
+
+const handleSubTextClick = (): void => {
+  emit('subTextClick')
   closeAlert()
 }
 
@@ -186,6 +192,7 @@ const closeAlert = (): void => {
       letter-spacing: 1.92px;
     }
     .alert-subtext {
+      cursor: pointer;
       color: var(--On-input-sec);
       text-align: right;
       font-size: 20px;
