@@ -68,7 +68,7 @@ if (orderStore.orderData.orderDetailData) {
 
 const getQRcodeImage = async () => {
   isLoading.value = true
-  const orderUrlToken = 'MGQUJ';
+  const orderUrlToken = 'xJXFM';
   const qrcodeDataRequest: QRcodeDataRequest = {
     order_number: orderNumber.value,
     url_token: orderUrlToken,

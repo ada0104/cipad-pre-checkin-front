@@ -39,8 +39,41 @@ const buildQueryParams = <T extends Record<string, any>>(params: T): string => {
   return new URLSearchParams(params).toString();
 };
 
-export type OrderDataRequest = {
+export interface OrderDataRequest {
   url_token: string;
+};
+
+export interface OrderDetailDataRequest {
+  pms: string,
+  domain: string,
+  order_number: string,
+};
+
+export interface OcrDataRequest {
+  order_number: string;
+  image_type: string;
+  image1: string;
+  image2?: string;
+};
+
+export interface DefaultMemberDataRequest {
+  pms: string;
+  email: string;
+  order_number: string;
+}
+
+export interface NewMemberDataRequest {
+  source: string; // 來源，從哪個PMS來的
+  country_codes: string; // 手機國碼
+  phone: string;
+  name: string;
+  email: string;
+  birthday: string;
+  order_number: string;
+  is_default: boolean; // 是否要存為預設資料
+  compiled?: string; // 公司統編
+  company?: string; // 公司抬頭
+  barcode?: string; // 手機載具
 };
 
 export interface QRcodeDataRequest {
@@ -51,45 +84,15 @@ export interface QRcodeDataRequest {
   company?: string,
 }
 
-export interface QRcodeDataResponse {
-  code: string;
-  message: string;
-  img?: string;
-}
-
-export type NewMemberDataRequest = {
-  source: string; // 來源，從哪個PMS來的
-  country_codes: string; // 手機國碼
-  phone: string;
-  name: string;
-  email: string;
-  birthday: string;
-  order_number: string;
-  is_default: boolean; // 是否為預設資料
-  compiled?: string; // 公司統編
-  company?: string; // 公司抬頭
-  barcode?: string; // 手機載具
-};
-
-export interface NewMemberDataResponse {
-  code: string;
-  message: string;
-}
-
 export interface OrderDataResponse {
   code: string;
   order_number: string;
   name: string;
   pms: string;
   domain: string;
+  email: string;
   img?: string;
 }
-
-export type OrderDetailDataRequest = {
-  pms: string,
-  domain: string,
-  order_number: string,
-};
 
 export interface OrderDetailDataResponse {
   code: string;
@@ -107,13 +110,6 @@ export interface OrderDetailDataResponse {
   }>;
 }
 
-export type OcrDataRequest = {
-  order_number: string;
-  image_type: string;
-  image1: string;
-  image2?: string;
-};
-
 export interface OcrDataResponse {
   code: string;
   message: string;
@@ -122,6 +118,37 @@ export interface OcrDataResponse {
     age: string;
     birthday: string;
   };
+}
+
+export interface DefaultMemberDataResponse {
+  code: string;
+  message: string;
+  data: {
+    country_codes: string;
+    phone: string;
+    name: string;
+    email: string;
+    birthday: string;
+    invoice: {
+      barcode: null,
+      Compiled: null,
+      company: null
+    },
+    image_type: string;
+    image1: string;
+    image2: string;
+  }
+}
+
+export interface NewMemberDataResponse {
+  code: string;
+  message: string;
+}
+
+export interface QRcodeDataResponse {
+  code: string;
+  message: string;
+  img?: string;
 }
 
 const fetchOrderData = async (orderDataRequest: OrderDataRequest): Promise<OrderDataResponse> => {
@@ -180,7 +207,7 @@ const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResp
   }
 };
 
-const fetchMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promise<NewMemberDataResponse> => {
+const addMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promise<NewMemberDataResponse> => {
   const formData = new FormData();
   formData.set('source', newMemberDataRequest.source);
   formData.set('country_codes', newMemberDataRequest.country_codes);
@@ -216,6 +243,20 @@ const fetchMemberData = async (newMemberDataRequest: NewMemberDataRequest): Prom
     return await postResponse.json()
   } catch (error) {
     console.error("Failed to fetch add member data:", error);
+    throw error;
+  }
+};
+
+const fetchMemberData = async (defaultMemberDataRequest: DefaultMemberDataRequest): Promise<DefaultMemberDataResponse> => {
+  try {
+    const queryParams = buildQueryParams(defaultMemberDataRequest);
+    const data = await fetchApi<DefaultMemberDataResponse>(
+      `/dunqian/pre_checkin/get_member_data?${queryParams}`
+    );
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch default member data:", error);
     throw error;
   }
 };
@@ -282,9 +323,20 @@ const getOcrData = async (ocrDataRequest: OcrDataRequest) => {
   }
 };
 
+const getMemberData = async (defaultMemberDataRequest: DefaultMemberDataRequest) => {
+  try {
+    const defaultMemberData = await fetchMemberData(defaultMemberDataRequest);
+
+    return defaultMemberData;
+  } catch (error) {
+    console.error("Error in getMemberData:", error);
+    throw error;
+  }
+};
+
 const setMemberData = async (newMemberDataRequest: NewMemberDataRequest) => {
   try {
-    const newMember = await fetchMemberData(newMemberDataRequest);
+    const newMember = await addMemberData(newMemberDataRequest);
 
     return newMember;
   } catch (error) {
@@ -307,6 +359,7 @@ const getQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest) => {
 export {
   getData,
   getOcrData,
+  getMemberData,
   setMemberData,
   getQRcodeData,
 };

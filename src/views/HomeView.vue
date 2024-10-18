@@ -1,6 +1,8 @@
 <template>
   <Header />
-  <div v-if="isLoading">Loading...</div>
+  <div v-if="isLoading" class="loading-animation">
+    <Vue3Lottie :animationData="upLoadOcrLottie" :loop="true" :autoplay="true" />
+  </div>
   <main v-else>
     <div class="title-block">
       <div class="title">
@@ -10,24 +12,27 @@
     <div class="card card-1">
       <p class="card-title m-b-16">{{ orderDomain }}</p>
       <p class="card-sec-title">訂單編號 {{ orderId }}</p>
-      <p v-if="!showError" class="card-text">({{ orderCheckInDate }} - {{ orderCheckOutDate }})</p>
+      <p v-if="!showError" class="card-text">
+        (
+        <span>{{ new Date(orderCheckInDate).toLocaleDateString() }}</span> -
+        <span>{{ new Date(orderCheckOutDate).toLocaleDateString() }}</span>
+        )
+      </p>
     </div>
     <div v-if="!showError" class="card card-2">
       <p class="card-title">訂購人 - {{ orderName }}</p>
       <p class="card-title m-b-48">是否為本次入住旅客？</p>
       <div class="btn-group">
-        <Button buttonClass="btn secondary-btn">否，不同人</Button>
-        <router-link to="/upload" class="no-underline">
-          <Button buttonClass="btn primary-btn">是，同一人</Button>
-        </router-link>
+        <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">否，不同人</Button>
+        <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">是，同一人</Button>
       </div>
     </div>
     <div v-if="showError" class="card card-2">
       <p class="error-title">預先登記權限關閉</p>
       <p class="error-text">
-        因您的訂單內容變更<br>
-        暫時無法使用【預先登記入住】服務<br>
-        請改於旅館現場辦理入住<br><br>
+        因您的訂單內容變更<br/>
+        暫時無法使用【預先登記入住】服務<br/>
+        請改於旅館現場辦理入住<br/><br/>
         造成您的困擾，敬請見諒
       </p>
     </div>
@@ -35,11 +40,14 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getData, type OrderDataRequest } from '@/api/api'
+import { Vue3Lottie } from 'vue3-lottie'
+
+import { getData, type OrderDataRequest, getMemberData, type DefaultMemberDataRequest, type OrderDataResponse, type OrderDetailDataResponse } from '@/api/api'
 import { useOrderStore } from '@/stores/order'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
+import upLoadOcrLottie from '@/assets/lottie/id_ocr.json'
 
 const orderId = ref<string>('')
 const orderName = ref<string>('')
@@ -51,38 +59,72 @@ const showError = ref<boolean>(false)
 
 const orderStore = useOrderStore()
 const router = useRouter()
+const orderDataRequest: OrderDataRequest = {
+  url_token: 'xJXFM'
+}
+
+const handleNextStep = async (isSameOne: boolean) => {
+  const defaultMemberDataRequest: DefaultMemberDataRequest = {
+    pms: orderStore.orderData.orderData.pms,
+    email: orderStore.orderData.orderData.email,
+    order_number: orderStore.orderData.orderData.order_number,
+  }
+
+  if (isSameOne) {
+    try {
+      const memberData = await getMemberData(defaultMemberDataRequest);
+
+      if (memberData.code === '0' && memberData.data) {
+        // 撈資料存入store
+      }
+
+    } catch (error) {
+      console.error('Failed to get member data:', error);
+    }
+  }
+
+  router.push('/upload');
+};
+
+const setViewOrderData = (
+  data: {
+    orderData: OrderDataResponse;
+    orderDetailData?: OrderDetailDataResponse;
+  }
+) => {
+  const { orderData } = data;
+  orderId.value = orderData.order_number;
+  orderName.value = orderData.name;
+  orderDomain.value = orderData.domain;
+
+  if (data.orderDetailData) {
+    const [orderDetail] = data.orderDetailData.data
+    orderCheckInDate.value = orderDetail.check_in
+    orderCheckOutDate.value = orderDetail.check_out
+  }
+};
 
 const getOrderData = async () => {
   isLoading.value = true
 
-  const orderDataRequest: OrderDataRequest = {
-    url_token: 'MGQUJ',
-  }
-
   try {
     const data = await getData(orderDataRequest)
-    const dataStatus = data.orderData?.code;
+    const dataStatus = data.orderData?.code
 
     if (dataStatus === '0' && data.orderDetailData?.code === '0') {
-      orderId.value = data.orderData.order_number;
-      orderName.value = data.orderData.name;
-      orderDomain.value = data.orderData.domain;
-
-      if (data.orderDetailData?.data?.length > 0) {
-        const [orderDetail] = data.orderDetailData.data;
-        orderCheckInDate.value = orderDetail.check_in;
-        orderCheckOutDate.value = orderDetail.check_out;
-      }
-
-      orderStore.setOrderData(data);
+      setViewOrderData(data);
+      orderStore.setOrderData(data)
     } else if (dataStatus === '1001') {
-      orderStore.setOrderData(data);
-      router.push('/checkin');
-    } else if (data.orderDetailData?.code === '1002') {
-      orderId.value = data.orderData.order_number;
-      orderName.value = data.orderData.name;
-      orderDomain.value = data.orderData.domain;
-      showError.value = true;
+      // 已經有圖片直接到最後一頁
+      orderStore.setOrderData(data)
+      router.push('/checkin')
+    } else if (
+      // 多房訂單 顯示阻擋畫面 或是 撈詳細資料時失敗
+      (data.orderDetailData?.code === '1002') ||
+      (dataStatus === '0' && data.orderDetailData?.code !== '0')
+    ) {
+      setViewOrderData(data);
+      showError.value = true
     }
   } catch (error) {
     console.error('Error fetching data:', error)

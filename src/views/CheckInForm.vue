@@ -2,10 +2,11 @@
   <Header />
   <main>
     <div class="title-block">
-      <router-link to="/upload" class="no-underline back-route">
+      <!--- 若 v-if="showContact" 的話 返回改為form表單--->
+      <Button buttonClass="btn" class="back-route">
         <SvgIcon name="back" class="back-icon" />
         <span>返回</span>
-      </router-link>
+      </Button>
       <div class="title">
         <p>預先登記入住</p>
       </div>
@@ -262,7 +263,6 @@ import Select from '@/components/Select.vue'
 import Button from '@/components/Button.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
-import SvgIcon from '@/components/SvgIcon.vue'
 
 import { useRouter } from 'vue-router'
 import { useVuelidate } from '@vuelidate/core'
@@ -292,9 +292,10 @@ const companyId = ref<string>('')
 const companyName = ref<string>('')
 const pmsSource = ref<string>('')
 const orderNumber = ref<string>('')
-const acceptTerms = ref(false)
-const hasBeenChecked = ref(false)
-const showErrorMessage = ref(false)
+const acceptTerms = ref<boolean>(false)
+const isDefault = ref<boolean>(true)
+const hasBeenChecked = ref<boolean>(false)
+const showErrorMessage = ref<boolean>(false)
 
 // 證件照浮水印處理
 const idImageArray = computed(() => {
@@ -370,6 +371,15 @@ const applyWatermarks = () => {
   })
 }
 
+watch(selectedInvoiceType, (newType) => {
+  if (newType === 'two-step') {
+    companyId.value = '';
+    companyName.value = '';
+  } else if (newType === 'three-step') {
+    cloudCarrier.value = '';
+  }
+});
+
 onMounted(() => {
   // 若有資料/dunqian/pre_checkin/pms_get_member_data
   // is_default: true 並且 將對應的資料丟給ref
@@ -435,10 +445,16 @@ const rules = {
     maxLength: maxLength(10),
     numeric: (value: string) => /^\d+$/.test(value)
   },
-  cloudCarrier: {},
   companyId: {
     required: (value: string) => (selectedInvoiceType.value === 'three-step' ? !!value : true),
     minLength: minLength(8)
+  },
+  cloudCarrier: {
+    minLength: minLength(8),
+    maxLength: maxLength(8),
+    startsWithSlash: (value: string) => {
+      return value ? value.startsWith('/') : true;
+    },
   },
   companyName: {},
   acceptTerms: {
@@ -496,6 +512,10 @@ const phoneErrorMessage = computed(() => {
 })
 
 const cloudCarrierErrorMessage = computed(() => {
+  if (!v$.value.cloudCarrier.minLength.$response) return '至少需要8個字符'
+  if (!v$.value.cloudCarrier.maxLength.$response) return '最多8個字符'
+  if (!v$.value.cloudCarrier.startsWithSlash.$response) return '第一碼為 /'
+
   return ''
 })
 
@@ -593,6 +613,7 @@ const handleRetryUpload = (errorType: ErrorType | null) => {
     saveFormData()
   }
 
+  // 自動跳轉 就不顯示按鈕
   if (errorType === ErrorType.hasQRNotification) {
     router.push('/checkin')
   }
@@ -606,6 +627,8 @@ const handleRetryUpload = (errorType: ErrorType | null) => {
 
 const handleExtraAction = () => {
   showError.value = false
+  isDefault.value = false;
+  // 還是要送出表單 只是預設資料參數為false
   router.push('/checkin')
 }
 
@@ -625,7 +648,7 @@ const saveFormData = async () => {
     compiled: companyId.value,
     company: companyName.value,
     order_number: orderNumber.value,
-    is_default: false
+    is_default: isDefault.value
   }
 
   isLoading.value = true
