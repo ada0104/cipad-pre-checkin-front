@@ -16,7 +16,7 @@ export const useMemberDataStore = defineStore('memberData', () => {
       birthday: '',
       invoice: {
         barcode: null,
-        Compiled: null,
+        compiled: null,
         company: null
       },
       image_type: '',
