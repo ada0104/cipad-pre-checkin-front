@@ -30,3 +30,16 @@ export const useOrderStore = defineStore('orderData', () => {
     clearStore
   };
 });
+
+export const useUrlTokenStore = defineStore('urlToken', () => {
+  const urlToken = ref<string>('');
+
+  function setUrlToken(data:string) {
+    urlToken.value = data;
+  }
+
+  return {
+    urlToken,
+    setUrlToken,
+  };
+});

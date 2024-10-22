@@ -71,9 +71,9 @@ export interface NewMemberDataRequest {
   birthday: string;
   order_number: string;
   is_default: boolean; // 是否要存為預設資料
-  compiled?: string; // 公司統編
-  company?: string; // 公司抬頭
-  barcode?: string; // 手機載具
+  compiled?: string | null; // 公司統編
+  company?: string | null; // 公司抬頭
+  barcode?: string | null; // 手機載具
 };
 
 export interface QRcodeDataRequest {
@@ -131,7 +131,7 @@ export interface DefaultMemberDataResponse {
     birthday: string;
     invoice: {
       barcode: null,
-      Compiled: null,
+      compiled: null,
       company: null
     },
     image_type: string;
@@ -265,7 +265,6 @@ const fetchQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest): Promise<QRc
   try {
 
     const queryParams = buildQueryParams(qrcodeDataRequest);
-    console.log(queryParams);
     const data = await fetchApi<QRcodeDataResponse>(
       `/dunqian/pre_checkin/get_checkin_qr?${queryParams}`
     );

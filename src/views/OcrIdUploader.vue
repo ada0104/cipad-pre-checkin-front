@@ -18,7 +18,7 @@
           :options="options"
           @update:selectedOption="updateSelectedOption"
         />
-        <Upload ref="uploadRef" :name="computedLabels.name" :labels="computedLabels.labels" />
+        <Upload ref="uploadRef" :name="computedLabels.name" :labels="computedLabels.labels" @imageChanged="isImageChanged = true"/>
         <Button buttonClass="btn primary-btn" :disabled="isDisabled" @click="handleNextStep">
           下一步
         </Button>
@@ -67,6 +67,7 @@ const router = useRouter()
 const uploadRef = ref<any>(null)
 const isLoading = ref<boolean>(false)
 const isDisabled = ref<boolean>(true)
+const isImageChanged = ref<boolean>(false);
 
 const selectedOption = ref<Option>({
   name: 'id',
@@ -106,12 +107,18 @@ const checkIfCanProceed = computed(() => {
   const requiredFields = Object.keys(uploadLabelMap[selectedName] || {})
   const imageData = idImage.idImages[selectedName] || {}
 
-  return requiredFields.every((field) => imageData[field])
+  const canProceed = requiredFields.every((field) => imageData[field])
+
+  return canProceed
 })
 
 const handleNextStep = () => {
-  if (!isDisabled.value) {
+  if (!isDisabled.value && isImageChanged.value) {
     getOcrImageData()
+  }
+
+  if (!isDisabled.value && !isImageChanged.value ) {
+    router.push('/form')
   }
 }
 
@@ -120,7 +127,7 @@ watch(checkIfCanProceed, (canProceed) => {
 })
 
 onMounted(() => {
-  idImage.clearStore()
+  isDisabled.value = !checkIfCanProceed.value
 })
 
 enum ErrorType {
@@ -241,9 +248,9 @@ const getOcrImageData = async () => {
         code: ocrData.code,
         message: ocrData.message,
         data: ocrData.data
-      };
+      }
 
-      idImage.setIdOcrResult(response);
+      idImage.setIdOcrResult(response)
       router.push('/form')
     }
   } catch (error) {

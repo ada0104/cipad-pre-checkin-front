@@ -2,8 +2,7 @@
   <Header />
   <main>
     <div class="title-block">
-      <!--- 若 v-if="showContact" 的話 返回改為form表單--->
-      <Button buttonClass="btn" class="back-route">
+      <Button buttonClass="" @click="handleBackAction" class="back-route">
         <SvgIcon name="back" class="back-icon" />
         <span>返回</span>
       </Button>
@@ -271,10 +270,12 @@ import { setMemberData, type NewMemberDataRequest } from '@/api/api'
 
 import { useOrderStore } from '@/stores/order'
 import { useIdImageStore } from '@/stores/idimage'
+import { useMemberDataStore } from '@/stores/member'
 
 const router = useRouter()
 const idImage = useIdImageStore()
 const orderStore = useOrderStore()
+const memberDataStore = useMemberDataStore()
 
 // 表單動作
 const isLoading = ref<boolean>(false)
@@ -287,9 +288,9 @@ const userName = ref<string>('')
 const birthday = ref<string>('')
 const email = ref<string>('')
 const phone = ref<string>('')
-const cloudCarrier = ref<string>('')
-const companyId = ref<string>('')
-const companyName = ref<string>('')
+const cloudCarrier = ref<string | null>(null);
+const companyId = ref<string | null>(null);
+const companyName = ref<string | null>(null);
 const pmsSource = ref<string>('')
 const orderNumber = ref<string>('')
 const acceptTerms = ref<boolean>(false)
@@ -381,20 +382,28 @@ watch(selectedInvoiceType, (newType) => {
 });
 
 onMounted(() => {
-  // 若有資料/dunqian/pre_checkin/pms_get_member_data
-  // is_default: true 並且 將對應的資料丟給ref
-  // 如果沒有 帶入 ocr資料
+  const assignMemberData = (data: any) => {
+    userName.value = data.name;
+    birthday.value = data.birthday;
+    phone.value = data.phone || '';
+    email.value = data.email || '';
+    cloudCarrier.value = data.invoice?.barcode || '';
+    companyId.value = data.invoice?.compiled || '';
+    companyName.value = data.invoice?.company || '';
+  };
 
-  const orderOriginData = orderStore.orderData.orderData
-  pmsSource.value = orderOriginData.pms
-  orderNumber.value = orderOriginData.order_number
+  if (memberDataStore.defaultMemberData.code === '0') {
+    assignMemberData(memberDataStore.defaultMemberData.data);
+  } else {
+    assignMemberData(idImage.idOcrResult.data);
+  }
 
-  const ocrResult = idImage.idOcrResult.data
-  userName.value = ocrResult.name
-  birthday.value = ocrResult.birthday
+  const { pms, order_number } = orderStore.orderData.orderData;
+  pmsSource.value = pms;
+  orderNumber.value = order_number;
 
-  applyWatermarks()
-})
+  applyWatermarks();
+});
 
 watch([idImageArray, canvasRefs], applyWatermarks)
 
@@ -574,7 +583,7 @@ function updateErrorMessages (type: ErrorType): void {
     case ErrorType.hasQRNotification:
       errorTitle.value = '資料上傳失敗'
       errorContent.value = [{ text: '已有 pre-checkin 圖片' }]
-      errorButtonText.value = '取得pre-checkin 圖片'
+      errorButtonText.value = '進入qrcode頁面'
       break
     case ErrorType.noOcrImage:
       errorTitle.value = '資料上傳失敗'
@@ -613,7 +622,7 @@ const handleRetryUpload = (errorType: ErrorType | null) => {
     saveFormData()
   }
 
-  // 自動跳轉 就不顯示按鈕
+  // 如果已經有qrcode自動跳轉 就不顯示按鈕
   if (errorType === ErrorType.hasQRNotification) {
     router.push('/checkin')
   }
@@ -627,19 +636,24 @@ const handleRetryUpload = (errorType: ErrorType | null) => {
 
 const handleExtraAction = () => {
   showError.value = false
-  isDefault.value = false;
-  // 還是要送出表單 只是預設資料參數為false
+  isDefault.value = false
+
   router.push('/checkin')
 }
 
 const handleBackAction = () => {
-  showError.value = false
+  if (showContact.value) {
+    showContact.value = false;
+    applyWatermarks();
+  } else {
+    router.push('/upload')
+  }
 }
 
 const saveFormData = async () => {
   const newMemberData: NewMemberDataRequest = {
     source: pmsSource.value,
-    country_codes: '+886',
+    country_codes: selectedOption.value.label,
     phone: phone.value,
     name: userName.value,
     email: email.value,
@@ -751,7 +765,7 @@ const submitFormData = async () => {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-
+  cursor: pointer;
   .back-icon {
     color: inherit;
   }

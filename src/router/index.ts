@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useOrderStore } from '@/stores/order';
+import { useOrderStore , useUrlTokenStore} from '@/stores/order';
 import { useIdImageStore } from '@/stores/idimage';
 
 const router = createRouter({
@@ -31,24 +31,32 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const orderStore = useOrderStore();
+  const urlTokenStore = useUrlTokenStore();
   const idStore = useIdImageStore();
 
   const hasOrderData = Object.values(orderStore.orderData.orderData).length > 0;
   const hasIdImages = Object.keys(idStore.idImages).length > 0;
+  const hasUrlToken = !!urlTokenStore.urlToken;
 
-  // 如果沒有訂單資料，跳回首頁
-  if (to.name !== 'home' && !hasOrderData) {
+  if (!to.name) {
+    const fullPath = to.fullPath;
+    const match = fullPath.match(/\/([a-zA-Z0-9]+)$/);
+
+    if (match) {
+      const urlToken = match[1];
+      urlTokenStore.setUrlToken(urlToken);
+    }
+  }
+  // 重新整理的時候會遺失urlToken
+  if (to.name !== 'home' && !hasOrderData && !hasUrlToken) {
     return next({ name: 'home' });
   }
 
-  // 如果在 form 頁面，且沒有身分證資料，回到上傳身分證頁面
   if (to.name == 'form' && !hasIdImages ) {
     return next({ name: 'upload' });
   }
 
   next();
 });
-
-
 
 export default router

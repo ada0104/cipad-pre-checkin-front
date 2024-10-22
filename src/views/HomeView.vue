@@ -9,7 +9,7 @@
         <p>登記入住資料</p>
       </div>
     </div>
-    <div class="card card-1">
+    <div v-if="!showNoUrlToken" class="card card-1">
       <p class="card-title m-b-16">{{ orderDomain }}</p>
       <p class="card-sec-title">訂單編號 {{ orderId }}</p>
       <p v-if="!showError" class="card-text">
@@ -19,7 +19,7 @@
         )
       </p>
     </div>
-    <div v-if="!showError" class="card card-2">
+    <div v-if="!showError && !showNoUrlToken" class="card card-2">
       <p class="card-title">訂購人 - {{ orderName }}</p>
       <p class="card-title m-b-48">是否為本次入住旅客？</p>
       <div class="btn-group">
@@ -36,6 +36,12 @@
         造成您的困擾，敬請見諒
       </p>
     </div>
+    <div v-if="showNoUrlToken" class="card card-2">
+      <p class="error-title">輸入網址錯誤</p>
+      <p class="error-text">
+        無法取得urlToken
+      </p>
+    </div>
   </main>
 </template>
 <script setup lang="ts">
@@ -43,7 +49,8 @@ import { ref, onMounted } from 'vue'
 import { Vue3Lottie } from 'vue3-lottie'
 
 import { getData, type OrderDataRequest, getMemberData, type DefaultMemberDataRequest, type OrderDataResponse, type OrderDetailDataResponse } from '@/api/api'
-import { useOrderStore } from '@/stores/order'
+import { useOrderStore, useUrlTokenStore } from '@/stores/order'
+import { useMemberDataStore } from '@/stores/member'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
@@ -56,34 +63,46 @@ const orderCheckInDate = ref<string>('')
 const orderCheckOutDate = ref<string>('')
 const isLoading = ref<boolean>(false)
 const showError = ref<boolean>(false)
+const showNoUrlToken = ref<boolean>(false)
 
 const orderStore = useOrderStore()
+const urlTokenStore = useUrlTokenStore();
+
+const memberDataStore = useMemberDataStore()
 const router = useRouter()
 const orderDataRequest: OrderDataRequest = {
-  url_token: 'xJXFM'
+  url_token: urlTokenStore.urlToken
 }
 
+const prepareMemberDataRequest = (): DefaultMemberDataRequest => {
+  const { pms, email, order_number } = orderStore.orderData.orderData;
+
+  return {
+    pms: pms,
+    email: email,
+    order_number: order_number
+  };
+};
+
 const handleNextStep = async (isSameOne: boolean) => {
-  const defaultMemberDataRequest: DefaultMemberDataRequest = {
-    pms: orderStore.orderData.orderData.pms,
-    email: orderStore.orderData.orderData.email,
-    order_number: orderStore.orderData.orderData.order_number,
+  if (!isSameOne) {
+    return router.push('/upload');
   }
 
-  if (isSameOne) {
-    try {
-      const memberData = await getMemberData(defaultMemberDataRequest);
+  try {
+    const memberData = await getMemberData(prepareMemberDataRequest());
 
-      if (memberData.code === '0' && memberData.data) {
-        // 撈資料存入store
-      }
+    if (memberData.code === '0' && memberData.data) {
+      memberDataStore.setMemberData(memberData);
 
-    } catch (error) {
-      console.error('Failed to get member data:', error);
+      return router.push('/form');
     }
+
+  } catch (error) {
+    console.error('getMemberData error :', error);
   }
 
-  router.push('/upload');
+  return router.push('/upload');
 };
 
 const setViewOrderData = (
@@ -97,10 +116,10 @@ const setViewOrderData = (
   orderName.value = orderData.name;
   orderDomain.value = orderData.domain;
 
-  if (data.orderDetailData) {
-    const [orderDetail] = data.orderDetailData.data
-    orderCheckInDate.value = orderDetail.check_in
-    orderCheckOutDate.value = orderDetail.check_out
+  if (!showError.value && data.orderDetailData) {
+    const [orderDetail] = data.orderDetailData.data;
+    orderCheckInDate.value = orderDetail.check_in;
+    orderCheckOutDate.value = orderDetail.check_out;
   }
 };
 
@@ -114,17 +133,14 @@ const getOrderData = async () => {
     if (dataStatus === '0' && data.orderDetailData?.code === '0') {
       setViewOrderData(data);
       orderStore.setOrderData(data)
-    } else if (dataStatus === '1001') {
-      // 已經有圖片直接到最後一頁
+    } else if (dataStatus === '1001' && data.orderDetailData?.code === '0') {
       orderStore.setOrderData(data)
       router.push('/checkin')
-    } else if (
-      // 多房訂單 顯示阻擋畫面 或是 撈詳細資料時失敗
-      (data.orderDetailData?.code === '1002') ||
-      (dataStatus === '0' && data.orderDetailData?.code !== '0')
-    ) {
-      setViewOrderData(data);
+    } else if(dataStatus === '1000') {
+      showNoUrlToken.value = true;
+    } else{
       showError.value = true
+      setViewOrderData(data);
     }
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -134,6 +150,11 @@ const getOrderData = async () => {
 }
 
 onMounted(async () => {
+  if (urlTokenStore.urlToken === '') {
+    showNoUrlToken.value = true;
+    return;
+  }
+
   orderStore.clearStore()
   await getOrderData()
 })

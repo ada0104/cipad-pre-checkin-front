@@ -29,10 +29,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, defineProps, computed, watch } from 'vue'
+import { ref, defineProps, computed, watch, onMounted, defineEmits } from 'vue'
 import imageCompression from 'browser-image-compression'
 import { useIdImageStore } from '@/stores/idimage'
 
+const emit = defineEmits(['imageChanged'])
 const idImage = useIdImageStore()
 
 const props = defineProps({
@@ -79,6 +80,8 @@ const handleImageUpload = async (name: string, side: string, event: any) => {
 
     await saveToStore(name, side, base64String)
     event.target.value = ''
+
+    emit('imageChanged', true); 
   } catch (error) {
     console.error('Error during image compression or upload:', error)
   }
@@ -111,6 +114,12 @@ const clearUploadData = () => {
 defineExpose({
   clearUploadData
 })
+
+onMounted(() => {
+  if (Object.keys(idImage.idImages).length > 0) {
+    imageSrcs.value = idImage.idImages;
+  }
+});
 </script>
 <style scoped lang="scss">
 @mixin text-style($weight, $size, $color) {

@@ -14,12 +14,13 @@
       </div>
       <div class="qr-card">
         <img class="qr-code" :src="formattedQrCodeImage" alt="QRcode" />
+        <p v-if="!formattedQrCodeImage" class="order-error">取得 QR code 失敗</p>
         <p class="order-id">訂單編號</p>
         <p class="order-id">{{ orderNumber }}</p>
       </div>
       <div>
         <p class="sub-title">開放入住時間</p>
-        <p class="check-in-time">{{ orderCheckInDate }} 15:00</p>
+        <p class="check-in-time">{{ orderCheckInDate }}</p>
       </div>
     </div>
     <div class="card download">
@@ -47,7 +48,7 @@ import { onMounted, ref, computed } from 'vue'
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
 
-import { useOrderStore } from '@/stores/order'
+import { useOrderStore, useUrlTokenStore } from '@/stores/order'
 import { getQRcodeData, type QRcodeDataRequest } from '@/api/api'
 
 const isLoading = ref<boolean>(false)
@@ -58,6 +59,7 @@ const orderNumber =ref<string>('')
 const qrCodeImage =ref<string>('')
 
 const orderStore = useOrderStore()
+const urlTokenStore = useUrlTokenStore();
 orderNumber.value = orderStore.orderData.orderData.order_number
 orderDomain.value = orderStore.orderData.orderData.domain
 
@@ -68,7 +70,7 @@ if (orderStore.orderData.orderDetailData) {
 
 const getQRcodeImage = async () => {
   isLoading.value = true
-  const orderUrlToken = 'xJXFM';
+  const orderUrlToken = urlTokenStore.urlToken
   const qrcodeDataRequest: QRcodeDataRequest = {
     order_number: orderNumber.value,
     url_token: orderUrlToken,
@@ -79,7 +81,7 @@ const getQRcodeImage = async () => {
     if (qrcodeData.code === '0' && qrcodeData.img) {
       qrCodeImage.value = qrcodeData.img
     } else {
-      console.log(qrcodeData);
+      console.error('Failed to fetch QR code image')
     }
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -145,6 +147,14 @@ onMounted(async () => {
     .qr-code {
       width: 150px;
       height: 150px;
+    }
+    .order-error {
+      color: var(--On-Error-Cont);
+      text-align: center;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 140%;
+      letter-spacing: 1.92px;
     }
 
     .order-id {
