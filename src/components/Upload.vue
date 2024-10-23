@@ -88,6 +88,13 @@ const handleImageUpload = async (name: string, side: string, event: any) => {
 }
 
 const saveToStore = (name: string, side: string, base64String: string) => {
+  const existingImages = Object.keys(idImage.idImages)[0];
+
+  if (existingImages !== name) {
+    imageSrcs.value[existingImages] = {}
+    idImage.clearStore()
+  }
+
   idImage.setImage64BaseData(name, side, base64String)
 }
 

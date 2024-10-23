@@ -130,7 +130,6 @@ onMounted(() => {
   const existingImages = Object.keys(idImage.idImages);
 
   if (existingImages.length > 0) {
-    console.log(existingImages);
 
     const firstExistingImage = existingImages[0];
     const option = options.value.find(option => option.name === firstExistingImage);
