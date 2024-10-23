@@ -81,7 +81,7 @@ const handleImageUpload = async (name: string, side: string, event: any) => {
     await saveToStore(name, side, base64String)
     event.target.value = ''
 
-    emit('imageChanged', true); 
+    emit('imageChanged', true);
   } catch (error) {
     console.error('Error during image compression or upload:', error)
   }
@@ -97,14 +97,6 @@ const currentLabels = computed(() => {
     ...(props.labels.back && { back: props.labels.back })
   }
 })
-
-watch(
-  () => props.name,
-  (newName, oldName) => {
-    imageSrcs.value[oldName] = {}
-    idImage.clearStore()
-  }
-)
 
 const clearUploadData = () => {
   imageSrcs.value = {}

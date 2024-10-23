@@ -154,7 +154,6 @@ onMounted(async () => {
     showNoUrlToken.value = true;
     return;
   }
-
   orderStore.clearStore()
   await getOrderData()
 })

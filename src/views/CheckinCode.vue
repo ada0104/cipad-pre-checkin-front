@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="card download">
-      <Button buttonClass="btn primary-btn">下載圖片</Button>
+      <Button buttonClass="btn primary-btn" @click="handleDownload">下載圖片</Button>
       <div class="svg-text">
         <SvgIcon name="email" class="email-icon" />
         <p class="email-text">已同步寄至入住人Email信箱</p>
@@ -43,7 +43,7 @@
   </main>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, handleError } from 'vue'
 
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
@@ -93,6 +93,10 @@ const getQRcodeImage = async () => {
 const formattedQrCodeImage = computed(() => {
   return `data:image/png;base64,${qrCodeImage.value}`;
 });
+
+const handleDownload = () => {
+  console.log('formattedQrCodeImage',formattedQrCodeImage)
+}
 
 onMounted(async () => {
   if (orderStore.orderData.orderData.img) {
