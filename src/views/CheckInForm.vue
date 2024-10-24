@@ -233,7 +233,9 @@
       </div>
     </div>
     <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" />
-    <p v-if="isLoading">Loading...</p>
+    <div v-if="isLoading" class="loading-animation">
+      <LottieAnimation name="upload" lottie_text="資料上傳中" />
+    </div>
   </main>
   <ErrorAlert
     v-if="showError"
@@ -262,6 +264,7 @@ import Select from '@/components/Select.vue'
 import Button from '@/components/Button.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
+import LottieAnimation from '@/components/Lottie.vue';
 
 import { useRouter } from 'vue-router'
 import { useVuelidate } from '@vuelidate/core'

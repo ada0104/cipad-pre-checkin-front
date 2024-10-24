@@ -18,11 +18,18 @@
           :options="options"
           @update:selectedOption="updateSelectedOption"
         />
-        <Upload ref="uploadRef" :name="computedLabels.name" :labels="computedLabels.labels" @imageChanged="isImageChanged = true"/>
+        <Upload
+          ref="uploadRef"
+          :name="computedLabels.name"
+          :labels="computedLabels.labels"
+          @imageChanged="isImageChanged = true"
+        />
         <Button buttonClass="btn primary-btn" :disabled="isDisabled" @click="handleNextStep">
           下一步
         </Button>
-        <p v-if="isLoading">Loading...</p>
+        <div v-if="isLoading" class="loading-animation">
+          <LottieAnimation name="id_ocr" lottie_text="證件審核中" />
+        </div>
       </div>
     </div>
   </main>
@@ -39,14 +46,18 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
 import Select from '@/components/Select.vue'
 import Upload from '@/components/Upload.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
+import LottieAnimation from '@/components/Lottie.vue';
+
 import { useIdImageStore } from '@/stores/idimage'
 import { useOrderStore } from '@/stores/order'
-import { useRouter } from 'vue-router'
+
 import { getOcrData, type OcrDataResponse, type OcrDataRequest } from '@/api/api'
 
 interface Option {
@@ -67,7 +78,7 @@ const router = useRouter()
 const uploadRef = ref<any>(null)
 const isLoading = ref<boolean>(false)
 const isDisabled = ref<boolean>(true)
-const isImageChanged = ref<boolean>(false);
+const isImageChanged = ref<boolean>(false)
 
 const selectedOption = ref<Option>({
   name: 'id',
@@ -113,12 +124,8 @@ const checkIfCanProceed = computed(() => {
 })
 
 const handleNextStep = () => {
-  if (!isDisabled.value && isImageChanged.value) {
+  if (!isDisabled.value) {
     getOcrImageData()
-  }
-
-  if (!isDisabled.value && !isImageChanged.value ) {
-    router.push('/form')
   }
 }
 
@@ -127,15 +134,14 @@ watch(checkIfCanProceed, (canProceed) => {
 })
 
 onMounted(() => {
-  const existingImages = Object.keys(idImage.idImages);
+  const existingImages = Object.keys(idImage.idImages)
 
   if (existingImages.length > 0) {
-
-    const firstExistingImage = existingImages[0];
-    const option = options.value.find(option => option.name === firstExistingImage);
+    const firstExistingImage = existingImages[0]
+    const option = options.value.find((option) => option.name === firstExistingImage)
 
     if (option) {
-      updateSelectedOption(option);
+      updateSelectedOption(option)
     }
   }
   isDisabled.value = !checkIfCanProceed.value

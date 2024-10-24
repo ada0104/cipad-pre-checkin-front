@@ -1,7 +1,7 @@
 <template>
   <Header />
   <div v-if="isLoading" class="loading-animation">
-    <Vue3Lottie :animationData="upLoadOcrLottie" :loop="true" :autoplay="true" />
+    <LottieAnimation name="loading" lottie_text="Loading" />
   </div>
   <main v-else>
     <div class="title-block">
@@ -30,31 +30,36 @@
     <div v-if="showError" class="card card-2">
       <p class="error-title">預先登記權限關閉</p>
       <p class="error-text">
-        因您的訂單內容變更<br/>
-        暫時無法使用【預先登記入住】服務<br/>
-        請改於旅館現場辦理入住<br/><br/>
+        因您的訂單內容變更<br />
+        暫時無法使用【預先登記入住】服務<br />
+        請改於旅館現場辦理入住<br /><br />
         造成您的困擾，敬請見諒
       </p>
     </div>
     <div v-if="showNoUrlToken" class="card card-2">
       <p class="error-title">輸入網址錯誤</p>
-      <p class="error-text">
-        無法取得urlToken
-      </p>
+      <p class="error-text">無法取得urlToken</p>
     </div>
   </main>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Vue3Lottie } from 'vue3-lottie'
+import LottieAnimation from '@/components/Lottie.vue';
 
-import { getData, type OrderDataRequest, getMemberData, type DefaultMemberDataRequest, type OrderDataResponse, type OrderDetailDataResponse } from '@/api/api'
+import {
+  getData,
+  getMemberData,
+  type OrderDataRequest,
+  type OrderDataResponse,
+  type DefaultMemberDataRequest,
+  type OrderDetailDataResponse
+} from '@/api/api'
+
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
 import { useMemberDataStore } from '@/stores/member'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
-import upLoadOcrLottie from '@/assets/lottie/id_ocr.json'
 
 const orderId = ref<string>('')
 const orderName = ref<string>('')
@@ -66,7 +71,7 @@ const showError = ref<boolean>(false)
 const showNoUrlToken = ref<boolean>(false)
 
 const orderStore = useOrderStore()
-const urlTokenStore = useUrlTokenStore();
+const urlTokenStore = useUrlTokenStore()
 
 const memberDataStore = useMemberDataStore()
 const router = useRouter()
@@ -75,53 +80,48 @@ const orderDataRequest: OrderDataRequest = {
 }
 
 const prepareMemberDataRequest = (): DefaultMemberDataRequest => {
-  const { pms, email, order_number } = orderStore.orderData.orderData;
+  const { pms, email, order_number } = orderStore.orderData.orderData
 
   return {
     pms: pms,
     email: email,
     order_number: order_number
-  };
-};
+  }
+}
 
 const handleNextStep = async (isSameOne: boolean) => {
   if (!isSameOne) {
-    return router.push('/upload');
+    return router.push('/upload')
   }
 
   try {
-    const memberData = await getMemberData(prepareMemberDataRequest());
+    const memberData = await getMemberData(prepareMemberDataRequest())
 
     if (memberData.code === '0' && memberData.data) {
-      memberDataStore.setMemberData(memberData);
-
-      return router.push('/form');
+      memberDataStore.setMemberData(memberData)
     }
-
   } catch (error) {
-    console.error('getMemberData error :', error);
+    console.error('getMemberData error:', error)
   }
 
-  return router.push('/upload');
-};
+  router.push('/upload')
+}
 
-const setViewOrderData = (
-  data: {
-    orderData: OrderDataResponse;
-    orderDetailData?: OrderDetailDataResponse;
-  }
-) => {
-  const { orderData } = data;
-  orderId.value = orderData.order_number;
-  orderName.value = orderData.name;
-  orderDomain.value = orderData.domain;
+const setViewOrderData = (data: {
+  orderData: OrderDataResponse
+  orderDetailData?: OrderDetailDataResponse
+}) => {
+  const { orderData } = data
+  orderId.value = orderData.order_number
+  orderName.value = orderData.name
+  orderDomain.value = orderData.domain
 
   if (!showError.value && data.orderDetailData) {
-    const [orderDetail] = data.orderDetailData.data;
-    orderCheckInDate.value = orderDetail.check_in;
-    orderCheckOutDate.value = orderDetail.check_out;
+    const [orderDetail] = data.orderDetailData.data
+    orderCheckInDate.value = orderDetail.check_in
+    orderCheckOutDate.value = orderDetail.check_out
   }
-};
+}
 
 const getOrderData = async () => {
   isLoading.value = true
@@ -131,16 +131,16 @@ const getOrderData = async () => {
     const dataStatus = data.orderData?.code
 
     if (dataStatus === '0' && data.orderDetailData?.code === '0') {
-      setViewOrderData(data);
+      setViewOrderData(data)
       orderStore.setOrderData(data)
     } else if (dataStatus === '1001' && data.orderDetailData?.code === '0') {
       orderStore.setOrderData(data)
       router.push('/checkin')
-    } else if(dataStatus === '1000') {
-      showNoUrlToken.value = true;
-    } else{
+    } else if (dataStatus === '1000') {
+      showNoUrlToken.value = true
+    } else {
       showError.value = true
-      setViewOrderData(data);
+      setViewOrderData(data)
     }
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -151,8 +151,8 @@ const getOrderData = async () => {
 
 onMounted(async () => {
   if (urlTokenStore.urlToken === '') {
-    showNoUrlToken.value = true;
-    return;
+    showNoUrlToken.value = true
+    return
   }
   orderStore.clearStore()
   await getOrderData()

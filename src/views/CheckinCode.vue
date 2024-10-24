@@ -1,6 +1,8 @@
 <template>
   <Header />
-  <div v-if="isLoading">Loading...</div>
+  <div v-if="isLoading" class="loading-animation">
+    <LottieAnimation name="loading" lottie_text="Loading" />
+  </div>
   <main v-else>
     <div class="title-block">
       <div class="title">
@@ -43,10 +45,11 @@
   </main>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, computed, handleError } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
+import LottieAnimation from '@/components/Lottie.vue';
 
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
 import { getQRcodeData, type QRcodeDataRequest } from '@/api/api'
@@ -242,6 +245,7 @@ onMounted(async () => {
       }
     }
     .icon {
+      color: var(--Primary);
       width: 78px;
       height: 78px;
     }
