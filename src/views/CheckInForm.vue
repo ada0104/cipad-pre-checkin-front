@@ -442,6 +442,9 @@ const updateSelectedOption = (option: Option) => {
 const showContact = ref<boolean>(false)
 const togglePrivacyPolicy = () => {
   showContact.value = !showContact.value
+  if (!showContact.value) {
+    applyWatermarks();
+  }
 }
 
 // 驗證規則
