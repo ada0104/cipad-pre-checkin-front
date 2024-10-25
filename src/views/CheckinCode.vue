@@ -43,13 +43,24 @@
       <SvgIcon name="icon" class="icon" />
     </div>
   </main>
+  <DownloadTemplate
+    ref="downloadTemplateRef"
+    :domainName="orderDomain"
+    :qrCode="formattedQrCodeImage"
+    :orderNumber="orderNumber"
+    :checkInDate="orderCheckInDate"
+    class="hidden-template"
+  />
 </template>
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, nextTick, type ComponentPublicInstance, type Ref } from 'vue'
+import dayjs from 'dayjs'
+import html2canvas from 'html2canvas'
 
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
-import LottieAnimation from '@/components/Lottie.vue';
+import LottieAnimation from '@/components/Lottie.vue'
+import DownloadTemplate from '@/components/Download.vue'
 
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
 import { getQRcodeData, type QRcodeDataRequest } from '@/api/api'
@@ -58,17 +69,21 @@ const isLoading = ref<boolean>(false)
 const orderDomain = ref<string>('')
 const orderCheckInDate = ref<string>('')
 const orderCheckOutDate = ref<string>('')
-const orderNumber =ref<string>('')
-const qrCodeImage =ref<string>('')
+const orderNumber = ref<string>('')
+const qrCodeImage = ref<string>('')
 
 const orderStore = useOrderStore()
-const urlTokenStore = useUrlTokenStore();
+const urlTokenStore = useUrlTokenStore()
+
 orderNumber.value = orderStore.orderData.orderData.order_number
 orderDomain.value = orderStore.orderData.orderData.domain
 
 if (orderStore.orderData.orderDetailData) {
-  orderCheckInDate.value = orderStore.orderData.orderDetailData.data[0].check_in
-  orderCheckOutDate.value = orderStore.orderData.orderDetailData.data[0].check_out
+  const checkIn = orderStore.orderData.orderDetailData.data[0].check_in
+  const checkOut = orderStore.orderData.orderDetailData.data[0].check_out
+
+  orderCheckInDate.value = dayjs(checkIn).format('YYYY/M/D HH:mm')
+  orderCheckOutDate.value = dayjs(checkOut).format('YYYY/M/D HH:mm')
 }
 
 const getQRcodeImage = async () => {
@@ -76,7 +91,7 @@ const getQRcodeImage = async () => {
   const orderUrlToken = urlTokenStore.urlToken
   const qrcodeDataRequest: QRcodeDataRequest = {
     order_number: orderNumber.value,
-    url_token: orderUrlToken,
+    url_token: orderUrlToken
   }
 
   try {
@@ -94,11 +109,30 @@ const getQRcodeImage = async () => {
 }
 
 const formattedQrCodeImage = computed(() => {
-  return `data:image/png;base64,${qrCodeImage.value}`;
-});
+  return `data:image/png;base64,${qrCodeImage.value}`
+})
 
-const handleDownload = () => {
-  console.log('formattedQrCodeImage',formattedQrCodeImage)
+const downloadTemplateRef: Ref<ComponentPublicInstance<
+  InstanceType<typeof DownloadTemplate>
+> | null> = ref(null)
+
+const handleDownload = async () => {
+  try {
+    await nextTick()
+
+    const canvas = await html2canvas(downloadTemplateRef.value?.$el as HTMLElement, {
+      scale: 2,
+      logging: false,
+    })
+
+    const imgUrl = canvas.toDataURL('image/jpeg', true)
+    const link = document.createElement('a')
+    link.download = 'Check-in QR Code.png'
+    link.href = imgUrl
+    link.click()
+  } catch (error) {
+    console.error('download Check-in QR Code error :', error)
+  }
 }
 
 onMounted(async () => {
@@ -108,7 +142,6 @@ onMounted(async () => {
     await getQRcodeImage()
   }
 })
-
 </script>
 <style lang="scss" scoped>
 .card {
@@ -250,5 +283,12 @@ onMounted(async () => {
       height: 78px;
     }
   }
+}
+
+.hidden-template {
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  z-index: 0;
 }
 </style>
