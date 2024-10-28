@@ -1,0 +1,17 @@
+{
+  "中文":"中文",
+  "EN":"EN",
+  "登記入住資料": "Check-in Information",
+  "訂單編號": "Order Number",
+  "訂購人": "Orderer",
+  "是否為本次入住旅客？": "Is this the guest for this stay?",
+  "否，不同人": "No, different person",
+  "是，同一人": "Yes, same person",
+  "預先登記權限關閉": "Pre-Check-in Privilege Closed",
+  "因您的訂單內容變更": "Due to changes in your order",
+  "暫時無法使用【預先登記入住】服務": "Pre-Check-in service is temporarily unavailable",
+  "請改於旅館現場辦理入住": "Please proceed with check-in at the hotel front desk",
+  "造成您的困擾，敬請見諒": "We apologize for any inconvenience caused",
+  "輸入網址錯誤": "Incorrect URL entered",
+  "無法取得": "Unable to retrieve"
+}

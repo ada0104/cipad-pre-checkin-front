@@ -5,17 +5,36 @@
     </div>
     <div class="header-right">
       <div class="lang">
-        <span class="ch-tw">中文</span>
-        <span class="en">/</span>
-        <span class="en">EN</span>
+        <span
+          class="tw"
+          @click="changeLanguage('zh')"
+          :class="{ active: isActive('zh') }">{{ $t('中文') }}</span>
+        <span>/</span>
+        <span
+          class="en"
+          @click="changeLanguage('en')"
+          :class="{ active: isActive('en') }">{{ $t('EN') }}</span>
       </div>
       <ThemeToggle />
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
+
+const changeLanguage = (lang: string) => {
+  locale.value = lang
+}
+
+const isActive = (lang: string) => {
+  return locale.value === lang
+}
 </script>
+
 <style scoped lang="scss">
 .header {
   display: flex;
@@ -37,12 +56,22 @@ import ThemeToggle from '@/components/ThemeToggle.vue'
       display: flex;
       gap: 10px;
 
-      .ch-tw {
-        color: var(--Primary);
+      .tw {
+        color: var(--Sec-Cont);
+        cursor: pointer;
+
+        &.active {
+          color: var(--Primary);
+        }
       }
 
       .en {
         color: var(--Sec-Cont);
+        cursor: pointer;
+
+        &.active {
+          color: var(--Primary);
+        }
       }
     }
   }
