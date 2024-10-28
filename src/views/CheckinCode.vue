@@ -63,7 +63,7 @@ import LottieAnimation from '@/components/Lottie.vue'
 import DownloadTemplate from '@/components/Download.vue'
 
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
-import { getQRcodeData, type QRcodeDataRequest } from '@/api/api'
+import { getQRcodeData, type QRcodeDataRequest, setSentEmailData, type SentEmailRequest } from '@/api/api'
 
 const isLoading = ref<boolean>(false)
 const orderDomain = ref<string>('')
@@ -71,16 +71,22 @@ const orderCheckInDate = ref<string>('')
 const orderCheckOutDate = ref<string>('')
 const orderNumber = ref<string>('')
 const qrCodeImage = ref<string>('')
+const email = ref<string>('')
+const name = ref<string>('')
 
 const orderStore = useOrderStore()
 const urlTokenStore = useUrlTokenStore()
 
 orderNumber.value = orderStore.orderData.orderData.order_number
 orderDomain.value = orderStore.orderData.orderData.domain
+orderDomain.value = orderStore.orderData.orderData.domain
+orderDomain.value = orderStore.orderData.orderData.domain
 
 if (orderStore.orderData.orderDetailData) {
   const checkIn = orderStore.orderData.orderDetailData.data[0].check_in
   const checkOut = orderStore.orderData.orderDetailData.data[0].check_out
+  email.value = orderStore.orderData.orderDetailData.data[0].email
+  name.value = orderStore.orderData.orderDetailData.data[0].name
 
   orderCheckInDate.value = dayjs(checkIn).format('YYYY/M/D HH:mm')
   orderCheckOutDate.value = dayjs(checkOut).format('YYYY/M/D HH:mm')
@@ -105,6 +111,28 @@ const getQRcodeImage = async () => {
     console.error('Error fetching data:', error)
   } finally {
     isLoading.value = false
+  }
+}
+
+const setSentEmail = async () => {
+  const sentEmailRequest: SentEmailRequest = {
+    mail: email.value,
+    name: name.value,
+    domain: orderDomain.value,
+    order_number: orderNumber.value,
+    check_in_date: orderCheckInDate.value,
+    check_out_date: orderCheckOutDate.value,
+  }
+
+  try {
+    const sentEmailData = await setSentEmailData(sentEmailRequest)
+    if (sentEmailData.code === '0') {
+      console.log('Email sent successfully');
+    } else {
+      console.error('Failed to sent Email')
+    }
+  } catch (error) {
+    console.error('Error sent Email :', error)
   }
 }
 
@@ -140,6 +168,7 @@ onMounted(async () => {
     qrCodeImage.value = orderStore.orderData.orderData.img
   } else {
     await getQRcodeImage()
+    await setSentEmail()
   }
 })
 </script>

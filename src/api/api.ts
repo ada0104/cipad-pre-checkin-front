@@ -84,6 +84,15 @@ export interface QRcodeDataRequest {
   company?: string,
 }
 
+export interface SentEmailRequest {
+  mail: string,
+  name: string,
+  domain: string,
+  order_number: string,
+  check_in_date: string,
+  check_out_date: string,
+}
+
 export interface OrderDataResponse {
   code: string;
   order_number: string;
@@ -149,6 +158,12 @@ export interface QRcodeDataResponse {
   code: string;
   message: string;
   img?: string;
+}
+
+export interface SentEmailResponse {
+  code: string;
+  message: string;
+  data?: string;
 }
 
 const fetchOrderData = async (orderDataRequest: OrderDataRequest): Promise<OrderDataResponse> => {
@@ -276,6 +291,21 @@ const fetchQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest): Promise<QRc
   }
 };
 
+const fetchSentEmail = async (sentEmailRequest:SentEmailRequest): Promise<SentEmailResponse> => {
+  try {
+
+    const queryParams = buildQueryParams(sentEmailRequest);
+    const data = await fetchApi<SentEmailResponse>(
+      `/dunqian/pre_checkin/send_pci_mail?${queryParams}`
+    );
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch sent email data:", error);
+    throw error;
+  }
+};
+
 const getData = async (orderDataRequest: OrderDataRequest) => {
   try {
     const orderData = await fetchOrderData(orderDataRequest);
@@ -355,10 +385,22 @@ const getQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest) => {
   }
 };
 
+const setSentEmailData = async (sentEmailRequest:SentEmailRequest) => {
+  try {
+    const sentEmailData = await fetchSentEmail(sentEmailRequest);
+
+    return sentEmailData;
+  } catch (error) {
+    console.error("Error in sentEmailData:", error);
+    throw error;
+  }
+};
+
 export {
   getData,
   getOcrData,
   getMemberData,
   setMemberData,
   getQRcodeData,
+  setSentEmailData
 };

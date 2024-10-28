@@ -87,36 +87,6 @@ const closeAlert = (): void => {
   z-index: 4;
 
   .error-alert {
-    &.purple {
-      .alert-title {
-        color: var(--Primary);
-        margin-bottom: 24px;
-      }
-
-      .alert-button {
-        background: var(--Prim-Cont);
-        color: var(--On-Prim);
-      }
-
-      :slotted(button) {
-        margin-left: 10px;
-      }
-    }
-    &.extra {
-      width: 800px;
-
-      .btn-group {
-        height: 82px;
-        display: flex;
-        width: 100%;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 12px;
-      }
-      .alert-button {
-        width: 307px;
-      }
-    }
     width: 592px;
     padding: 48px;
     border-radius: 32px;
@@ -133,6 +103,39 @@ const closeAlert = (): void => {
       0px 56px 33px 0px rgba(28, 28, 28, 0.05),
       0px 25px 25px 0px rgba(28, 28, 28, 0.09),
       0px 6px 14px 0px rgba(28, 28, 28, 0.1);
+
+    &.purple {
+      .alert-title {
+        color: var(--Primary);
+        margin-bottom: 24px;
+      }
+
+      .alert-button {
+        background: var(--Prim-Cont);
+        color: var(--On-Prim);
+      }
+
+      :slotted(button) {
+        margin-left: 10px;
+      }
+    }
+
+    &.extra {
+      width: 800px;
+
+      .btn-group {
+        height: 82px;
+        display: flex;
+        width: 100%;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .alert-button {
+        width: 307px;
+      }
+    }
 
     .alert-title {
       color: var(--Error);
@@ -162,6 +165,7 @@ const closeAlert = (): void => {
         color: var(--Secondary);
       }
     }
+
     .alert-footer {
       display: flex;
       gap: 24px;
@@ -191,6 +195,7 @@ const closeAlert = (): void => {
       line-height: 140%;
       letter-spacing: 1.92px;
     }
+
     .alert-subtext {
       cursor: pointer;
       color: var(--On-input-sec);
