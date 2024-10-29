@@ -18,6 +18,7 @@ const proxyApiList = [
   'pre_checkin/upload_image',
   'pre_checkin/add_member_data',
   'pre_checkin/get_checkin_qr',
+  'pre_checkin/send_pci_mail',
   'pms/get_order_data'
 ]
 

@@ -291,15 +291,14 @@ const fetchQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest): Promise<QRc
   }
 };
 
-const fetchSentEmail = async (sentEmailRequest:SentEmailRequest): Promise<SentEmailResponse> => {
+const fetchSentEmail = async (sentEmailRequest: SentEmailRequest): Promise<SentEmailResponse> => {
   try {
+    const response = await fetchApi<SentEmailResponse>('/dunqian/pre_checkin/send_pci_mail', {
+      method: 'POST',
+      body: JSON.stringify(sentEmailRequest),
+    });
 
-    const queryParams = buildQueryParams(sentEmailRequest);
-    const data = await fetchApi<SentEmailResponse>(
-      `/dunqian/pre_checkin/send_pci_mail?${queryParams}`
-    );
-
-    return data;
+    return response;
   } catch (error) {
     console.error("Failed to fetch sent email data:", error);
     throw error;

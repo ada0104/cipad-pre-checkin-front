@@ -51,8 +51,9 @@ export const useMemberDataStore = defineStore('memberData', () => {
   }
 
   function setSendableEmail(name:string ,email: string) {
-    sendableEmail.value = email;
+    console.log('setSendableEmail', name, email);
     sendableName.value = name;
+    sendableEmail.value = email;
   }
 
   function clearStore() {

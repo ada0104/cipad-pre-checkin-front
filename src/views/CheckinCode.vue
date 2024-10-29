@@ -115,16 +115,13 @@ const getQRcodeImage = async () => {
 }
 
 const setSentEmail = async () => {
-  email.value = memberDataStore.sendableEmail;
-  name.value = memberDataStore.sendableName;
-
   const sentEmailRequest: SentEmailRequest = {
-    mail: email.value,
-    name: name.value,
+    mail: memberDataStore.sendableEmail,
+    name: memberDataStore.sendableName,
     domain: orderDomain.value,
     order_number: orderNumber.value,
-    check_in_date: orderCheckInDate.value,
-    check_out_date: orderCheckOutDate.value,
+    check_in_date: dayjs(orderCheckInDate.value).format('YYYY/M/D'),
+    check_out_date: dayjs(orderCheckOutDate.value).format('YYYY/M/D'),
   }
 
   try {

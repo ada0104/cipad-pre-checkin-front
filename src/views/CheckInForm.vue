@@ -644,8 +644,6 @@ const handleExtraAction = () => {
   showError.value = false
   isDefault.value = false
   saveFormData()
-
-  router.push('/checkin')
 }
 
 const handleBackAction = () => {
@@ -683,13 +681,15 @@ const saveFormData = async () => {
     }
 
     if (res.code === '0') {
-      router.push('/checkin')
+      memberDataStore.setSendableEmail(userName.value, email.value)
     }
   } catch (error) {
     updateErrorMessages(ErrorType.UnknownError)
   } finally {
     isLoading.value = false
   }
+
+  router.push('/checkin')
 }
 
 const submitFormData = async () => {
