@@ -120,8 +120,8 @@ const setSentEmail = async () => {
     name: memberDataStore.sendableName,
     domain: orderDomain.value,
     order_number: orderNumber.value,
-    check_in_date: dayjs(orderCheckInDate.value).format('YYYY/M/D'),
-    check_out_date: dayjs(orderCheckOutDate.value).format('YYYY/M/D'),
+    check_in_date: dayjs(orderCheckInDate.value).format('YYYY-M-D'),
+    check_out_date: dayjs(orderCheckOutDate.value).format('YYYY-M-D'),
   }
 
   try {

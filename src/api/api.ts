@@ -295,7 +295,10 @@ const fetchSentEmail = async (sentEmailRequest: SentEmailRequest): Promise<SentE
   try {
     const response = await fetchApi<SentEmailResponse>('/dunqian/pre_checkin/send_pci_mail', {
       method: 'POST',
-      body: JSON.stringify(sentEmailRequest),
+      body: sentEmailRequest,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     return response;
