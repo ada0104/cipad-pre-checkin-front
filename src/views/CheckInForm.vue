@@ -643,6 +643,7 @@ const handleRetryUpload = (errorType: ErrorType | null) => {
 const handleExtraAction = () => {
   showError.value = false
   isDefault.value = false
+  saveFormData()
 
   router.push('/checkin')
 }

@@ -25,6 +25,9 @@ export const useMemberDataStore = defineStore('memberData', () => {
       }
   });
 
+  const sendableEmail = ref<string>('');
+  const sendableName = ref<string>('');
+
   function setMemberData(memberData: DefaultMemberDataResponse) {
     defaultMemberData.value = memberData;
 
@@ -47,13 +50,21 @@ export const useMemberDataStore = defineStore('memberData', () => {
     setImageData('back', image2);
   }
 
+  function setSendableEmail(name:string ,email: string) {
+    sendableEmail.value = email;
+    sendableName.value = name;
+  }
+
   function clearStore() {
     defaultMemberData.value = <DefaultMemberDataResponse>{};
   }
 
   return {
     defaultMemberData,
+    sendableEmail,
+    sendableName,
     setMemberData,
+    setSendableEmail,
     clearStore
   };
 });

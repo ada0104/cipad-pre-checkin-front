@@ -62,6 +62,7 @@ import Button from '@/components/Button.vue'
 import LottieAnimation from '@/components/Lottie.vue'
 import DownloadTemplate from '@/components/Download.vue'
 
+import { useMemberDataStore } from '@/stores/member'
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
 import { getQRcodeData, type QRcodeDataRequest, setSentEmailData, type SentEmailRequest } from '@/api/api'
 
@@ -76,6 +77,7 @@ const name = ref<string>('')
 
 const orderStore = useOrderStore()
 const urlTokenStore = useUrlTokenStore()
+const memberDataStore = useMemberDataStore()
 
 orderNumber.value = orderStore.orderData.orderData.order_number
 orderDomain.value = orderStore.orderData.orderData.domain
@@ -85,8 +87,6 @@ orderDomain.value = orderStore.orderData.orderData.domain
 if (orderStore.orderData.orderDetailData) {
   const checkIn = orderStore.orderData.orderDetailData.data[0].check_in
   const checkOut = orderStore.orderData.orderDetailData.data[0].check_out
-  email.value = orderStore.orderData.orderDetailData.data[0].email
-  name.value = orderStore.orderData.orderDetailData.data[0].name
 
   orderCheckInDate.value = dayjs(checkIn).format('YYYY/M/D HH:mm')
   orderCheckOutDate.value = dayjs(checkOut).format('YYYY/M/D HH:mm')
@@ -115,6 +115,9 @@ const getQRcodeImage = async () => {
 }
 
 const setSentEmail = async () => {
+  email.value = memberDataStore.sendableEmail;
+  name.value = memberDataStore.sendableName;
+
   const sentEmailRequest: SentEmailRequest = {
     mail: email.value,
     name: name.value,

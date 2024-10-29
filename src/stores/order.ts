@@ -13,8 +13,14 @@ export const useOrderStore = defineStore('orderData', () => {
     orderDetailData: {} as OrderDetailDataResponse
   });
 
+  const qrimg = ref<string>('');
+
   function setOrderData(data: CombinedOrderData) {
     orderData.value = data;
+  }
+
+  function setQRCodeImage(img: string) {
+    qrimg.value = img;
   }
 
   function clearStore() {
@@ -25,8 +31,10 @@ export const useOrderStore = defineStore('orderData', () => {
   }
 
   return {
+    qrimg,
     orderData,
     setOrderData,
+    setQRCodeImage,
     clearStore
   };
 });
