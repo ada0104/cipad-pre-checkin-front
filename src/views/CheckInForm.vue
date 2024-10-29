@@ -671,6 +671,7 @@ const saveFormData = async () => {
   }
 
   isLoading.value = true
+  let success = false;
 
   try {
     const res = await setMemberData(newMemberData)
@@ -681,15 +682,18 @@ const saveFormData = async () => {
     }
 
     if (res.code === '0') {
+      success = true;
       memberDataStore.setSendableEmail(userName.value, email.value)
     }
   } catch (error) {
-    updateErrorMessages(ErrorType.UnknownError)
+     updateErrorMessages(ErrorType.UnknownError)
   } finally {
     isLoading.value = false
-  }
 
-  router.push('/checkin')
+    if (success) {
+      router.push('/checkin');
+    }
+  }
 }
 
 const submitFormData = async () => {
