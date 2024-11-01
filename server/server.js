@@ -5,9 +5,28 @@ const {join} = require('node:path')
 const path = require('path')
 const fetch = require('node-fetch');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const WebSocket = require('ws');
+const port = process.env.PORT || 3000;
+const wsPort = process.env.WS_PORT || 8081;
 
 const app = express()
-const port = process.env.PORT || 3000;
+const wss = new WebSocket.Server({ port: wsPort });
+
+// 當有新的客戶端連接到 WebSocket 伺服器時
+wss.on('connection', (ws) => {
+  console.log('Client connected to WebSocket');
+
+  // 可以添加接收訊息的監聽
+  ws.on('message', (message) => {
+      console.log(`Received message from client: ${message}`);
+  });
+
+  ws.on('close', () => {
+      console.log('Client disconnected');
+  });
+});
+
+
 const distFolder = join(process.cwd(), 'dist')
 
 // API呼叫設定
@@ -32,10 +51,20 @@ app.get('/ready', (req, res) => {
 app.post('/webhook', (req, res) => {
   const event = req.headers['x-github-event'];
 
-  // 確認是 push 事件且目標分支為 dev
+  // 確認是 push
   if (event === 'push' ) {
-      console.log("Push to dev branch detected, triggering update scripts on all machines.", (req.body));
-      res.status(200).send('Update scripts triggered on all machines');
+    // 將推送事件轉到客端Ws
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+                data: req.body,
+                branch: req.body.ref,
+                repo: req.body.repository.full_name
+            }));
+        }
+    });
+    console.log("Push to dev branch detected, triggering update scripts on all machines.", (req.body));
+    res.status(200).send('Update scripts triggered on all machines');
   } else if( event === 'ping' ){
     res.status(200).send('pong');
   } else {
