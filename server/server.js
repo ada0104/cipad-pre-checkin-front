@@ -36,6 +36,8 @@ app.post('/webhook', (req, res) => {
   if (event === 'push' ) {
       console.log("Push to dev branch detected, triggering update scripts on all machines.", (req.body));
       res.status(200).send('Update scripts triggered on all machines');
+  } else if( event === 'ping' ){
+    res.status(200).send('pong');
   } else {
       res.status(400).send('Event not handled');
   }
