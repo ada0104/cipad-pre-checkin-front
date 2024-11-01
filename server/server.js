@@ -28,6 +28,18 @@ app.use(compression())
 app.get('/ready', (req, res) => {
   res.send('ping')
 })
+app.post('/webhook', (req, res) => {
+  const event = req.headers['x-github-event'];
+
+  // 確認是 push 事件且目標分支為 dev
+  if (event === 'push' ) {
+      console.log("Push to dev branch detected, triggering update scripts on all machines.", JSON.stringify(req.body));
+      res.status(200).send('Update scripts triggered on all machines');
+  } else {
+      res.status(400).send('Event not handled');
+  }
+});
+
 proxyApiList.forEach(path=> {
   app.use(`/dunqian/${path}`, createProxyMiddleware({
     target: `${API_URL}`, // 你的遠端 API 的 URL
