@@ -33,7 +33,7 @@ app.post('/webhook', (req, res) => {
 
   // 確認是 push 事件且目標分支為 dev
   if (event === 'push' ) {
-      console.log("Push to dev branch detected, triggering update scripts on all machines.", JSON.stringify(req.body));
+      console.log("Push to dev branch detected, triggering update scripts on all machines.", (req.body));
       res.status(200).send('Update scripts triggered on all machines');
   } else {
       res.status(400).send('Event not handled');
