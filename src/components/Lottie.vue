@@ -57,11 +57,10 @@ watch(
   }
 )
 
-// 監聽亮暗模式變化，重新加載Lottie數據
 prefersDarkScheme.addEventListener('change', (e) => {
   const newIsDarkTheme = e.matches
   if (newIsDarkTheme !== isDarkTheme) {
-    loadLottieData(props.name) // 重新加載Lottie數據
+    loadLottieData(props.name)
   }
 })
 </script>

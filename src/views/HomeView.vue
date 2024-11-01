@@ -1,50 +1,59 @@
 <template>
   <Header />
-  <div v-if="isLoading" class="loading-animation">
-    <LottieAnimation name="loading" lottie_text="Loading" />
-  </div>
-  <main v-else>
+  <main>
     <div class="title-block">
       <div class="title">
-        <p>{{$t('登記入住資料')}}</p>
+        <p>登記入住資料</p>
       </div>
-    </div>
-    <div v-if="!showNoUrlToken" class="card card-1">
-      <p class="card-title m-b-16">{{ orderDomain }}</p>
-      <p class="card-sec-title">{{$t('訂單編號')}} {{ orderId }}</p>
-      <p v-if="!showError" class="card-text">
-        (
-        <span>{{ new Date(orderCheckInDate).toLocaleDateString() }}</span> -
-        <span>{{ new Date(orderCheckOutDate).toLocaleDateString() }}</span>
-        )
-      </p>
-    </div>
-    <div v-if="!showError && !showNoUrlToken" class="card card-2">
-      <p class="card-title">{{$t('訂購人')}} - {{ orderName }}</p>
-      <p class="card-title m-b-48">{{$t('是否為本次入住旅客？')}}</p>
-      <div class="btn-group">
-        <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">{{$t('否，不同人')}}</Button>
-        <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">{{$t('是，同一人')}}</Button>
-      </div>
-    </div>
-    <div v-if="showError" class="card card-2">
-      <p class="error-title">{{$t('預先登記權限關閉')}}</p>
-      <p class="error-text">
-        {{$t('因您的訂單內容變更')}}<br />
-        {{$t('暫時無法使用【預先登記入住】服務')}}<br />
-        {{$t('請改於旅館現場辦理入住')}}<br /><br />
-        {{$t('造成您的困擾，敬請見諒')}}
-      </p>
     </div>
     <div v-if="showNoUrlToken" class="card card-2">
-      <p class="error-title">{{$t('輸入網址錯誤')}}</p>
-      <p class="error-text">{{$t('無法取得')}}urlToken</p>
+      <p class="error-title">網址有誤</p>
+      <p class="error-text">訂單網址不完整</p>
+      <p class="error-text">請回到Email信件，使用正確導引連結</p>
+    </div>
+    <div class="loading" v-else-if="isLoading">
+      <div class="card card-1">
+        <Vue3Lottie :animationData="Loading" :loop="true" :autoplay="true" class="lottie" />
+      </div>
+      <div class="card card-2">
+        <Vue3Lottie :animationData="Loading" :loop="true" :autoplay="true" class="lottie" />
+      </div>
+    </div>
+    <div v-else-if="showError" class="card card-2">
+      <p class="error-title">預先登記權限關閉</p>
+      <p class="error-text">
+        因您的訂單內容變更<br />
+        暫時無法使用【預先登記入住】服務<br />
+        請改於旅館現場辦理入住<br /><br />
+        造成您的困擾，敬請見諒
+      </p>
+    </div>
+    <div v-else>
+      <div class="card card-1">
+        <p class="card-title m-b-16">{{ orderDomain }}</p>
+        <p class="card-sec-title">訂單編號 {{ orderId }}</p>
+        <p v-if="!showError" class="card-text">
+          (
+          <span>{{ new Date(orderCheckInDate).toLocaleDateString() }}</span> -
+          <span>{{ new Date(orderCheckOutDate).toLocaleDateString() }}</span>
+          )
+        </p>
+      </div>
+      <div class="card card-2">
+        <p class="card-title">訂購人 - {{ orderName }}</p>
+        <p class="card-title m-b-48">是否為本次入住旅客？</p>
+        <div class="btn-group">
+          <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">否，不同人</Button>
+          <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">是，同一人</Button>
+        </div>
+      </div>
     </div>
   </main>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import LottieAnimation from '@/components/Lottie.vue';
+import { Vue3Lottie } from 'vue3-lottie'
+import Loading from '@/assets/lottie/loading.json'
 
 import {
   getData,
@@ -225,4 +234,27 @@ $spacing-small: 16px;
 .no-underline {
   text-decoration: none;
 }
+
+.loading {
+  .card-1 {
+    height: 191px;
+    position:relative;
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+  .card-2 {
+    height: 341px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .lottie {
+    width: 100%;
+    height: 410px;
+    position: relative;
+    object-fit: cover;
+  }
+}
+
 </style>

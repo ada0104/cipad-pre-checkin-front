@@ -20,6 +20,10 @@
       />
       <div v-if="imageSrcs[props.name] && imageSrcs[props.name][side]" class="image-preview">
         <img :src="imageSrcs[props.name][side]" />
+        <div class="overlay" @click.stop="deleteImage(side)">
+          <SvgIcon name="delete" class="delete-icon" />
+          <p>移除</p>
+        </div>
       </div>
       <div v-else>
         <SvgIcon name="upload" class="upload-icon" />
@@ -105,6 +109,16 @@ const currentLabels = computed(() => {
   }
 })
 
+const deleteImage = (side: string) => {
+  if (imageSrcs.value[props.name]) {
+    delete imageSrcs.value[props.name][side]
+    delete idImage.idImages[props.name][side]
+  }
+  if (fileInputs.value[side]) {
+    fileInputs.value[side]!.value = ''
+  }
+}
+
 const clearUploadData = () => {
   imageSrcs.value = {}
   idImage.clearStore()
@@ -157,6 +171,7 @@ onMounted(() => {
 }
 
 .image-preview {
+  position: relative;
   border-radius: 16px;
   border: 1px solid var(--Outline);
   width: 100%;
@@ -173,5 +188,31 @@ onMounted(() => {
 .id-card-container {
   display: flex;
   gap: 24px;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--On-Prim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-preview:hover .overlay {
+  opacity: 1;
+}
+
+.delete-icon {
+  width: 58px;
+  height: 58px;
+  color: var(--On-Prim);
 }
 </style>

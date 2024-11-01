@@ -103,19 +103,20 @@
               <div>
                 <label for="name-input" class="input-label">手機號碼</label>
                 <label v-if="v$.phone.$error" class="error-message">{{ phoneErrorMessage }}</label>
+                <label v-else class="error-message phone-sub ">*僅限臺灣手機號碼</label>
               </div>
               <div class="input-container phone-input">
-                <Select
-                  :selectedOption="selectedOption"
-                  :options="options"
-                  @update:selectedOption="updateSelectedOption"
-                  class="phone-select"
-                />
+                <div
+                  :class="{ 'error-border': v$.phone.$error }"
+                  class="input-field country-code">
+                  <span>+886</span>
+                  <span>|</span>
+                </div>
                 <input
                   type="tel"
                   id="phone-input"
                   v-model="phone"
-                  class="input-field"
+                  class="input-field phone-input"
                   :class="{ 'error-border': v$.phone.$error }"
                   placeholder="輸入手機號碼"
                   @blur="v$.phone.$touch()"
@@ -260,7 +261,6 @@
 import { ref, watch, computed, onMounted, nextTick } from 'vue'
 
 import Header from '@/components/Header.vue'
-import Select from '@/components/Select.vue'
 import Button from '@/components/Button.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
@@ -421,23 +421,6 @@ const enableInput = () => {
   userNameInput.value?.focus()
 }
 
-// 手機國碼下拉清單
-interface Option {
-  name: string
-  label: string
-}
-const selectedOption = ref<Option>({
-  name: 'Taiwan',
-  label: '+886'
-})
-const options = ref<Option[]>([
-  { name: 'Taiwan', label: '+886' },
-  { name: 'Tainan', label: '+887' }
-])
-const updateSelectedOption = (option: Option) => {
-  selectedOption.value = option
-}
-
 // 顯示/關閉 隱私條款
 const showContact = ref<boolean>(false)
 const togglePrivacyPolicy = () => {
@@ -455,10 +438,8 @@ const rules = {
     email: emailValidator
   },
   phone: {
-    required,
-    minLength: minLength(10),
-    maxLength: maxLength(10),
-    numeric: (value: string) => /^\d+$/.test(value)
+    required: (value: string) => !value || value.length === 10,
+    numeric: (value: string) => !value || /^\d+$/.test(value)
   },
   companyId: {
     required: (value: string) => (selectedInvoiceType.value === 'three-step' ? !!value : true),
@@ -518,13 +499,11 @@ const emailErrorMessage = computed(() => {
 })
 
 const phoneErrorMessage = computed(() => {
-  if (!v$.value.phone.required.$response) return '*必填'
-  if (!v$.value.phone.numeric.$response) return '手機號碼只能包含數字'
-  if (!v$.value.phone.minLength.$response || !v$.value.phone.maxLength.$response)
-    return '手機號碼必須為10位數字'
+  if (!v$.value.phone.numeric.$response) return '手機號碼只能包含數字';
+  if (!v$.value.phone.required.$response) return '手機號碼必須為10位數字';
 
-  return ''
-})
+  return '';
+});
 
 const cloudCarrierErrorMessage = computed(() => {
   if (!v$.value.cloudCarrier.minLength.$response) return '至少需要8個字符'
@@ -588,8 +567,8 @@ function updateErrorMessages (type: ErrorType): void {
       break
     case ErrorType.hasQRNotification:
       errorTitle.value = '資料上傳失敗'
-      errorContent.value = [{ text: '已有 pre-checkin 圖片' }]
-      errorButtonText.value = '進入qrcode頁面'
+      errorContent.value = [{ text: '已取過 預先報到 QRcode' }]
+      errorButtonText.value = '進入QRcode頁面'
       break
     case ErrorType.noOcrImage:
       errorTitle.value = '資料上傳失敗'
@@ -658,7 +637,7 @@ const handleBackAction = () => {
 const saveFormData = async () => {
   const newMemberData: NewMemberDataRequest = {
     source: pmsSource.value,
-    country_codes: selectedOption.value.label,
+    country_codes: '+886',
     phone: phone.value,
     name: userName.value,
     email: email.value,
@@ -861,11 +840,6 @@ const submitFormData = async () => {
     align-items: center;
     width: 100%;
     margin-top: 6px;
-    gap: 10px;
-
-    .phone-select {
-      width: 200px;
-    }
 
     &.invoice-co-name {
       margin-top: 16px;
@@ -890,6 +864,24 @@ const submitFormData = async () => {
 
     &.error-border {
       border: 2px solid var(--Error);
+    }
+
+    &.country-code {
+      width: 20%;
+      border-radius: 16px 0px 0px 16px;
+      color: var(--On-Surface-Var);
+      padding: 20px 0px 20px 20px;
+      border-right: none;
+
+      span {
+        margin-right: 11px;
+      }
+    }
+
+    &.phone-input {
+      border-radius: 0px 16px 16px 0px;
+      padding: 20px 0px;
+      border-left: none;
     }
   }
 }
@@ -1059,5 +1051,10 @@ const submitFormData = async () => {
   float: right;
   @include text-style(400, 14px, var(--Error));
   vertical-align: middle;
+
+  &.phone-sub {
+    color: var(--On-Surface-Var);
+    letter-spacing: 1px;
+  }
 }
 </style>

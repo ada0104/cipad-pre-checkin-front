@@ -2,17 +2,23 @@
   <Header />
   <main>
     <div class="title-block">
-      <router-link to="/" class="no-underline back-route">
+      <router-link
+        :to="{
+          name: 'home',
+          params: { urlToken: urlTokenStore.urlToken }
+        }"
+        class="no-underline back-route"
+      >
         <SvgIcon name="back" class="back-icon" />
-        <span>返回</span>
+        <span>{{$t('返回')}}</span>
       </router-link>
       <div class="title">
-        <p>預先登記入住</p>
+        <p>{{$t('預先登記入住')}}</p>
       </div>
     </div>
     <div class="card">
       <div class="card-content">
-        <p class="card-title">上傳個人證件</p>
+        <p class="card-title">{{$t('上傳個人證件')}}</p>
         <Select
           :selectedOption="selectedOption"
           :options="options"
@@ -25,10 +31,10 @@
           @imageChanged="isImageChanged = true"
         />
         <Button buttonClass="btn primary-btn" :disabled="isDisabled" @click="handleNextStep">
-          下一步
+          {{$t('下一步')}}
         </Button>
         <div v-if="isLoading" class="loading-animation">
-          <LottieAnimation name="id_ocr" lottie_text="證件審核中" />
+          <LottieAnimation name="id_ocr" :lottie_text="$t('證件審核中')" />
         </div>
       </div>
     </div>
@@ -56,7 +62,7 @@ import ErrorAlert from '@/components/ErrorAlert.vue'
 import LottieAnimation from '@/components/Lottie.vue';
 
 import { useIdImageStore } from '@/stores/idimage'
-import { useOrderStore } from '@/stores/order'
+import { useOrderStore, useUrlTokenStore } from '@/stores/order'
 
 import { getOcrData, type OcrDataResponse, type OcrDataRequest } from '@/api/api'
 
@@ -73,6 +79,7 @@ interface UploadLabelMap {
 }
 
 const idImage = useIdImageStore()
+const urlTokenStore = useUrlTokenStore();
 const router = useRouter()
 
 const uploadRef = ref<any>(null)

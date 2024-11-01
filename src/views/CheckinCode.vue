@@ -1,9 +1,6 @@
 <template>
   <Header />
-  <div v-if="isLoading" class="loading-animation">
-    <LottieAnimation name="loading" lottie_text="Loading" />
-  </div>
-  <main v-else>
+  <main>
     <div class="title-block">
       <div class="title">
         <p>預先登記完成</p>
@@ -59,7 +56,6 @@ import html2canvas from 'html2canvas'
 
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
-import LottieAnimation from '@/components/Lottie.vue'
 import DownloadTemplate from '@/components/Download.vue'
 
 import { useMemberDataStore } from '@/stores/member'
@@ -72,8 +68,6 @@ const orderCheckInDate = ref<string>('')
 const orderCheckOutDate = ref<string>('')
 const orderNumber = ref<string>('')
 const qrCodeImage = ref<string>('')
-const email = ref<string>('')
-const name = ref<string>('')
 
 const orderStore = useOrderStore()
 const urlTokenStore = useUrlTokenStore()

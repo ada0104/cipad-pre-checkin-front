@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useOrderStore , useUrlTokenStore} from '@/stores/order';
+import { useOrderStore, useUrlTokenStore } from '@/stores/order';
 import { useIdImageStore } from '@/stores/idimage';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '/:urlToken?',
       name: 'home',
       component: () => import('@/views/HomeView.vue')
     },
@@ -38,24 +38,36 @@ router.beforeEach((to, from, next) => {
   const hasIdImages = Object.keys(idStore.idImages).length > 0;
   const hasUrlToken = !!urlTokenStore.urlToken;
 
-  if (!to.name) {
-    const fullPath = to.fullPath;
-    const match = fullPath.match(/\/([a-zA-Z0-9]+)$/);
+  // 處理帶有 token 的路徑
+  if (to.params.urlToken) {
+    const urlToken = Array.isArray(to.params.urlToken)
+      ? to.params.urlToken[0]
+      : to.params.urlToken;
+    urlTokenStore.setUrlToken(urlToken);
+  }
 
+  // 處理直接輸入的 URL
+  if (!to.name && to.path !== '/') {
+    const match = to.path.match(/\/([a-zA-Z0-9]+)$/);
     if (match) {
-      const urlToken = match[1];
-      urlTokenStore.setUrlToken(urlToken);
+      urlTokenStore.setUrlToken(match[1]);
+      // 只在確實需要重定向時才返回
+      if (to.path !== `/${match[1]}`) {
+        return next({ path: `/${match[1]}` });
+      }
     }
   }
-  // 重新整理的時候會遺失urlToken
-  if (to.name !== 'home' && !hasOrderData && !hasUrlToken) {
-    return next({ name: 'home' });
-  }
 
-  if (to.name == 'form' && !hasIdImages ) {
+  // 檢查訪問權限
+  if (!hasUrlToken && !hasOrderData) {
+    if (to.name !== 'home') {
+      return next({ name: 'home' });
+    }
+  } else if (to.name === 'form' && !hasIdImages) {
     return next({ name: 'upload' });
   }
 
+  // 正常導航，不需要重定向
   next();
 });
 
