@@ -65,7 +65,7 @@ export interface DefaultMemberDataRequest {
 export interface NewMemberDataRequest {
   source: string; // 來源，從哪個PMS來的
   country_codes: string; // 手機國碼
-  phone: string;
+  phone?: string | null;
   name: string;
   email: string;
   birthday: string;
@@ -226,11 +226,14 @@ const addMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promis
   const formData = new FormData();
   formData.set('source', newMemberDataRequest.source);
   formData.set('country_codes', newMemberDataRequest.country_codes);
-  formData.set('phone', newMemberDataRequest.phone);
   formData.set('name', newMemberDataRequest.name);
   formData.set('email', newMemberDataRequest.email);
   formData.set('birthday', newMemberDataRequest.birthday);
   formData.set('order_number', newMemberDataRequest.order_number);
+
+  if (newMemberDataRequest.phone) {
+    formData.set('barcode', newMemberDataRequest.phone);
+  }
 
   if (newMemberDataRequest.barcode) {
     formData.set('barcode', newMemberDataRequest.barcode);
