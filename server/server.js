@@ -21,7 +21,8 @@ const proxyApiList = [
   'pre_checkin/send_pci_mail',
   'pms/get_order_data'
 ]
-
+// 使用 middleware 處理 JSON 格式的請求內容
+app.use(express.json());
 app.use(compression())
 
 // API
