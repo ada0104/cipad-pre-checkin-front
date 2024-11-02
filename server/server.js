@@ -26,7 +26,9 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
       console.log(`Received message from client: ${message}`);
   });
-
+  ws.on('pong', () => {
+      console.log('Received pong from client');
+  });
   ws.on('close', () => {
       clearInterval(interval); // 清除定時器
       console.log('Client disconnected');
