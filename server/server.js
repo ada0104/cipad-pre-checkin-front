@@ -20,7 +20,7 @@ wss.on('connection', (ws) => {
       if (ws.readyState === WebSocket.OPEN) {
           ws.ping();
       }
-  }, 20000);
+  }, 30000);
 
   // 可以添加接收訊息的監聽
   ws.on('message', (message) => {
