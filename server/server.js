@@ -18,7 +18,11 @@ wss.on('connection', (ws) => {
   // 每隔30秒發送 ping，檢查連線
   const interval = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
-          ws.ping();
+          ws.send(JSON.stringify({
+            data: '',
+            branch: 'ping',
+            repo: ''
+        }));
       }
   }, 20000);
 
