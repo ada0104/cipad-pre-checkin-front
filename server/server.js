@@ -14,7 +14,13 @@ const wss = new WebSocket.Server({ port: wsPort });
 
 // 當有新的客戶端連接到 WebSocket 伺服器時
 wss.on('connection', (ws) => {
-  console.log('Client connected to WebSocket');
+  console.log('Client connected');
+  // 每隔30秒發送 ping，檢查連線
+  const interval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+          ws.ping();
+      }
+  }, 30000);
 
   // 可以添加接收訊息的監聽
   ws.on('message', (message) => {
@@ -22,6 +28,7 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
+      clearInterval(interval); // 清除定時器
       console.log('Client disconnected');
   });
 });
