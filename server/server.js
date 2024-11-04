@@ -5,9 +5,41 @@ const {join} = require('node:path')
 const path = require('path')
 const fetch = require('node-fetch');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const WebSocket = require('ws');
+const port = process.env.PORT || 3000;
+const wsPort = process.env.WS_PORT || 8081;
 
 const app = express()
-const port = process.env.PORT || 3000;
+const wss = new WebSocket.Server({ port: wsPort });
+
+// 當有新的客戶端連接到 WebSocket 伺服器時
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+  // 每隔30秒發送 ping，檢查連線
+  const interval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            data: '',
+            branch: 'ping',
+            repo: ''
+        }));
+      }
+  }, 20000);
+
+  // 可以添加接收訊息的監聽
+  ws.on('message', (message) => {
+      console.log(`Received message from client: ${message}`);
+  });
+  ws.on('pong', () => {
+      console.log('Received pong from client');
+  });
+  ws.on('close', () => {
+      clearInterval(interval); // 清除定時器
+      console.log('Client disconnected');
+  });
+});
+
+
 const distFolder = join(process.cwd(), 'dist')
 
 // API呼叫設定
@@ -21,13 +53,38 @@ const proxyApiList = [
   'pre_checkin/send_pci_mail',
   'pms/get_order_data'
 ]
-
+// 使用 middleware 處理 JSON 格式的請求內容
+app.use(express.json());
 app.use(compression())
 
 // API
 app.get('/ready', (req, res) => {
   res.send('ping')
 })
+app.post('/webhook', (req, res) => {
+  const event = req.headers['x-github-event'];
+
+  // 確認是 push
+  if (event === 'push' ) {
+    // 將推送事件轉到客端Ws
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+                data: req.body,
+                branch: req.body.ref,
+                repo: req.body.repository.full_name
+            }));
+        }
+    });
+    console.log("Push to dev branch detected, triggering update scripts on all machines.", (req.body));
+    res.status(200).send('Update scripts triggered on all machines');
+  } else if( event === 'ping' ){
+    res.status(200).send('pong');
+  } else {
+      res.status(400).send('Event not handled');
+  }
+});
+
 proxyApiList.forEach(path=> {
   app.use(`/dunqian/${path}`, createProxyMiddleware({
     target: `${API_URL}`, // 你的遠端 API 的 URL

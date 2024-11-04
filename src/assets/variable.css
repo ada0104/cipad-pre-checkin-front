@@ -1,0 +1,61 @@
+[data-theme=dark] {
+  --Primary: #e6e1ff;
+  --On-Prim: #2f3677;
+  --Secondary: #c1c3ec;
+  --On-Sec: #30375c;
+  --Prim-Cont: #c6c2f0;
+  --On-Prim-Cont: #2b2b79;
+  --Sec-Cont: #9197d2;
+  --On-Sec-Cont: #0b0b29;
+  --Error: #fd8e84;
+  --On-Error: #1b0506;
+  --Error-Cont: #ffcec6;
+  --On-Error-Cont: #a22a2d;
+  --Surface: #33333a;
+  --On-Surface: #f4f2fd;
+  --On-Surface-Var: #a9a9a9;
+  --Surface-Dim: #6f7185;
+  --Inverse-Surface: #4d4d4d;
+  --On-Inv-Surf: #fff;
+  --Outline: #f3f3f3;
+  --Outline-Variant: #27282e;
+  --Overlay: rgba(0, 0, 0, 0.6588235294);
+  --Input-box: #424451;
+  --On-input-box: #fff;
+  --On-input-sec: #e0e0e0;
+  --Card-Background: rgba(0, 0, 0, 0.66);
+  --Body-background: linear-gradient(180deg, #444270 20.67%, #ffdad6 161.35%);
+  --svg-fill-color: rgba(54, 56, 70, 0.22);
+  --svg-icon: #f3f3f3;
+}
+
+[data-theme=light] {
+  --Primary: #2f3677;
+  --On-Prim: #fff;
+  --Secondary: #7a82c1;
+  --On-Sec: #fff;
+  --Prim-Cont: #5e60a8;
+  --On-Prim-Cont: #fff;
+  --Sec-Cont: #c6c2f0;
+  --On-Sec-Cont: #31314b;
+  --Error: #c93639;
+  --On-Error: #fff;
+  --Error-Cont: #ffcec6;
+  --On-Error-Cont: #a22a2d;
+  --Surface: #f3f3f7;
+  --On-Surface: #262c61;
+  --On-Surface-Var: #a7a7a8;
+  --Surface-Dim: #dbdce6;
+  --Inverse-Surface: #6d7188;
+  --On-Inv-Surf: #fff;
+  --Outline: #adb0c3;
+  --Outline-Variant: #c4c6d5;
+  --Overlay: rgba(54, 56, 70, 0.6588235294);
+  --Input-box: #fff;
+  --On-input-box: #2f3677;
+  --On-input-sec: #757577;
+  --Card-Background: rgba(255, 255, 255, 0.33);
+  --Body-background: linear-gradient(44deg, #f1f0f7 -1.03%, #dce1ff 101.53%);
+  --svg-fill-color: rgba(54, 56, 70, 0.22);
+  --svg-icon: #adb0c3;
+}/*# sourceMappingURL=variable.css.map */

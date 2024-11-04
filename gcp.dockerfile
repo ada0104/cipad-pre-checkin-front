@@ -10,5 +10,6 @@ RUN npm run build
 
 ENV NODE_ENV=production
 ENV PORT=80
+ENV WS_PORT=8081
 
 CMD ["node", "/usr/app/server/server.js"]
