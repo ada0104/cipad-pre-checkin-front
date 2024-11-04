@@ -1,14 +1,25 @@
 <template>
   <div class="card">
-    <div class="card-title">隱私權條款</div>
-    <PrivacyPolicy />
-    <Button buttonClass="btn primary-btn" @click="$emit('close')">關閉</Button>
+    <div class="card-title">{{ $t('privacyPolicy') }}</div>
+    <component :is="currentPrivacyPolicy" />
+    <Button buttonClass="btn primary-btn" @click="$emit('close')">{{ $t('close') }}</Button>
   </div>
 </template>
+
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Button from '@/components/Button.vue'
-import PrivacyPolicy from '@/assets/privacy-policy/tw.vue'
+import PrivacyPolicyTW from '@/assets/privacy-policy/tw.vue'
+import PrivacyPolicyEN from '@/assets/privacy-policy/en.vue'
+
+const { locale } = useI18n()
+
+const currentPrivacyPolicy = computed(() => {
+  return locale.value === 'zh' ? PrivacyPolicyTW : PrivacyPolicyEN
+})
 </script>
+
 <style lang="scss" scoped>
 @mixin flex-center {
   display: flex;

@@ -4,22 +4,22 @@
     <div class="title-block">
       <Button buttonClass="" @click="handleBackAction" class="back-route">
         <SvgIcon name="back" class="back-icon" />
-        <span>返回</span>
+        <span>{{ $t('return') }}</span>
       </Button>
       <div class="title">
-        <p>預先登記入住</p>
+        <p>{{ $t('preCheckIn') }}</p>
       </div>
     </div>
     <div v-if="!showContact" class="card">
       <div class="card-content">
-        <p class="card-title">填寫資料</p>
+        <p class="card-title">{{ $t('fillInInformation') }}</p>
         <div class="form-block">
           <!----- 基本資料 ----->
           <div class="block-content">
             <div class="form-title">
-              <p class="form-title-text">個人證件資料</p>
+              <p class="form-title-text">{{ $t('personalIdentificationInformation') }}</p>
               <router-link to="/upload" class="no-underline">
-                <button class="back-to-upload-btn">重新上傳</button>
+                <button class="back-to-upload-btn">{{ $t('reUpload') }}</button>
               </router-link>
             </div>
             <div class="image-preview-block">
@@ -40,7 +40,7 @@
             </div>
             <div class="input-wrapper">
               <div>
-                <label for="name-input" class="input-label">姓名</label>
+                <label for="name-input" class="input-label">{{ $t('name') }}</label>
                 <label v-if="v$.userName.$error" class="error-message">{{
                   userNameErrorMessage
                 }}</label>
@@ -62,7 +62,7 @@
               </div>
             </div>
             <div class="input-wrapper">
-              <label for="date-input" class="input-label">生日</label>
+              <label for="date-input" class="input-label">{{ $t('dateOfBirth') }}</label>
               <div class="input-container">
                 <input
                   type="text"
@@ -78,12 +78,12 @@
           <!----- 聯絡方式 ----->
           <div class="block-content">
             <div class="form-title">
-              <p class="form-title-text">聯絡方式</p>
+              <p class="form-title-text">{{ $t('contactInformation') }}</p>
             </div>
             <!----- 電子信箱 ----->
             <div class="input-wrapper">
               <div>
-                <label for="email-input" class="input-label">電子信箱</label>
+                <label for="email-input" class="input-label">{{ $t('emailAddress') }}</label>
                 <label v-if="v$.email.$error" class="error-message">{{ emailErrorMessage }}</label>
               </div>
               <div class="input-container">
@@ -101,7 +101,7 @@
             <!----- 手機號碼 ----->
             <div class="input-wrapper">
               <div>
-                <label for="name-input" class="input-label">手機號碼</label>
+                <label for="name-input" class="input-label">{{ $t('mobileNumber') }}</label>
                 <label v-if="v$.phone.$error" class="error-message">{{ phoneErrorMessage }}</label>
                 <label v-else class="error-message phone-sub ">*僅限臺灣手機號碼</label>
               </div>
@@ -118,7 +118,7 @@
                   v-model="phone"
                   class="input-field phone-input"
                   :class="{ 'error-border': v$.phone.$error }"
-                  placeholder="輸入手機號碼"
+                  placeholder="{{ $t('enterMobileNumber') }}"
                   @blur="v$.phone.$touch()"
                 />
               </div>
@@ -127,8 +127,8 @@
           <!----- 發票格式 ----->
           <div>
             <div class="form-title">
-              <p class="form-title-text">發票格式</p>
-              <p class="form-title-sub">本店採用紙本發票</p>
+              <p class="form-title-text">{{ $t('invoiceFormat') }}</p>
+              <p class="form-title-sub">{{ $t('thisStoreUsesPaperInvoices') }}</p>
             </div>
             <div class="radio-group">
               <label class="radio-label">
@@ -139,7 +139,7 @@
                   v-model="selectedInvoiceType"
                 />
                 <span class="radio-custom"></span>
-                <span class="label-text">二聯式個人發票</span>
+                <span class="label-text">{{ $t('twoPartPersonalInvoice') }}</span>
               </label>
               <label class="radio-label">
                 <input
@@ -149,7 +149,7 @@
                   v-model="selectedInvoiceType"
                 />
                 <span class="radio-custom"></span>
-                <span class="label-text">三聯式個人發票</span>
+                <span class="label-text">{{ $t('threePartPersonalInvoice') }}</span>
               </label>
               <p v-if="v$.cloudCarrier.$error" class="error-message">
                 {{ cloudCarrierErrorMessage }}
@@ -167,7 +167,7 @@
                   v-model="cloudCarrier"
                   class="input-field"
                   :class="{ 'error-border': v$.cloudCarrier.$error }"
-                  placeholder="輸入雲端載具(選填)"
+                  placeholder="{{ $t('enterCloudCarrierOptional') }}"
                   @blur="v$.cloudCarrier.$touch()"
                 />
               </div>
@@ -181,7 +181,7 @@
                   v-model="companyId"
                   class="input-field"
                   :class="{ 'error-border': v$.companyId.$error }"
-                  placeholder="輸入公司統一編號"
+                  placeholder="{{ $t('enterCompanyTaxId') }}"
                   @blur="v$.companyId.$touch()"
                 />
               </div>
@@ -195,7 +195,7 @@
                   v-model="companyName"
                   class="input-field"
                   :class="{ 'error-border': v$.companyName.$error }"
-                  placeholder="輸入公司行號抬頭(選填)"
+                  placeholder="{{ $t('enterCompanyNameOptional') }}"
                 />
               </div>
             </div>
@@ -214,7 +214,7 @@
             <SvgIcon v-if="acceptTerms" name="check" class="check-icon" />
           </label>
           <span class="label-text" :class="{ 'error-label': showErrorMessage }"
-            >我同意CIPAD GUEST平臺之
+            >{{ $t('iAgreeToTerms') }}
           </span>
           <button
             type="button"
@@ -222,20 +222,20 @@
             :class="{ 'error-label': showErrorMessage }"
             @click="togglePrivacyPolicy"
           >
-            隱私權使用條款
+          {{ $t('privacyPolicy') }}
           </button>
           <span v-if="showErrorMessage" class="error-message">
             {{ acceptTermsErrorMessage }}
           </span>
         </div>
         <Button buttonClass="btn primary-btn" :disabled="isDisabled" @click="handleNextStep">
-          送出
+          {{ $t('submit') }}
         </Button>
       </div>
     </div>
     <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" />
     <div v-if="isLoading" class="loading-animation">
-      <LottieAnimation name="upload" lottie_text="資料上傳中" />
+      <LottieAnimation name="upload" lottie_text="{{ $t('uploadingData') }}" />
     </div>
   </main>
   <ErrorAlert
@@ -249,10 +249,10 @@
     <template #extra-button v-if="showExtraButton">
       <div class="no-underline back-edit" @click="handleBackAction">
         <SvgIcon name="back" class="back-icon" />
-        <span>返回編輯</span>
+        <span>{{ $t('returnToEdit') }}</span>
       </div>
       <Button buttonClass="btn secondary-btn pass-btn" @click="handleExtraAction"
-        >略過不存取</Button
+        >{{ $t('skipAndDoNotAccess') }}</Button
       >
     </template>
   </ErrorAlert>

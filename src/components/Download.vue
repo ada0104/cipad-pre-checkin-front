@@ -6,15 +6,15 @@
     <div class="template-container">
       <div>
         <h1 class="domain">{{ domainName }}</h1>
-        <p class="sub-title">訂單憑證</p>
+        <p class="sub-title">{{ $t('orderConfirmation') }}</p>
       </div>
       <div class="qr-code-container">
         <img :src="qrCode" alt="QRcode" class="qr-code" />
-        <p class="label">訂單編號</p>
+        <p class="label">{{ $t('orderNumber') }}</p>
         <p class="label">{{ orderNumber }}</p>
       </div>
       <div>
-        <p class="sub-title">開放入住時間</p>
+        <p class="sub-title">{{ $t('checkInTimeOpen') }}</p>
         <p class="check-in-time">{{ checkInDate }}</p>
       </div>
     </div>

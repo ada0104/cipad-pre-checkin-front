@@ -10,15 +10,15 @@
         class="no-underline back-route"
       >
         <SvgIcon name="back" class="back-icon" />
-        <span>{{$t('返回')}}</span>
+        <span>{{$t('return')}}</span>
       </router-link>
       <div class="title">
-        <p>{{$t('預先登記入住')}}</p>
+        <p>{{$t('preCheckIn')}}</p>
       </div>
     </div>
     <div class="card">
       <div class="card-content">
-        <p class="card-title">{{$t('上傳個人證件')}}</p>
+        <p class="card-title">{{$t('uploadPersonalIdentification')}}</p>
         <Select
           :selectedOption="selectedOption"
           :options="options"
@@ -31,10 +31,10 @@
           @imageChanged="isImageChanged = true"
         />
         <Button buttonClass="btn primary-btn" :disabled="isDisabled" @click="handleNextStep">
-          {{$t('下一步')}}
+          {{$t('nextStep')}}
         </Button>
         <div v-if="isLoading" class="loading-animation">
-          <LottieAnimation name="id_ocr" :lottie_text="$t('證件審核中')" />
+          <LottieAnimation name="id_ocr" :lottie_text="$t('documentUnderReview')" />
         </div>
       </div>
     </div>

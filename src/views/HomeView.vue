@@ -3,13 +3,13 @@
   <main>
     <div class="title-block">
       <div class="title">
-        <p>登記入住資料</p>
+        <p>{{ $t('checkInInfo') }}</p>
       </div>
     </div>
     <div v-if="showNoUrlToken" class="card card-2">
-      <p class="error-title">網址有誤</p>
-      <p class="error-text">訂單網址不完整</p>
-      <p class="error-text">請回到Email信件，使用正確導引連結</p>
+      <p class="error-title">{{ $t('incorrectUrl') }}</p>
+      <p class="error-text">{{ $t('orderUrlIncomplete') }}</p>
+      <p class="error-text">{{ $t('returnToEmailUseCorrectLink') }}</p>
     </div>
     <div class="loading" v-else-if="isLoading">
       <div class="card card-1">
@@ -20,18 +20,18 @@
       </div>
     </div>
     <div v-else-if="showError" class="card card-2">
-      <p class="error-title">預先登記權限關閉</p>
+      <p class="error-title">{{ $t('preCheckInAccessClosed') }}</p>
       <p class="error-text">
-        因您的訂單內容變更<br />
-        暫時無法使用【預先登記入住】服務<br />
-        請改於旅館現場辦理入住<br /><br />
-        造成您的困擾，敬請見諒
+        {{ $t('dueToChangesInYourOrder') }}<br />
+        {{ $t('preCheckInServiceTemporarilyUnavailable') }}<br />
+        {{ $t('pleaseCheckInAtTheHotel') }}<br /><br />
+        {{ $t('apologizeForTheInconvenience') }}
       </p>
     </div>
     <div v-else>
       <div class="card card-1">
         <p class="card-title m-b-16">{{ orderDomain }}</p>
-        <p class="card-sec-title">訂單編號 {{ orderId }}</p>
+        <p class="card-sec-title">{{ $t('orderNumber') }} {{ orderId }}</p>
         <p v-if="!showError" class="card-text">
           (
           <span>{{ new Date(orderCheckInDate).toLocaleDateString() }}</span> -
@@ -40,11 +40,11 @@
         </p>
       </div>
       <div class="card card-2">
-        <p class="card-title">訂購人 - {{ orderName }}</p>
-        <p class="card-title m-b-48">是否為本次入住旅客？</p>
+        <p class="card-title">{{ $t('buyer') }} - {{ orderName }}</p>
+        <p class="card-title m-b-48">{{ $t('isThisGuestForThisStay') }}</p>
         <div class="btn-group">
-          <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">否，不同人</Button>
-          <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">是，同一人</Button>
+          <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">{{ $t('noDifferentPerson') }}</Button>
+          <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">{{ $t('yesSamePerson') }}</Button>
         </div>
       </div>
     </div>

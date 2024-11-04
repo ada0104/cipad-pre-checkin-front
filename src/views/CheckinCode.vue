@@ -3,38 +3,37 @@
   <main>
     <div class="title-block">
       <div class="title">
-        <p>預先登記完成</p>
+        <p>{{ $t('preCheckInCompleted') }}</p>
       </div>
     </div>
     <div class="card">
       <div>
         <p class="card-title">{{ orderDomain }}</p>
-        <p class="sub-title">訂單憑證</p>
+        <p class="sub-title">{{ $t('orderConfirmation') }}</p>
       </div>
       <div class="qr-card">
         <img class="qr-code" :src="formattedQrCodeImage" alt="QRcode" />
-        <p v-if="!formattedQrCodeImage" class="order-error">取得 QR code 失敗</p>
-        <p class="order-id">訂單編號</p>
+        <p v-if="!formattedQrCodeImage" class="order-error">{{ $t('failedToObtainQRCode') }}</p>
+        <p class="order-id">{{ $t('orderNumber') }}</p>
         <p class="order-id">{{ orderNumber }}</p>
       </div>
       <div>
-        <p class="sub-title">開放入住時間</p>
+        <p class="sub-title">{{ $t('checkInTimeOpen') }}</p>
         <p class="check-in-time">{{ orderCheckInDate }}</p>
       </div>
     </div>
     <div class="card download">
-      <Button buttonClass="btn primary-btn" @click="handleDownload">下載圖片</Button>
+      <Button buttonClass="btn primary-btn" @click="handleDownload">{{ $t('downloadImage') }}</Button>
       <div class="svg-text">
         <SvgIcon name="email" class="email-icon" />
-        <p class="email-text">已同步寄至入住人Email信箱</p>
+        <p class="email-text">{{ $t('sentToGuestsEmail') }}</p>
       </div>
     </div>
     <div class="card card-button">
       <div>
-        <p class="card-button-title">如何使用？</p>
+        <p class="card-button-title">{{ $t('howToUse') }}</p>
         <span class="card-button-text"
-          >於本店自住機臺點選『 <span class="point">預辦入住 快速通關</span> 』 <br />掃描訂單憑證QR
-          CODE，完成付款，即可領取房卡
+          >{{ $t('selectAtSelfCheckInKiosk') }} <span class="point">{{ $t('preCheckInFastTrack') }}</span> 』 <br />{{ $t('scanQRCodeCompletePaymentCollectRoomKey') }}
         </span>
       </div>
       <SvgIcon name="icon" class="icon" />
