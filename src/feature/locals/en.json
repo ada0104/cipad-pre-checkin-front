@@ -1,10 +1,10 @@
 {
-  "chinese": "中文",
+  "chinese": "CH",
   "english": "EN",
   "language": "Language",
   "theme": "Theme",
-  "light": "Morning Light",
-  "dark": "Nightfall",
+  "light": "Morning",
+  "dark": "Night",
   "checkInInfo": "Check-in Information",
   "orderNumber": "Order Number",
   "buyer": "Buyer",

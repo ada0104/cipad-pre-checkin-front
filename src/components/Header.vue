@@ -49,8 +49,9 @@
             <div class="toggle-container">
               <span>{{ $t('light') }}</span>
               <Switch
-                v-model="themeCheckbox"
+                :model-value="isDarkTheme"
                 id="theme-toggle"
+                @update:model-value="handleThemeChange"
               />
               <span>{{ $t('dark') }}</span>
             </div>
@@ -66,13 +67,17 @@ import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ThemeToggle from '@/components/ThemeToggle.vue';
 import Switch from '@/components/Switch.vue';
+import { useTheme } from '@/composables/useTheme'
 
 const { locale } = useI18n();
+const { isDarkTheme, setTheme } = useTheme()
 
 const showSettings = ref<boolean>(false);
-const themeCheckbox = ref<boolean>(false);
 
-// 使用 computed 來簡化 langCheckbox 的處理
+const handleThemeChange = (value: boolean) => {
+  setTheme(value)
+}
+
 const langCheckbox = computed({
   get: () => locale.value === 'en',
   set: (value: boolean) => changeLanguage(value ? 'en' : 'zh'),
@@ -88,7 +93,6 @@ const changeLanguage = (lang: string) => {
 
 const isActive = (lang: string) => locale.value === lang;
 
-// 當 showSettings 變為 true 時，更新 langCheckbox
 watch(showSettings, (newValue) => {
   if (newValue) {
     langCheckbox.value = locale.value === 'en';
