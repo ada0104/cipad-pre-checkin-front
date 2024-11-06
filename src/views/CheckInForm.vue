@@ -93,7 +93,7 @@
                   v-model="email"
                   class="input-field"
                   :class="{ 'error-border': v$.email.$error }"
-                  placeholder="輸入電子信箱"
+                  :placeholder="$t('enterEmailAddress')"
                   @blur="v$.email.$touch()"
                 />
               </div>
@@ -118,7 +118,7 @@
                   v-model="phone"
                   class="input-field phone-input"
                   :class="{ 'error-border': v$.phone.$error }"
-                  placeholder="{{ $t('enterMobileNumber') }}"
+                  :placeholder="$t('enterMobileNumber')"
                   @blur="v$.phone.$touch()"
                 />
               </div>
@@ -167,7 +167,7 @@
                   v-model="cloudCarrier"
                   class="input-field"
                   :class="{ 'error-border': v$.cloudCarrier.$error }"
-                  placeholder="{{ $t('enterCloudCarrierOptional') }}"
+                  :placeholder="$t('enterCloudCarrierOptional')"
                   @blur="v$.cloudCarrier.$touch()"
                 />
               </div>
@@ -181,7 +181,7 @@
                   v-model="companyId"
                   class="input-field"
                   :class="{ 'error-border': v$.companyId.$error }"
-                  placeholder="{{ $t('enterCompanyTaxId') }}"
+                  :placeholder="$t('enterCompanyTaxId')"
                   @blur="v$.companyId.$touch()"
                 />
               </div>
@@ -195,7 +195,7 @@
                   v-model="companyName"
                   class="input-field"
                   :class="{ 'error-border': v$.companyName.$error }"
-                  placeholder="{{ $t('enterCompanyNameOptional') }}"
+                  :placeholder="$t('enterCompanyNameOptional')"
                 />
               </div>
             </div>

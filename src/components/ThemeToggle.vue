@@ -1,41 +1,17 @@
 <template>
   <button @click="toggleTheme" class="theme-toggle-button">
-    <SvgIcon :name="isDarkTheme ? 'light' : 'dark'" class="theme-icon" />
+    <SvgIcon :name="currentThemeIcon" class="theme-icon" />
   </button>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import $ from 'jquery';
+import { computed } from 'vue'
+import { useTheme } from '@/composables/useTheme'
 
-const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)')
-const localTheme = localStorage.getItem('theme')
-const isDarkTheme = ref(localTheme === 'dark' || (localTheme === null && prefersDarkScheme.matches))
+const { isDarkTheme, toggleTheme } = useTheme()
 
-const setTheme = (isDark: boolean) => {
-  if (isDark) {
-    $('html').attr('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark')
-  } else {
-    $('html').attr('data-theme', 'light');
-    localStorage.setItem('theme', 'light')
-  }
-}
-
-const toggleTheme = () => {
-  isDarkTheme.value = !isDarkTheme.value
-  setTheme(isDarkTheme.value)
-}
-
-onMounted(() => {
-  setTheme(isDarkTheme.value)
-
-  prefersDarkScheme.addEventListener('change', (e) => {
-    if (!localStorage.getItem('theme')) {
-      isDarkTheme.value = e.matches
-      setTheme(isDarkTheme.value)
-    }
-  })
+const currentThemeIcon = computed(() => {
+  return isDarkTheme.value ? 'light' : 'dark'
 })
 </script>
 
