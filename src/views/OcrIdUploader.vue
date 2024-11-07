@@ -1,6 +1,6 @@
 <template>
   <Header />
-  <main>
+  <main class="ocr">
     <div class="title-block">
       <router-link
         :to="{
@@ -285,32 +285,4 @@ const getOcrImageData = async () => {
 }
 </script>
 <style lang="scss" scoped>
-.card {
-  width: 1113px;
-  display: flex;
-  justify-content: center;
-
-  .card-content {
-    display: inline-block;
-    width: auto;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-}
-
-.card-title {
-  color: var(--On-Surface-Var);
-  margin-bottom: 32px;
-}
-
-.btn {
-  width: 100%;
-}
-
-.upload-group {
-  display: flex;
-  gap: 24px;
-}
 </style>

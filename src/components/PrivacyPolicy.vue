@@ -52,10 +52,5 @@ const currentPrivacyPolicy = computed(() => {
   }
 }
 
-.privacy-text {
-  max-width: 100%;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  line-height: 1.6;
-}
+
 </style>

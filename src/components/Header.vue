@@ -106,7 +106,7 @@ watch(showSettings, (newValue) => {
   justify-content: space-between;
   align-items: center;
   height: 56px;
-  padding: 0 26px;
+  padding: 44px 25px;
   background-color: var(--bg-color);
   position: relative;
 
@@ -114,7 +114,7 @@ watch(showSettings, (newValue) => {
     display: flex;
     align-items: center;
     gap: 8px;
-    height: 26px;
+    height: 46px;
 
     img {
       height: 100%;
@@ -173,7 +173,7 @@ watch(showSettings, (newValue) => {
     .modal-header {
       display: flex;
       justify-content: flex-end;
-      padding: 50px 18px 28px 26px;
+      margin: 50px 18px 28px 26px;
 
       .close-button {
         width: 40px;
@@ -245,10 +245,9 @@ watch(showSettings, (newValue) => {
 
 @media (max-width: 767px) {
   .header {
-    height: 110px;
-    padding-top: 56px;
-    padding-bottom: 28.4px;
-
+    margin: 56px 26px 28px 26px;
+    height: auto;
+    padding: 0;
     .header-right {
       &--desktop {
         display: none;

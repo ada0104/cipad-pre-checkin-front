@@ -1,5 +1,5 @@
 <template>
-  <svg :class="className">
+  <svg :class="className" class="default">
     <use :xlink:href="`#icon-${name}`"></use>
   </svg>
 </template>
@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 </script>
 <style scoped>
-svg {
+.default {
   width: 24px;
   height: 24px;
   fill: currentColor;

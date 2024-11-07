@@ -1,6 +1,6 @@
 <template>
   <Header />
-  <main>
+  <main class="home">
     <div class="title-block">
       <div class="title">
         <p>{{ $t('checkInInfo') }}</p>
@@ -168,93 +168,4 @@ onMounted(async () => {
 })
 </script>
 <style lang="scss" scoped>
-@mixin card-base {
-  width: 612px;
-}
-
-@mixin text-style($weight, $size, $color) {
-  font-weight: $weight;
-  font-size: $size;
-  color: $color;
-  line-height: 140%;
-  text-align: center;
-}
-
-$spacing-large: 58px;
-$spacing-medium: 31px;
-$spacing-small: 16px;
-
-.card {
-  @include card-base;
-
-  &-1 {
-    padding: $spacing-medium $spacing-large;
-  }
-
-  &-2 {
-    padding: $spacing-large;
-  }
-
-  &-title {
-    @include text-style(400, 32px, var(--On-Surface));
-    letter-spacing: 2.56px;
-
-    &.m-b-16 {
-      margin-bottom: $spacing-small;
-    }
-
-    &.m-b-48 {
-      margin-bottom: 48px;
-    }
-  }
-
-  &-sec-title {
-    @include text-style(400, 24px, var(--Secondary));
-    letter-spacing: 2px;
-  }
-
-  &-text {
-    @include text-style(400, 20px, var(--On-Surface-Var));
-  }
-
-  .error-title {
-    @include text-style(700, 32px, var(--Prim-Cont));
-    margin-bottom: 24px;
-  }
-  .error-text {
-    @include text-style(400, 24px, var(--On-input-sec));
-    letter-spacing: 1.92px;
-  }
-}
-
-.btn-group {
-  gap: $spacing-small;
-}
-
-.no-underline {
-  text-decoration: none;
-}
-
-.loading {
-  .card-1 {
-    height: 191px;
-    position:relative;
-    padding: 0;
-    width: 100%;
-    overflow: hidden;
-  }
-  .card-2 {
-    height: 341px;
-    padding: 0;
-    overflow: hidden;
-  }
-
-  .lottie {
-    width: 100%;
-    height: 410px;
-    position: relative;
-    object-fit: cover;
-  }
-}
-
 </style>
