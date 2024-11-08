@@ -98,6 +98,7 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 // *************************************
@@ -129,6 +130,10 @@ $font-sizes: (
   'xl': 32px
 );
 
+$spacing-large: 58px;
+$spacing-medium: 31px;
+$spacing-small: 16px;
+
 // *************************************
 //
 //   Mixins
@@ -143,6 +148,7 @@ $font-sizes: (
 }
 
 @mixin card-base {
+  position: relative;
   border-radius: map-get($border-radius, 'md');
   background: var(--Card-Background);
   box-shadow:
@@ -151,6 +157,34 @@ $font-sizes: (
     0px 151px 91px 0px rgba(150, 150, 150, 0.05),
     0px 67px 67px 0px rgba(150, 150, 150, 0.09),
     0px 17px 37px 0px rgba(150, 150, 150, 0.1);
+}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin input-field {
+  width: 100%;
+  padding: 20px 22px;
+  border-radius: 16px;
+  outline: none;
+  border: none;
+  font-size: 20px;
+  font-weight: 350;
+  line-height: 140%;
+}
+
+@mixin title-text {
+  color: var(--Primary);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+@mixin home-card-base {
+  width: 612px;
 }
 
 // *************************************
@@ -210,10 +244,12 @@ $font-sizes: (
   }
 
   &-1 {
+    position: relative;
     padding: map-get($spacing, 'xl') map-get($spacing, '3xl');
   }
 
   &-2 {
+    position: relative;
     padding: map-get($spacing, '3xl');
   }
 
@@ -232,6 +268,16 @@ $font-sizes: (
   display: flex;
   gap: map-get($spacing, 'lg');
   justify-content: center;
+
+  .back-edit {
+    display: flex;
+    gap: 6px;
+    color: var(--On-Surface-Var);
+    align-items: center;
+    font-size: 20px;
+    font-weight: 350;
+    line-height: 140%;
+  }
 }
 
 .secondary-btn {
@@ -280,24 +326,8 @@ $font-sizes: (
 
 // home
 .home {
-  @mixin card-base {
-    width: 612px;
-  }
-
-  @mixin text-style($weight, $size, $color) {
-    font-weight: $weight;
-    font-size: $size;
-    color: $color;
-    line-height: 140%;
-    text-align: center;
-  }
-
-  $spacing-large: 58px;
-  $spacing-medium: 31px;
-  $spacing-small: 16px;
-
   .card {
-    @include card-base;
+    @include home-card-base;
 
     &-1 {
       padding: $spacing-medium $spacing-large;
@@ -308,7 +338,7 @@ $font-sizes: (
     }
 
     &-title {
-      @include text-style(400, 32px, var(--On-Surface));
+      @include text-style(400, 32px, var(--On-Surface), 140%);
       letter-spacing: 2.56px;
 
       &.m-b-16 {
@@ -321,20 +351,20 @@ $font-sizes: (
     }
 
     &-sec-title {
-      @include text-style(400, 24px, var(--Secondary));
+      @include text-style(400, 24px, var(--Secondary), 140%);
       letter-spacing: 2px;
     }
 
     &-text {
-      @include text-style(400, 20px, var(--On-Surface-Var));
+      @include text-style(400, 20px, var(--On-Surface-Var), 140%);
     }
 
     .error-title {
-      @include text-style(700, 32px, var(--Prim-Cont));
+      @include text-style(700, 32px, var(--Prim-Cont), 140%);
       margin-bottom: 24px;
     }
     .error-text {
-      @include text-style(400, 24px, var(--On-input-sec));
+      @include text-style(400, 24px, var(--On-input-sec), 140%);
       letter-spacing: 1.92px;
     }
   }
@@ -352,7 +382,6 @@ $font-sizes: (
       height: 191px;
       position:relative;
       padding: 0;
-      width: 100%;
       overflow: hidden;
     }
     .card-2 {
@@ -371,38 +400,6 @@ $font-sizes: (
 }
 
 .form {
-  @mixin flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  @mixin input-field {
-    width: 100%;
-    padding: 20px 22px;
-    border-radius: 16px;
-    outline: none;
-    border: none;
-    font-size: 20px;
-    font-weight: 350;
-    line-height: 140%;
-  }
-
-  @mixin title-text {
-    color: var(--Primary);
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 110%;
-  }
-
-  @mixin text-style($weight, $size, $color) {
-    font-weight: $weight;
-    font-size: $size;
-    color: $color;
-    line-height: 140%;
-    text-align: center;
-  }
-
   .card {
     width: 1113px;
     @include flex-center;
@@ -416,7 +413,7 @@ $font-sizes: (
     }
 
     &-title {
-      @include text-style(400, 32px, var(--On-Surface-Var));
+      @include text-style(400, 32px, var(--On-Surface-Var), 140%);
     }
   }
 
@@ -427,7 +424,7 @@ $font-sizes: (
     cursor: pointer;
     padding: 0;
     font: inherit;
-    @include text-style(500, 20px, var(--Secondary));
+    @include text-style(500, 20px, var(--Secondary), 140%);
   }
 
   .form-block {
@@ -441,7 +438,7 @@ $font-sizes: (
     display: flex;
     align-items: center;
     gap: 6px;
-    @include text-style(350, 20px, var(--On-Surface));
+    @include text-style(350, 20px, var(--On-Surface), 140%);
     position: absolute;
     left: 0;
     top: 50%;
@@ -465,7 +462,7 @@ $font-sizes: (
     }
 
     &-sub {
-      @include text-style(400, 14px, var(--On-Surface-Var));
+      @include text-style(400, 14px, var(--On-Surface-Var), 140%);
       letter-spacing: 1px;
     }
   }
@@ -473,7 +470,7 @@ $font-sizes: (
   .back-to-upload-btn {
     border-radius: 99px;
     background: var(--Prim-Cont);
-    @include text-style(400, 14px, var(--On-Prim));
+    @include text-style(400, 14px, var(--On-Prim), 140%);
     padding: 6px 12px;
 
     &:hover {
@@ -487,16 +484,6 @@ $font-sizes: (
 
   .btn {
     width: 100%;
-  }
-
-  .back-edit {
-    display: flex;
-    gap: 6px;
-    color: var(--On-Surface-Var);
-    align-items: center;
-    font-size: 20px;
-    font-weight: 350;
-    line-height: 140%;
   }
 
   .pass-btn {
@@ -521,7 +508,7 @@ $font-sizes: (
     }
 
     &-label {
-      @include text-style(500, 16px, var(--On-Surface-Var));
+      @include text-style(500, 16px, var(--On-Surface-Var), 140%);
       text-align: left;
     }
 
@@ -544,7 +531,7 @@ $font-sizes: (
       caret-color: var(--Outline);
 
       &::placeholder {
-        @include text-style(350, 20px, var(--On-Surface-Var));
+        @include text-style(350, 20px, var(--On-Surface-Var), 140%);
         text-align: left;
       }
 
@@ -558,18 +545,19 @@ $font-sizes: (
       }
 
       &.country-code {
-        width: 20%;
         border-radius: 16px 0px 0px 16px;
         color: var(--On-Surface-Var);
         padding: 20px 0px 20px 20px;
         border-right: none;
-
+        display: inline-flex;
+        width: auto;
         span {
           margin-right: 11px;
         }
       }
 
       &.phone-input {
+        flex-grow: 1;
         border-radius: 0px 16px 16px 0px;
         padding: 20px 0px;
         border-left: none;
@@ -634,6 +622,7 @@ $font-sizes: (
       gap: 20px;
       height: 70px;
       align-items: center;
+      flex-wrap: wrap;
 
       .error-message {
         margin-top: auto;
@@ -647,7 +636,7 @@ $font-sizes: (
       align-items: center;
       cursor: pointer;
       gap: 10px;
-      @include text-style(350, 20px, var(--On-Surface-Var));
+      @include text-style(350, 20px, var(--On-Surface-Var), 140%);
 
       input[type='radio'] {
         display: none;
@@ -691,7 +680,6 @@ $font-sizes: (
 
   .custom-checkbox {
     display: flex;
-    align-items: center;
 
     .checkbox-input {
       display: none;
@@ -704,15 +692,13 @@ $font-sizes: (
     }
 
     label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 20px;
       height: 20px;
       border: 1px solid var(--On-input-sec);
       border-radius: 6px;
       cursor: pointer;
       margin-right: 8px;
+      margin-top: 5px;
 
       &.error-checkbox {
         border: 1px solid var(--Error);
@@ -724,8 +710,9 @@ $font-sizes: (
       }
     }
     .label-text {
-      @include text-style(350, 20px, var(--On-input-sec));
+      @include text-style(350, 20px, var(--On-input-sec), 140%);
       margin-right: 4px;
+      flex-shrink: 0;
     }
     .error-label {
       color: var(--Error);
@@ -740,7 +727,7 @@ $font-sizes: (
 
   .error-message {
     float: right;
-    @include text-style(400, 14px, var(--Error));
+    @include text-style(400, 14px, var(--Error), 140%);
     vertical-align: middle;
 
     &.phone-sub {
@@ -752,6 +739,7 @@ $font-sizes: (
 
 .id-card-container {
   display: flex;
+  justify-content: center;
   gap: map-get($spacing, 'lg');
 
   .upload-container {
@@ -776,6 +764,13 @@ $font-sizes: (
       margin-bottom: 10px;
       color: var(--On-Surface-Var);
     }
+
+    .delete-icon {
+      width: 58px;
+      height: 58px;
+      color: var(--On-Inv-Surf);
+      margin-bottom: 10px;
+    }
   }
 }
 
@@ -786,7 +781,7 @@ $font-sizes: (
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  color: var(--On-Prim);
+  color: var(--On-Inv-Surf);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -797,12 +792,6 @@ $font-sizes: (
 
 .image-preview:hover .overlay {
   opacity: 1;
-}
-
-.delete-icon {
-  width: 58px;
-  height: 58px;
-  color: var(--On-Prim);
 }
 
 .image-preview {
@@ -976,15 +965,17 @@ $font-sizes: (
     }
 
     &.card-button {
-      height: 124px;
+      height: auto;
       border-radius: 0px 0px 16px 16px;
       display: flex;
       padding: 22px 95px;
-      justify-content: space-between;
+      justify-content: center;
       background: var(--Input-box);
       margin-bottom: 96px;
       flex-direction: row;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
 
       .card-button-title {
         color: var(--On-Surface);
@@ -1022,72 +1013,19 @@ $font-sizes: (
   z-index: 0;
 }
 
-// Media Queries
-@media (max-width: 1113px) {
-  .title-block {
-    margin-top: map-get($spacing, 'sm');
-    width: 80vw;
-  }
-
-  .id-card-container {
-    flex-direction: column;
-  }
-
-  .card {
-    padding: map-get($spacing, '2xl') map-get($spacing, 'xl');
-    width: 80vw !important;
-  }
-
-  .id-card-container {
-    display: flex;
-    gap: 0px;
-  }
-
-  .id-card-container .upload-container {
-    width: 448px;
-    height: 282px;
-    margin-bottom: 0px;
-  }
-
-  .card-content .btn {
-    margin-top: 24px;
-  }
-}
-
-@media (max-width: 618px) {
-  .title-block {
-    width: 90vw;
-  }
-
-  .card {
-    width: 90vw !important;
-  }
-
-  .id-card-container .upload-container {
-    width: 448px;
-    height: 282px;
-    margin-bottom: 0px;
-  }
-
-  .card-content .btn {
-    margin-top: 24px;
-  }
-
-  .id-card-container {
-    display: flex;
-    gap: 0px;
-  }
-}
-
 .ocr {
   .card {
     width: 1113px;
     display: flex;
     justify-content: center;
+    flex-direction: column;
 
     .card-content {
       position: relative;
       width: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
 
       &:last-child {
         margin-bottom: 0;
@@ -1101,11 +1039,169 @@ $font-sizes: (
   }
 
   .btn {
-    width: 100%;
+    width: calc(100%);
   }
 
   .upload-group {
     display: flex;
     gap: 24px;
+  }
+}
+
+// Media Queries
+@media (max-width: 1153px) {
+  .title-block {
+    margin-top: map-get($spacing, 'sm');
+    width: calc(100% - 80px);
+  }
+
+  .id-card-container {
+    flex-direction: column;
+  }
+
+  .card {
+    padding: map-get($spacing, '2xl') map-get($spacing, 'xl');
+    width: calc(100% - 80px);
+  }
+
+  .ocr .card {
+    width: calc(100% - 60px);
+  }
+
+  .form .card {
+    width: calc(100% - 60px);
+  }
+
+  .home {
+    .card {
+      width: 612px;
+    }
+  }
+
+  .id-card-container {
+    display: flex;
+    gap: 0px;
+  }
+
+  .id-card-container .upload-container {
+    width: 448px;
+    height: 282px;
+    margin-bottom: 0px;
+  }
+
+  .card-content .btn {
+    margin-top: 24px;
+  }
+
+  .ocr .btn {
+    width: 448px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home {
+    .card {
+      width: calc(100% - 40px);
+      margin: auto;
+      margin-bottom: 36px;
+    }
+  }
+
+  .form .back-route {
+    display: none;
+  }
+
+  .back-route {
+    display: none;
+  }
+
+  .code .card  {
+    width: calc(100% - 40px);
+    padding: 32px;
+  }
+}
+
+@media (max-width: 658px) {
+  .title-block {
+    width: calc(100% - 50px);
+  }
+
+  .card {
+    position: relative;
+    width: calc(100% - 20px);
+  }
+
+  .id-card-container {
+    display: flex;
+    gap: 0px;
+    width: 100%;
+    align-items: center;
+  }
+
+  .form .card-content {
+    position: relative;
+    width: 100%;
+  }
+
+  .ocr .card .card-content {
+    width: 100%;
+  }
+
+  .id-card-container .upload-container {
+    width: calc(100% - 20px);
+    margin-bottom: 0px;
+  }
+
+  .ocr .btn {
+    width: calc(100% - 20px);
+  }
+
+  .card-content .btn {
+    margin-top: 24px;
+  }
+
+  .form .radio {
+    &-group {
+      gap: 5px;
+      margin: 5px;
+    }
+  }
+}
+
+@media (max-width: 435px) {
+  .title-block {
+    width: calc(100% - 10px);
+  }
+
+  .card {
+    width: calc(100% - 10px);
+  }
+
+  .home .card {
+    position: relative;
+    width: calc(100% - 30px);
+  }
+
+  .id-card-container .upload-container {
+    width: 100%;
+    height: 282px;
+    margin-bottom: 0px;
+  }
+
+  .card-content .btn {
+    margin-top: 24px;
+  }
+
+  .id-card-container {
+    display: flex;
+    gap: 0px;
+  }
+
+  .ocr .card .card-content {
+    width: 100%;
+  }
+
+  .ocr .btn {
+    width: 100%;
   }
 }

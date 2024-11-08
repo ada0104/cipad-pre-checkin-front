@@ -103,7 +103,7 @@
               <div>
                 <label for="name-input" class="input-label">{{ $t('mobileNumber') }}</label>
                 <label v-if="v$.phone.$error" class="error-message">{{ phoneErrorMessage }}</label>
-                <label v-else class="error-message phone-sub ">*僅限臺灣手機號碼</label>
+                <label v-else class="error-message phone-sub ">{{ $t('validationPhoneNumberTaiwanOnly') }}</label>
               </div>
               <div class="input-container phone-input">
                 <div
@@ -213,17 +213,19 @@
           <label for="checkbox" :class="{ 'error-checkbox': showErrorMessage }">
             <SvgIcon v-if="acceptTerms" name="check" class="check-icon" />
           </label>
-          <span class="label-text" :class="{ 'error-label': showErrorMessage }"
-            >{{ $t('iAgreeToTerms') }}
-          </span>
-          <button
-            type="button"
-            class="link-button"
-            :class="{ 'error-label': showErrorMessage }"
-            @click="togglePrivacyPolicy"
-          >
-          {{ $t('privacyPolicy') }}
-          </button>
+          <div>
+            <span class="label-text" :class="{ 'error-label': showErrorMessage }"
+              >{{ $t('iAgreeToTerms') }}
+            </span>
+            <button
+              type="button"
+              class="link-button"
+              :class="{ 'error-label': showErrorMessage }"
+              @click="togglePrivacyPolicy"
+            >
+            {{ $t('privacyPolicy') }}
+            </button>
+          </div>
           <span v-if="showErrorMessage" class="error-message">
             {{ acceptTermsErrorMessage }}
           </span>
@@ -270,6 +272,7 @@ import { useRouter } from 'vue-router'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email as emailValidator, minLength, maxLength } from '@vuelidate/validators'
 import { setMemberData, type NewMemberDataRequest } from '@/api/api'
+import { useI18n } from 'vue-i18n';
 
 import { useOrderStore } from '@/stores/order'
 import { useIdImageStore } from '@/stores/idimage'
@@ -279,6 +282,7 @@ const router = useRouter()
 const idImage = useIdImageStore()
 const orderStore = useOrderStore()
 const memberDataStore = useMemberDataStore()
+const { t } = useI18n();
 
 // 表單動作
 const isLoading = ref<boolean>(false)
@@ -486,36 +490,37 @@ const handleCheckboxChange = () => {
 }
 
 const userNameErrorMessage = computed(() => {
-  if (!v$.value.userName.required.$response) return '*必填'
+  if (!v$.value.userName.required.$response) return t('required')
 
   return ''
 })
 
 const emailErrorMessage = computed(() => {
-  if (!v$.value.email.required.$response) return '*必填'
-  if (!v$.value.email.email.$response) return '請輸入有效的電子信箱'
+  if (!v$.value.email.required.$response) return t('required')
+  if (!v$.value.email.email.$response) return t('pleaseEnterValidEmail')
 
   return ''
 })
 
 const phoneErrorMessage = computed(() => {
-  if (!v$.value.phone.numeric.$response) return '手機號碼只能包含數字';
+  if (!v$.value.phone.numeric.$response) return t('mobileNumberCanOnlyContainDigits');
   if (!v$.value.phone.required.$response) return '手機號碼必須為10位數字';
 
   return '';
 });
 
 const cloudCarrierErrorMessage = computed(() => {
-  if (!v$.value.cloudCarrier.minLength.$response) return '至少需要8個字符'
-  if (!v$.value.cloudCarrier.maxLength.$response) return '最多8個字符'
-  if (!v$.value.cloudCarrier.startsWithSlash.$response) return '第一碼為 /'
+  if (!v$.value.cloudCarrier.minLength.$response) return t('atLeast8CharactersRequired')
+  if (!v$.value.cloudCarrier.maxLength.$response) return t('upTo8CharactersAllowed')
+  if (!v$.value.cloudCarrier.startsWithSlash.$response) return `${t('firstCharacterMustBe')} /`;
+
 
   return ''
 })
 
 const companyIdErrorMessage = computed(() => {
-  if (!v$.value.companyId.required.$response) return '*必填'
-  if (!v$.value.companyId.minLength.$response) return '至少需要8個字符'
+  if (!v$.value.companyId.required.$response) return t('required')
+  if (!v$.value.companyId.minLength.$response) return t('atLeast8CharactersRequired')
 
   return ''
 })
@@ -525,7 +530,7 @@ const companyNameErrorMessage = computed(() => {
 })
 
 const acceptTermsErrorMessage = computed(() => {
-  if (!v$.value.acceptTerms.required.$response) return '*必填'
+  if (!v$.value.acceptTerms.required.$response) return t('required')
 
   return ''
 })
@@ -561,35 +566,35 @@ function updateErrorMessages (type: ErrorType): void {
 
   switch (type) {
     case ErrorType.UploadFailed:
-      errorTitle.value = '資料上傳失敗'
-      errorContent.value = [{ text: '請確認網路穩定後' }, { text: '重新嘗試', class: 'mt-20' }]
-      errorButtonText.value = '重新上傳'
+      errorTitle.value = t('dataUploadFailed')
+      errorContent.value = [{ text: '請確認網路穩定後' }, { text: t('tryAgain'), class: 'mt-20' }]
+      errorButtonText.value = t('reUpload')
       break
     case ErrorType.hasQRNotification:
-      errorTitle.value = '資料上傳失敗'
+      errorTitle.value = t('dataUploadFailed')
       errorContent.value = [{ text: '已取過 預先報到 QRcode' }]
       errorButtonText.value = '進入QRcode頁面'
       break
     case ErrorType.noOcrImage:
-      errorTitle.value = '資料上傳失敗'
-      errorContent.value = [{ text: '請先完成證件驗證' }]
-      errorButtonText.value = '返回證件上傳'
+      errorTitle.value = t('dataUploadFailed')
+      errorContent.value = [{ text: t('pleaseCompleteDocumentVerificationFirst')}]
+      errorButtonText.value = t('returnToDocumentUpload')
       break
     case ErrorType.SaveDataNotification:
       errorTitle.value = '存取預設資料'
       errorContent.value = [
-        { text: `是否將本次資料設為${userName.value}的預設？` },
+        { text: `${t('setThisDataAs')} ${userName.value} ${t('default')}` },
         { text: `${email.value}`, class: 'fz-20 mt-20' },
-        { text: '未來使用此信箱訂房，即可自動帶入登記資料！', class: 'fz-20 fc-p mt-20' }
+        { text: t('futureBookingsWithThisEmail'), class: 'fz-20 fc-p mt-20' }
       ]
       showExtraButton.value = true
       errorButtonText.value = '存為預設'
       errorClass.value = 'purple extra'
       break
     default:
-      errorTitle.value = '未知錯誤'
-      errorContent.value = [{ text: '發生未知錯誤' }, { text: '請稍後再試' }]
-      errorButtonText.value = '關閉'
+      errorTitle.value = t('unknownError')
+      errorContent.value = [{ text: t('unknownErrorOccurred') }, { text: t('pleaseTryAgainLater') }]
+      errorButtonText.value = t('close')
       break
   }
 

@@ -122,14 +122,15 @@ const closeAlert = (): void => {
 
     &.extra {
       width: 800px;
-
+      margin: 10px;
       .btn-group {
         height: 82px;
         display: flex;
         width: 100%;
-        justify-content: flex-end;
         align-items: center;
         gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
       }
 
       .alert-button {
@@ -205,6 +206,26 @@ const closeAlert = (): void => {
       line-height: 110%;
       border-bottom: 1px solid var(--On-input-sec);
     }
+  }
+}
+
+@media (max-width: 792px) {
+
+  .error-alert-overlay .error-alert.extra .btn-group{
+    width: calc(100% - 10px);
+    flex-direction: column;
+    height: auto;
+    margin: 10px;
+  }
+}
+
+@media (max-width: 485px) {
+  .error-alert-overlay .error-alert.extra {
+    width: calc(100% - 10px);
+  }
+
+  .error-alert-overlay .error-alert.extra .alert-button {
+    width: 100%;
   }
 }
 </style>
