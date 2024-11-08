@@ -14,6 +14,7 @@ const wss = new WebSocket.Server({ port: wsPort });
 
 // 當有新的客戶端連接到 WebSocket 伺服器時
 wss.on('connection', (ws) => {
+  ws.is
   console.log('Client connected');
   // 每隔30秒發送 ping，檢查連線
   const interval = setInterval(() => {
@@ -92,6 +93,7 @@ proxyApiList.forEach(path=> {
     onProxyReq: (proxyReq, req, res) => {
       // 設定 Authorization header
       proxyReq.setHeader('Authorization', `Bearer ${API_TOKEN}`);
+      console.log('in proxy', `/dunqian/${path}`, API_URL)
     },
     onError: (err, req, res) => {
       res.status(500).json({ error: 'Proxy error', details: err.message });
