@@ -223,7 +223,7 @@ $spacing-small: 16px;
     width: fit-content;
     border-radius: map-get($border-radius, 'lg');
     border: 3px solid var(--Primary);
-    padding: map-get($spacing, 'md') map-get($spacing, 'xl');
+    padding: map-get($spacing, 'md') map-get($spacing, 'xl') map-get($spacing, 'md') map-get($spacing, 'xl');
 
     p {
       @include text-style(700, map-get($font-sizes, 'xl'), var(--Primary), 110%);
@@ -235,7 +235,7 @@ $spacing-small: 16px;
 .card {
   @include card-base;
   margin-bottom: 36px;
-  padding: map-get($spacing, '2xl') map-get($spacing, '4xl');
+  padding: map-get($spacing, '2xl') map-get($spacing, '4xl') map-get($spacing, '2xl') map-get($spacing, '4xl');
 
   &-title {
     color: var(--Primary);
@@ -245,7 +245,7 @@ $spacing-small: 16px;
 
   &-1 {
     position: relative;
-    padding: map-get($spacing, 'xl') map-get($spacing, '3xl');
+    padding: map-get($spacing, 'xl') map-get($spacing, '3xl') map-get($spacing, 'xl') map-get($spacing, '3xl');
   }
 
   &-2 {
@@ -330,7 +330,7 @@ $spacing-small: 16px;
     @include home-card-base;
 
     &-1 {
-      padding: $spacing-medium $spacing-large;
+      padding: $spacing-medium $spacing-large $spacing-medium $spacing-large;
     }
 
     &-2 {

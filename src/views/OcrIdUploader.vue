@@ -89,7 +89,12 @@ const isLoading = ref<boolean>(false)
 const isDisabled = ref<boolean>(true)
 const isImageChanged = ref<boolean>(false)
 
-const selectedOption = ref({
+interface SelectedOption {
+  name: string;
+  label: string;
+}
+
+const selectedOption = ref<SelectedOption>({
   name: 'id',
   label: t('identification.id') // 使用 i18n 翻譯
 });
@@ -123,8 +128,8 @@ const updateSelectedOption = (option: Option) => {
 }
 
 const checkIfCanProceed = computed(() => {
-  const selectedName = selectedOption.value.name as keyof typeof uploadLabelMap;
-  const requiredFields = Object.keys(uploadLabelMap[selectedName] || {});
+  const selectedName = selectedOption.value.name as 'id' | 'passport';
+  const requiredFields = Object.keys(uploadLabelMap.value[selectedName] || {});
   const imageData = idImage.idImages[selectedName] || {};
 
   const canProceed = requiredFields.every((field) => imageData[field]);
