@@ -32,6 +32,7 @@
   "pleaseCheckInWithGuardian": "Please check in with a guardian at the hotel front desk.",
   "iUnderstand": "I understand.",
   "iAmOfLegalAgeTryAgain": "I confirm that I am of legal age; please try again.",
+  "tryAgain": "Try again",
   "invalidDocumentFormat": "The document format is invalid.",
   "backOfIdCard": "Back of Identification Card",
   "imageFormatDoesNotMatch": "The image format does not match.",
@@ -64,7 +65,7 @@
   "skipAndDoNotAccess": "Skip and Do Not Access",
   "forPlatformUseOnly": "For Platform Use Only",
   "pleaseEnterValidEmail": "Please enter a valid email address.",
-  "required": "Required",
+  "required": "* required",
   "mobileNumberCanOnlyContainDigits": "Mobile number can only contain digits.",
   "atLeast8CharactersRequired": "At least 8 characters required.",
   "upTo8CharactersAllowed": "Up to 8 characters allowed.",
@@ -88,5 +89,15 @@
   "scanQRCodeCompletePaymentCollectRoomKey": "Please scan the order confirmation QR code, complete your payment, and collect your room key.",
   "incorrectUrl": "The URL address is incorrect.",
   "orderUrlIncomplete": "The URL address is incomplete.",
-  "returnToEmailUseCorrectLink": "Please return to the email and use the correct link."
+  "returnToEmailUseCorrectLink": "Please return to the email and use the correct link.",
+  "validationPhoneNumberTaiwanOnly":"* For Taiwan phone numbers only",
+  "identification": {
+    "id": "ID Card",
+    "passport": "Passport"
+  },
+  "uploadLabel": {
+    "idFront": "ID Card Front",
+    "idBack": "ID Card Back",
+    "passportFront": "Passport Personal Page"
+  }
 }

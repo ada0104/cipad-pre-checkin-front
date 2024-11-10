@@ -124,4 +124,22 @@ onBeforeUnmount(() => {
     }
   }
 }
+
+@media (max-width: 1153px) {
+  .form-dropdown {
+    width: 448px;
+  }
+}
+
+@media (max-width: 658px) {
+  .form-dropdown {
+    width: calc(100% - 20px);
+  }
+}
+
+@media (max-width: 435px) {
+  .form-dropdown {
+    width: calc(100%);
+  }
+}
 </style>
