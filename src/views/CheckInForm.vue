@@ -103,12 +103,12 @@
               <div>
                 <label for="name-input" class="input-label">{{ $t('mobileNumber') }}</label>
                 <label v-if="v$.phone.$error" class="error-message">{{ phoneErrorMessage }}</label>
-                <label v-else class="error-message phone-sub ">{{ $t('validationPhoneNumberTaiwanOnly') }}</label>
+                <label v-else class="error-message phone-sub">{{
+                  $t('validationPhoneNumberTaiwanOnly')
+                }}</label>
               </div>
               <div class="input-container phone-input">
-                <div
-                  :class="{ 'error-border': v$.phone.$error }"
-                  class="input-field country-code">
+                <div :class="{ 'error-border': v$.phone.$error }" class="input-field country-code">
                   <span>+886</span>
                   <span>|</span>
                 </div>
@@ -120,6 +120,7 @@
                   :class="{ 'error-border': v$.phone.$error }"
                   :placeholder="$t('enterMobileNumber')"
                   @blur="v$.phone.$touch()"
+                  @input="removeLeadingZero"
                 />
               </div>
             </div>
@@ -223,7 +224,7 @@
               :class="{ 'error-label': showErrorMessage }"
               @click="togglePrivacyPolicy"
             >
-            {{ $t('privacyPolicy') }}
+              {{ $t('privacyPolicy') }}
             </button>
           </div>
           <span v-if="showErrorMessage" class="error-message">
@@ -235,7 +236,7 @@
         </Button>
       </div>
     </div>
-    <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" class="privacyPolicy"/>
+    <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" class="privacyPolicy" />
     <div v-if="isLoading" class="loading-animation">
       <LottieAnimation name="upload" :lottie_text="$t('uploadingData')" />
     </div>
@@ -253,9 +254,9 @@
         <SvgIcon name="back" class="back-icon" />
         <span>{{ $t('returnToEdit') }}</span>
       </div>
-      <Button buttonClass="btn secondary-btn pass-btn" @click="handleExtraAction"
-        >{{ $t('skipAndDoNotAccess') }}</Button
-      >
+      <Button buttonClass="btn secondary-btn pass-btn" @click="handleExtraAction">{{
+        $t('skipAndDoNotAccess')
+      }}</Button>
     </template>
   </ErrorAlert>
 </template>
@@ -266,13 +267,13 @@ import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
-import LottieAnimation from '@/components/Lottie.vue';
+import LottieAnimation from '@/components/Lottie.vue'
 
 import { useRouter } from 'vue-router'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email as emailValidator, minLength, maxLength } from '@vuelidate/validators'
 import { setMemberData, type NewMemberDataRequest } from '@/api/api'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 
 import { useOrderStore } from '@/stores/order'
 import { useIdImageStore } from '@/stores/idimage'
@@ -282,7 +283,7 @@ const router = useRouter()
 const idImage = useIdImageStore()
 const orderStore = useOrderStore()
 const memberDataStore = useMemberDataStore()
-const { t } = useI18n();
+const { t } = useI18n()
 
 // 表單動作
 const isLoading = ref<boolean>(false)
@@ -295,9 +296,9 @@ const userName = ref<string>('')
 const birthday = ref<string>('')
 const email = ref<string>('')
 const phone = ref<string>('')
-const cloudCarrier = ref<string | null>(null);
-const companyId = ref<string | null>(null);
-const companyName = ref<string | null>(null);
+const cloudCarrier = ref<string | null>(null)
+const companyId = ref<string | null>(null)
+const companyName = ref<string | null>(null)
 const pmsSource = ref<string>('')
 const orderNumber = ref<string>('')
 const acceptTerms = ref<boolean>(false)
@@ -381,36 +382,42 @@ const applyWatermarks = () => {
 
 watch(selectedInvoiceType, (newType) => {
   if (newType === 'two-step') {
-    companyId.value = '';
-    companyName.value = '';
+    companyId.value = ''
+    companyName.value = ''
   } else if (newType === 'three-step') {
-    cloudCarrier.value = '';
+    cloudCarrier.value = ''
   }
-});
+})
+
+const removeLeadingZero = () => {
+  if (phone.value && phone.value[0] === '0') {
+    phone.value = phone.value.slice(1)
+  }
+}
 
 onMounted(() => {
   const assignMemberData = (data: any) => {
-    userName.value = data.name;
-    birthday.value = data.birthday;
-    phone.value = data.phone || '';
-    email.value = data.email || '';
-    cloudCarrier.value = data.invoice?.barcode || '';
-    companyId.value = data.invoice?.compiled || '';
-    companyName.value = data.invoice?.company || '';
-  };
-
-  if (memberDataStore.defaultMemberData.code === '0') {
-    assignMemberData(memberDataStore.defaultMemberData.data);
-  } else {
-    assignMemberData(idImage.idOcrResult.data);
+    userName.value = data.name
+    birthday.value = data.birthday
+    phone.value = data.phone || ''
+    email.value = data.email || ''
+    cloudCarrier.value = data.invoice?.barcode || ''
+    companyId.value = data.invoice?.compiled || ''
+    companyName.value = data.invoice?.company || ''
   }
 
-  const { pms, order_number } = orderStore.orderData.orderData;
-  pmsSource.value = pms;
-  orderNumber.value = order_number;
+  if (memberDataStore.defaultMemberData.code === '0') {
+    assignMemberData(memberDataStore.defaultMemberData.data)
+  } else {
+    assignMemberData(idImage.idOcrResult.data)
+  }
 
-  applyWatermarks();
-});
+  const { pms, order_number } = orderStore.orderData.orderData
+  pmsSource.value = pms
+  orderNumber.value = order_number
+  removeLeadingZero()
+  applyWatermarks()
+})
 
 watch([idImageArray, canvasRefs], applyWatermarks)
 
@@ -430,7 +437,7 @@ const showContact = ref<boolean>(false)
 const togglePrivacyPolicy = () => {
   showContact.value = !showContact.value
   if (!showContact.value) {
-    applyWatermarks();
+    applyWatermarks()
   }
 }
 
@@ -453,8 +460,8 @@ const rules = {
     minLength: minLength(8),
     maxLength: maxLength(8),
     startsWithSlash: (value: string) => {
-      return value ? value.startsWith('/') : true;
-    },
+      return value ? value.startsWith('/') : true
+    }
   },
   companyName: {},
   acceptTerms: {
@@ -503,17 +510,16 @@ const emailErrorMessage = computed(() => {
 })
 
 const phoneErrorMessage = computed(() => {
-  if (!v$.value.phone.numeric.$response) return t('mobileNumberCanOnlyContainDigits');
-  if (!v$.value.phone.required.$response) return '手機號碼必須為9位數字';
+  if (!v$.value.phone.numeric.$response) return t('mobileNumberCanOnlyContainDigits')
+  if (!v$.value.phone.required.$response) return '手機號碼必須為9位數字'
 
-  return '';
-});
+  return ''
+})
 
 const cloudCarrierErrorMessage = computed(() => {
   if (!v$.value.cloudCarrier.minLength.$response) return t('atLeast8CharactersRequired')
   if (!v$.value.cloudCarrier.maxLength.$response) return t('upTo8CharactersAllowed')
-  if (!v$.value.cloudCarrier.startsWithSlash.$response) return `${t('firstCharacterMustBe')} /`;
-
+  if (!v$.value.cloudCarrier.startsWithSlash.$response) return `${t('firstCharacterMustBe')} /`
 
   return ''
 })
@@ -550,7 +556,7 @@ const setMemberDataErrorCodeMap: { [key: string]: ErrorType } = {
   '1002': ErrorType.UploadFailed,
   '1003': ErrorType.noOcrImage,
   '5003': ErrorType.UploadFailed,
-  '5004': ErrorType.UploadFailed,
+  '5004': ErrorType.UploadFailed
 }
 
 const errorTitle = ref<string>('')
@@ -560,7 +566,7 @@ const errorClass = ref<string>('')
 const showExtraButton = ref<boolean>(false)
 const currentErrorType = ref<ErrorType | null>(null)
 
-function updateErrorMessages (type: ErrorType): void {
+function updateErrorMessages(type: ErrorType): void {
   errorClass.value = ''
   currentErrorType.value = type
 
@@ -577,7 +583,7 @@ function updateErrorMessages (type: ErrorType): void {
       break
     case ErrorType.noOcrImage:
       errorTitle.value = t('dataUploadFailed')
-      errorContent.value = [{ text: t('pleaseCompleteDocumentVerificationFirst')}]
+      errorContent.value = [{ text: t('pleaseCompleteDocumentVerificationFirst') }]
       errorButtonText.value = t('returnToDocumentUpload')
       break
     case ErrorType.SaveDataNotification:
@@ -606,8 +612,7 @@ const handleNextStep = () => {
 }
 
 const handleRetryUpload = (errorType: ErrorType | null) => {
-  if (
-    errorType === ErrorType.UploadFailed || errorType === ErrorType.SaveDataNotification) {
+  if (errorType === ErrorType.UploadFailed || errorType === ErrorType.SaveDataNotification) {
     showExtraButton.value = false
     saveFormData()
   }
@@ -632,15 +637,16 @@ const handleExtraAction = () => {
 
 const handleBackAction = () => {
   if (showContact.value) {
-    showContact.value = false;
-    applyWatermarks();
+    showContact.value = false
+    applyWatermarks()
   } else {
     router.push('/upload')
   }
 }
 
 const saveFormData = async () => {
-  let paddedPhoneValue = String(phone.value).padStart(10, '0');
+  let paddedPhoneValue =
+    phone.value.length === 9 ? String(phone.value).padStart(10, '0') : phone.value
 
   const newMemberData: NewMemberDataRequest = {
     source: pmsSource.value,
@@ -657,7 +663,7 @@ const saveFormData = async () => {
   }
 
   isLoading.value = true
-  let success = false;
+  let success = false
 
   try {
     const res = await setMemberData(newMemberData)
@@ -668,16 +674,16 @@ const saveFormData = async () => {
     }
 
     if (res.code === '0') {
-      success = true;
+      success = true
       memberDataStore.setSendableEmail(userName.value, email.value)
     }
   } catch (error) {
-     updateErrorMessages(ErrorType.UnknownError)
+    updateErrorMessages(ErrorType.UnknownError)
   } finally {
     isLoading.value = false
 
     if (success) {
-      router.push('/checkin');
+      router.push('/checkin')
     }
   }
 }
@@ -686,5 +692,4 @@ const submitFormData = async () => {
   updateErrorMessages(ErrorType.SaveDataNotification)
 }
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

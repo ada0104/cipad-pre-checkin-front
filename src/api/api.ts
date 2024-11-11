@@ -232,7 +232,7 @@ const addMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promis
   formData.set('order_number', newMemberDataRequest.order_number);
 
   if (newMemberDataRequest.phone) {
-    formData.set('barcode', newMemberDataRequest.phone);
+    formData.set('phone', newMemberDataRequest.phone);
   }
 
   if (newMemberDataRequest.barcode) {
