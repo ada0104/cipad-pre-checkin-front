@@ -6,45 +6,47 @@
         <p>{{ $t('checkInInfo') }}</p>
       </div>
     </div>
-    <div v-if="showNoUrlToken" class="card card-2">
-      <p class="error-title">{{ $t('incorrectUrl') }}</p>
-      <p class="error-text">{{ $t('orderUrlIncomplete') }}</p>
-      <p class="error-text">{{ $t('returnToEmailUseCorrectLink') }}</p>
-    </div>
-    <div class="loading" v-else-if="isLoading">
-      <div class="card card-1">
-        <Vue3Lottie :animationData="Loading" :loop="true" :autoplay="true" class="lottie" />
+    <div class="card-block">
+      <div v-if="showNoUrlToken" class="card card-2">
+        <p class="error-title">{{ $t('incorrectUrl') }}</p>
+        <p class="error-text">{{ $t('orderUrlIncomplete') }}</p>
+        <p class="error-text">{{ $t('returnToEmailUseCorrectLink') }}</p>
       </div>
-      <div class="card card-2">
-        <Vue3Lottie :animationData="Loading" :loop="true" :autoplay="true" class="lottie" />
+      <div v-else-if="isLoading" class="loading">
+        <div class="card card-1">
+          <Vue3Lottie :animationData="Loading" :loop="true" :autoplay="true" class="lottie" />
+        </div>
+        <div class="card card-2">
+          <Vue3Lottie :animationData="Loading" :loop="true" :autoplay="true" class="lottie" />
+        </div>
       </div>
-    </div>
-    <div v-else-if="showError" class="card card-2">
-      <p class="error-title">{{ $t('preCheckInAccessClosed') }}</p>
-      <p class="error-text">
-        {{ $t('dueToChangesInYourOrder') }}<br />
-        {{ $t('preCheckInServiceTemporarilyUnavailable') }}<br />
-        {{ $t('pleaseCheckInAtTheHotel') }}<br /><br />
-        {{ $t('apologizeForTheInconvenience') }}
-      </p>
-    </div>
-    <div v-else>
-      <div class="card card-1">
-        <p class="card-title m-b-16">{{ orderDomain }}</p>
-        <p class="card-sec-title">{{ $t('orderNumber') }} {{ orderId }}</p>
-        <p v-if="!showError" class="card-text">
-          (
-          <span>{{ new Date(orderCheckInDate).toLocaleDateString() }}</span> -
-          <span>{{ new Date(orderCheckOutDate).toLocaleDateString() }}</span>
-          )
+      <div v-else-if="showError" class="card card-2">
+        <p class="error-title">{{ $t('preCheckInAccessClosed') }}</p>
+        <p class="error-text">
+          {{ $t('dueToChangesInYourOrder') }}<br />
+          {{ $t('preCheckInServiceTemporarilyUnavailable') }}<br />
+          {{ $t('pleaseCheckInAtTheHotel') }}<br /><br />
+          {{ $t('apologizeForTheInconvenience') }}
         </p>
       </div>
-      <div class="card card-2">
-        <p class="card-title">{{ $t('buyer') }} - {{ orderName }}</p>
-        <p class="card-title m-b-48">{{ $t('isThisGuestForThisStay') }}</p>
-        <div class="btn-group">
-          <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">{{ $t('noDifferentPerson') }}</Button>
-          <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">{{ $t('yesSamePerson') }}</Button>
+      <div v-else>
+        <div class="card card-1">
+          <p class="card-title m-b-16">{{ orderDomain }}</p>
+          <p class="card-sec-title">{{ $t('orderNumber') }} {{ orderId }}</p>
+          <p v-if="!showError" class="card-text">
+            (
+            <span>{{ new Date(orderCheckInDate).toLocaleDateString() }}</span> -
+            <span>{{ new Date(orderCheckOutDate).toLocaleDateString() }}</span>
+            )
+          </p>
+        </div>
+        <div class="card card-2">
+          <p class="card-title">{{ $t('buyer') }} - {{ orderName }}</p>
+          <p class="card-title m-b-48">{{ $t('isThisGuestForThisStay') }}</p>
+          <div class="btn-group">
+            <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">{{ $t('noDifferentPerson') }}</Button>
+            <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">{{ $t('yesSamePerson') }}</Button>
+          </div>
         </div>
       </div>
     </div>

@@ -235,7 +235,7 @@
         </Button>
       </div>
     </div>
-    <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" />
+    <PrivacyPolicy v-if="showContact" @close="togglePrivacyPolicy" class="privacyPolicy"/>
     <div v-if="isLoading" class="loading-animation">
       <LottieAnimation name="upload" :lottie_text="$t('uploadingData')" />
     </div>
