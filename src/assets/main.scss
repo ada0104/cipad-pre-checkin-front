@@ -961,7 +961,7 @@ $spacing-small: 16px;
       .svg-text {
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         gap: 11px;
 
         .email-icon {
@@ -970,7 +970,7 @@ $spacing-small: 16px;
         .email-text {
           color: var(--Secondary);
           text-align: center;
-          font-size: 20px;
+          font-size: 1rem;
           font-weight: 350;
           line-height: 140%;
         }
@@ -1021,8 +1021,8 @@ $spacing-small: 16px;
 
 .hidden-template {
   position: absolute;
-  top: -100%;
-  left: -100%;
+  top: -200%;
+  left: -200%;
   z-index: 0;
 }
 
@@ -1189,6 +1189,10 @@ $spacing-small: 16px;
   .card-content .btn {
     margin-top: 24px;
   }
+
+  .code .card.card-button {
+    padding: 20px 30px;
+  }
 }
 
 @media (max-width: 435px) {
@@ -1226,5 +1230,18 @@ $spacing-small: 16px;
 
   .ocr .btn {
     width: 100%;
+  }
+
+  .code .card.card-button {
+    height: auto;
+    border-radius: 0 0 16px 16px;
+    display: flex;
+    justify-content: center;
+    background: var(--Input-box);
+    margin-bottom: 96px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
   }
 }
