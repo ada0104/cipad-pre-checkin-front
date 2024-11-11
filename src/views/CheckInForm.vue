@@ -442,7 +442,7 @@ const rules = {
     email: emailValidator
   },
   phone: {
-    required: (value: string) => !value || value.length === 10,
+    required: (value: string) => !value || value.length === 9,
     numeric: (value: string) => !value || /^\d+$/.test(value)
   },
   companyId: {
@@ -504,7 +504,7 @@ const emailErrorMessage = computed(() => {
 
 const phoneErrorMessage = computed(() => {
   if (!v$.value.phone.numeric.$response) return t('mobileNumberCanOnlyContainDigits');
-  if (!v$.value.phone.required.$response) return '手機號碼必須為10位數字';
+  if (!v$.value.phone.required.$response) return '手機號碼必須為9位數字';
 
   return '';
 });
@@ -640,10 +640,12 @@ const handleBackAction = () => {
 }
 
 const saveFormData = async () => {
+  let paddedPhoneValue = String(phone.value).padStart(10, '0');
+
   const newMemberData: NewMemberDataRequest = {
     source: pmsSource.value,
     country_codes: '+886',
-    phone: phone.value,
+    phone: paddedPhoneValue,
     name: userName.value,
     email: email.value,
     birthday: birthday.value,
