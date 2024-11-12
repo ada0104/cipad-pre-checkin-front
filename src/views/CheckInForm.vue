@@ -511,7 +511,7 @@ const emailErrorMessage = computed(() => {
 
 const phoneErrorMessage = computed(() => {
   if (!v$.value.phone.numeric.$response) return t('mobileNumberCanOnlyContainDigits')
-  if (!v$.value.phone.required.$response) return '手機號碼必須為9位數字'
+  if (!v$.value.phone.required.$response) return t('invalidPhoneNumber')
 
   return ''
 })
@@ -573,13 +573,13 @@ function updateErrorMessages(type: ErrorType): void {
   switch (type) {
     case ErrorType.UploadFailed:
       errorTitle.value = t('dataUploadFailed')
-      errorContent.value = [{ text: '請確認網路穩定後' }, { text: t('tryAgain'), class: 'mt-20' }]
+      errorContent.value = [{ text: t('networkCheckMessage') }, { text: t('tryAgain'), class: 'mt-20' }]
       errorButtonText.value = t('reUpload')
       break
     case ErrorType.hasQRNotification:
       errorTitle.value = t('dataUploadFailed')
-      errorContent.value = [{ text: '已取過 預先報到 QRcode' }]
-      errorButtonText.value = '進入QRcode頁面'
+      errorContent.value = [{ text: t('qrcodeAlreadyClaimed') }]
+      errorButtonText.value = t('navigateToQrcodePage')
       break
     case ErrorType.noOcrImage:
       errorTitle.value = t('dataUploadFailed')
@@ -587,14 +587,14 @@ function updateErrorMessages(type: ErrorType): void {
       errorButtonText.value = t('returnToDocumentUpload')
       break
     case ErrorType.SaveDataNotification:
-      errorTitle.value = '存取預設資料'
+      errorTitle.value = t('fetchDefaultData')
       errorContent.value = [
         { text: `${t('setThisDataAs')} ${userName.value} ${t('default')}` },
         { text: `${email.value}`, class: 'fz-20 mt-20' },
         { text: t('futureBookingsWithThisEmail'), class: 'fz-20 fc-p mt-20' }
       ]
       showExtraButton.value = true
-      errorButtonText.value = '存為預設'
+      errorButtonText.value = t('saveAsDefault')
       errorClass.value = 'purple extra'
       break
     default:

@@ -1193,11 +1193,23 @@ $spacing-small: 16px;
   .code .card.card-button {
     padding: 20px 30px;
   }
+
+  .home .card {
+    padding: 30px 20px;
+  }
+
+  .home .btn-group .btn {
+    padding: 15px;
+  }
 }
 
 @media (max-width: 435px) {
   .title-block {
     width: calc(100% - 10px);
+
+    .title p {
+      font-size: 24px;
+    }
   }
 
   .card {
@@ -1207,6 +1219,7 @@ $spacing-small: 16px;
   .home .card {
     position: relative;
     width: calc(100% - 30px);
+    padding: 20px;
   }
 
   .id-card-container .upload-container {
@@ -1226,6 +1239,10 @@ $spacing-small: 16px;
 
   .ocr .card .card-content {
     width: 100%;
+  }
+
+  .ocr .card .card-title {
+    font-size: 24px;
   }
 
   .ocr .btn {

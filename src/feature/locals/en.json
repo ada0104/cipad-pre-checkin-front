@@ -91,13 +91,19 @@
   "orderUrlIncomplete": "The URL address is incomplete.",
   "returnToEmailUseCorrectLink": "Please return to the email and use the correct link.",
   "validationPhoneNumberTaiwanOnly":"* For Taiwan phone numbers only",
+  "networkCheckMessage": "Please ensure the network is stable.",
+  "fetchDefaultData": "Access default data",
+  "saveAsDefault": "Save as default",
+  "invalidPhoneNumber": "The phone number must be 9 digits.",
+  "qrcodeAlreadyClaimed": "The check-in QR code has already been claimed.",
+  "navigateToQrcodePage": "Navigate to the QR code page.",
   "identification": {
-    "id": "ID Card",
+    "id": "National identification card (Taiwan)",
     "passport": "Passport"
   },
   "uploadLabel": {
     "idFront": "ID Card Front",
     "idBack": "ID Card Back",
-    "passportFront": "Passport Personal Page"
+    "passportFront": "Passport Data Page"
   }
 }

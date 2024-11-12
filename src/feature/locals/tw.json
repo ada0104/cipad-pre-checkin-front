@@ -90,14 +90,13 @@
   "incorrectUrl": "網址有誤",
   "orderUrlIncomplete": "訂單網址不完整",
   "returnToEmailUseCorrectLink": "請回到Email信件，使用正確導引連結",
-  "validationPhoneNumberTaiwanOnly":"* 僅限臺灣手機號碼",
-  "q":"請確認網路穩定後",
-  "a":"已取過預先報到 QRcode",
-  "z":"進入QRcode頁面",
-  "g":"存取預設資料",
-  "v":"存為預設",
-  "c":"手機號碼必須為10位數字",
-
+  "validationPhoneNumberTaiwanOnly": "* 僅限臺灣手機號碼",
+  "networkCheckMessage": "請確認網路穩定後",
+  "fetchDefaultData": "存取預設資料",
+  "saveAsDefault": "存為預設",
+  "invalidPhoneNumber": "手機號碼必須為9位數字",
+  "qrcodeAlreadyClaimed": "已取過預先報到 QRcode",
+  "navigateToQrcodePage": "進入QRcode頁面",
   "identification": {
     "id": "身分證",
     "passport": "護照"
