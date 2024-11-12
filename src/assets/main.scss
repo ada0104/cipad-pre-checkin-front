@@ -324,6 +324,197 @@ $spacing-small: 16px;
   }
 }
 
+.theme-toggle-button {
+  background-color: var(--svg-fill-color);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+
+  .theme-icon {
+    color: var(--On-Inv-Surf);
+  }
+
+  &:hover {
+    background-color: var(--Overlay, rgba(54, 56, 70, 0.66));
+  }
+}
+
+.toggle-switch {
+  display: block;
+  position: relative;
+
+  .toggle-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+
+    &:checked + .toggle-label {
+      background: var(--Prim-Cont);
+
+      .toggle-slider {
+        transform: translateX(24px);
+      }
+    }
+  }
+
+  .toggle-label {
+    display: block;
+    background: var(--Prim-Cont);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 3px;
+    width: 52px;
+    align-items: center;
+
+    .toggle-slider {
+      width: 22px;
+      height: 22px;
+      background-color: var(--On-Prim);
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+      display: block;
+    }
+  }
+}
+
+.lottie-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--Overlay, rgba(0, 0, 0, 0.75));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 4;
+
+  .lottie-animation {
+    display: flex;
+    padding: 48px;
+    border-radius: 24px;
+    background: var(--Surface);
+    width: 300px;
+    height: 336px;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+
+    .lottie {
+      margin-top: 29px;
+      margin-bottom: 29px;
+    }
+  }
+
+  .lottie-text {
+    font-size: 24px;
+    color: var(--On-Surface-Var);
+    font-weight: 700;
+    line-height: 110%;
+  }
+}
+
+.download-template {
+  width: 390px;
+  height: 844px;
+  background: linear-gradient(44deg, #f1f0f7 -1.03%, #dce1ff 101.53%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+
+  .logo {
+    width: 191px;
+    height: 35px;
+  }
+
+  .template-container {
+    width: 343px;
+    height: 543px;
+    border-radius: 32px;
+    background: var(--Card-Background);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 32px 0px;
+    box-shadow:
+      0px 421px 118px 0px rgba(150, 150, 150, 0),
+      0px 269px 108px 0px rgba(150, 150, 150, 0.01),
+      0px 151px 91px 0px rgba(150, 150, 150, 0.05),
+      0px 67px 67px 0px rgba(150, 150, 150, 0.09),
+      0px 17px 37px 0px rgba(150, 150, 150, 0.1);
+
+      .domain {
+        margin-bottom: 12px;
+        color: #4D5C92;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 140%;
+        letter-spacing: 1.92px;
+      }
+
+      .sub-title {
+        color: #757680;
+        text-align: center;
+
+        font-size: 20px;
+        font-weight: 350;
+        line-height: 140%;
+      }
+
+      .check-in-time {
+        margin-top: 12px;
+        color: #03174B;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 140%;
+      }
+
+      .qr-code-container {
+        width: 232px;
+        height: 283px;
+        border-radius: 16px;
+        background: #FFF;
+        transform: rotate(-0.035deg);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+
+        .qr-code {
+          width: 150px;
+          height: 150px;
+        }
+        .label {
+          color: #03174B;
+          text-align: center;
+
+          font-size: 24px;
+          font-weight: 400;
+          line-height: 140%;
+          letter-spacing: 1.92px;
+        }
+      }
+  }
+}
+
 // home
 .home {
   .card-block {
@@ -399,9 +590,9 @@ $spacing-small: 16px;
 
     .lottie {
       width: 100%;
-      height: 410px;
       position: relative;
       object-fit: cover;
+      transform: scale(3); 
     }
   }
 }

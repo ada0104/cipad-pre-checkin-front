@@ -65,6 +65,7 @@ import { useIdImageStore } from '@/stores/idimage'
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
 import { useI18n } from 'vue-i18n';
 
+import { useErrorHandling, ErrorType } from '@/composables/useErrorHandling'
 import { getOcrData, type OcrDataResponse, type OcrDataRequest } from '@/api/api'
 
 interface Option {
@@ -96,7 +97,7 @@ interface SelectedOption {
 
 const selectedOption = ref<SelectedOption>({
   name: 'id',
-  label: t('identification.id') // 使用 i18n 翻譯
+  label: t('identification.id')
 });
 
 const options = ref([
@@ -161,72 +162,17 @@ onMounted(() => {
   isDisabled.value = !checkIfCanProceed.value
 })
 
-enum ErrorType {
-  RecognitionFailed, // 證件辨識失敗
-  UnsupportedFormat, // 證件格式錯誤
-  MinorAccessDenied, // 未成年阻擋
-  UnknownError // 未知錯誤
-}
-
-const ocrErrorCodeMap: { [key: string]: ErrorType } = {
-  '1000': ErrorType.MinorAccessDenied,
-  '1001': ErrorType.MinorAccessDenied,
-  '1002': ErrorType.RecognitionFailed,
-  '1003': ErrorType.RecognitionFailed,
-  '1004': ErrorType.RecognitionFailed,
-  '1005': ErrorType.RecognitionFailed,
-  '5003': ErrorType.RecognitionFailed,
-  '5004': ErrorType.RecognitionFailed
-}
-
-const showError = ref<boolean>(false)
-const errorTitle = ref<string>('')
-const errorContent = ref<Array<{ text: string; class?: string }>>([])
-const errorButtonText = ref<string>('')
-const errorClass = ref<string>('')
-const errorSubText = ref<string>('')
-const currentErrorType = ref<ErrorType | null>(null)
-
-function updateErrorMessages(type: ErrorType): void {
-  errorClass.value = ''
-  errorSubText.value = ''
-  currentErrorType.value = type
-
-  switch (type) {
-    case ErrorType.RecognitionFailed:
-      errorTitle.value = t('identificationFailed')
-      errorContent.value = [{ text: t('documentImageCannotBeRecognized') }, { text: t('pleaseReselect') }]
-      errorButtonText.value = t('reUpload')
-      break
-    case ErrorType.MinorAccessDenied:
-      errorTitle.value = t('minorBlocked')
-      errorContent.value = [
-        { text: t('identifiedAsUnder18') },
-        { text: t('onlineRegistrationNotAvailable') },
-        { text: t('pleaseCheckInWithGuardian') }
-      ]
-      errorButtonText.value = t('iUnderstand')
-      errorSubText.value = t('iAmOfLegalAgeTryAgain')
-      errorClass.value = 'purple'
-      break
-    case ErrorType.UnsupportedFormat:
-      errorTitle.value = t('invalidDocumentFormat')
-      errorContent.value = [
-        { text: t('backOfIdCard') },
-        { text: t('imageFormatDoesNotMatch') },
-        { text: t('reUpload') }
-      ]
-      errorButtonText.value = t('reUpload')
-      break
-    default:
-      errorTitle.value = t('unknownError')
-      errorContent.value = [{ text: t('unknownErrorOccurred') }, { text: t('pleaseTryAgainLater') }]
-      errorButtonText.value = t('close')
-      break
-  }
-
-  showError.value = true
-}
+const {
+  showError,
+  errorTitle,
+  errorContent,
+  errorSubText,
+  errorButtonText,
+  errorClass,
+  currentErrorType,
+  ocrErrorCodeMap,
+  updateErrorMessages
+} = useErrorHandling()
 
 const handleRetryUpload = (errorType: ErrorType | null) => {
   if (errorType === ErrorType.MinorAccessDenied) {
@@ -245,7 +191,6 @@ const handleSubTextClick = (errorType: ErrorType | null) => {
   showError.value = false
 }
 
-// 完成上傳後開始進行OCR辨識
 const getOcrImageData = async () => {
   isLoading.value = true
 
@@ -291,5 +236,3 @@ const getOcrImageData = async () => {
   }
 }
 </script>
-<style lang="scss" scoped>
-</style>

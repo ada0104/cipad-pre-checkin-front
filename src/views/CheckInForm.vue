@@ -42,7 +42,7 @@
               <div>
                 <label for="name-input" class="input-label">{{ $t('name') }}</label>
                 <label v-if="v$.userName.$error" class="error-message">{{
-                  userNameErrorMessage
+                  errorMessages.userName
                 }}</label>
               </div>
               <div class="input-container">
@@ -84,7 +84,7 @@
             <div class="input-wrapper">
               <div>
                 <label for="email-input" class="input-label">{{ $t('emailAddress') }}</label>
-                <label v-if="v$.email.$error" class="error-message">{{ emailErrorMessage }}</label>
+                <label v-if="v$.email.$error" class="error-message">{{ errorMessages.email }}</label>
               </div>
               <div class="input-container">
                 <input
@@ -102,7 +102,7 @@
             <div class="input-wrapper">
               <div>
                 <label for="name-input" class="input-label">{{ $t('mobileNumber') }}</label>
-                <label v-if="v$.phone.$error" class="error-message">{{ phoneErrorMessage }}</label>
+                <label v-if="v$.phone.$error" class="error-message">{{ errorMessages.phone }}</label>
                 <label v-else class="error-message phone-sub">{{
                   $t('validationPhoneNumberTaiwanOnly')
                 }}</label>
@@ -153,10 +153,10 @@
                 <span class="label-text">{{ $t('threePartPersonalInvoice') }}</span>
               </label>
               <p v-if="v$.cloudCarrier.$error" class="error-message">
-                {{ cloudCarrierErrorMessage }}
+                {{ errorMessages.cloudCarrier }}
               </p>
               <p v-if="v$.companyId.$error" class="error-message">
-                {{ companyIdErrorMessage }}
+                {{ errorMessages.companyId }}
               </p>
             </div>
             <!-- 二聯式個人發票時顯示 -->
@@ -188,7 +188,7 @@
               </div>
               <div class="input-container invoice-co-name">
                 <p v-if="v$.companyName.$error" class="error-message">
-                  {{ companyNameErrorMessage }}
+                  {{ errorMessages.companyName }}
                 </p>
                 <input
                   type="text"
@@ -228,7 +228,7 @@
             </button>
           </div>
           <span v-if="showErrorMessage" class="error-message">
-            {{ acceptTermsErrorMessage }}
+            {{ errorMessages.acceptTerms }}
           </span>
         </div>
         <Button buttonClass="btn primary-btn" :disabled="isDisabled" @click="handleNextStep">
@@ -260,24 +260,29 @@
     </template>
   </ErrorAlert>
 </template>
-<script setup lang="ts">
-import { ref, watch, computed, onMounted, nextTick } from 'vue'
 
+<script setup lang="ts">
+import { ref, watch, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { setMemberData, type NewMemberDataRequest } from '@/api/api'
+
+// Components
 import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
 import PrivacyPolicy from '@/components/PrivacyPolicy.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
 import LottieAnimation from '@/components/Lottie.vue'
 
-import { useRouter } from 'vue-router'
-import { useVuelidate } from '@vuelidate/core'
-import { required, email as emailValidator, minLength, maxLength } from '@vuelidate/validators'
-import { setMemberData, type NewMemberDataRequest } from '@/api/api'
-import { useI18n } from 'vue-i18n'
-
+// Stores
 import { useOrderStore } from '@/stores/order'
 import { useIdImageStore } from '@/stores/idimage'
 import { useMemberDataStore } from '@/stores/member'
+
+// Composables
+import { useFormValidation } from '@/composables/useFormValidation'
+import { useIdImageCanvas } from '@/composables/useIdImageCanvas'
+import { useErrorHandling, ErrorType } from '@/composables/useErrorHandling'
 
 const router = useRouter()
 const idImage = useIdImageStore()
@@ -287,8 +292,6 @@ const { t } = useI18n()
 
 // 表單動作
 const isLoading = ref<boolean>(false)
-const isDisabled = ref<boolean>(true)
-const showError = ref<boolean>(false)
 const selectedInvoiceType = ref<'two-step' | 'three-step'>('two-step')
 
 // 表單資料
@@ -306,79 +309,39 @@ const isDefault = ref<boolean>(true)
 const hasBeenChecked = ref<boolean>(false)
 const showErrorMessage = ref<boolean>(false)
 
+// 使用 composables
+const formData = {
+  userName,
+  email,
+  phone,
+  cloudCarrier,
+  companyId,
+  companyName,
+  acceptTerms
+}
+
+const { v$, isDisabled, errorMessages } = useFormValidation(formData, selectedInvoiceType)
+const { canvasRefs, applyWatermarks } = useIdImageCanvas()
+const {
+  showError,
+  errorTitle,
+  errorContent,
+  errorButtonText,
+  errorClass,
+  showExtraButton,
+  currentErrorType,
+  setMemberDataErrorCodeMap,
+  updateErrorMessages
+} = useErrorHandling()
+
 // 證件照浮水印處理
 const idImageArray = computed(() => {
   return idImage.idImages[Object.keys(idImage.idImages)[0]]
 })
 
-type CanvasRefs = {
-  [key: string]: HTMLCanvasElement | null
-}
-
-const canvasRefs = ref<CanvasRefs>({})
-const addWatermark = (canvas: HTMLCanvasElement, imageUrl: string) => {
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
-  const img = new Image()
-  img.crossOrigin = 'Anonymous'
-  img.onload = () => {
-    // 先繪製圖片
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-
-    // 設置浮水印的樣式
-    const watermarkText = '僅供平臺使用'
-    const fontSize = 12
-    const fontFamily = '"Noto Sans"'
-    const fontWeight = '500'
-    const fillStyle = 'rgba(0, 0, 0, 0.5)'
-
-    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`
-    ctx.fillStyle = fillStyle
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-
-    // 設置浮水印的旋轉角度（20.951度）
-    const angle = 20.951 * (Math.PI / 180)
-
-    // 保存當前狀態
-    ctx.save()
-
-    // 將畫布旋轉
-    ctx.translate(canvas.width / 2, canvas.height / 2)
-    ctx.rotate(angle)
-    ctx.translate(-canvas.width / 2, -canvas.height / 2)
-
-    // 計算浮水印間距和位置
-    const textWidth = ctx.measureText(watermarkText).width
-    const textHeight = 0.3
-    const xOffset = 15
-    const yOffset = 25
-
-    // 使用雙重循環來繪製浮水印
-    for (let y = -canvas.height; y < canvas.height * 2; y += textHeight + yOffset) {
-      for (let x = -canvas.width; x < canvas.width * 2; x += textWidth + xOffset) {
-        const offsetX = (y / (textHeight + yOffset)) % 2 === 0 ? 0 : xOffset / 2
-        ctx.fillText(watermarkText, x + offsetX, y)
-      }
-    }
-    // 恢復畫布到初始狀態
-    ctx.restore()
-  }
-
-  img.src = imageUrl
-}
-// 當 idImageArray 或 canvasRefs 更新時，處理浮水印
-const applyWatermarks = () => {
-  nextTick(() => {
-    Object.keys(canvasRefs.value).forEach((side) => {
-      const canvas = canvasRefs.value[side]
-      if (canvas && idImageArray.value[side]) {
-        addWatermark(canvas, idImageArray.value[side])
-      }
-    })
-  })
-}
+watch([idImageArray, canvasRefs], () => {
+  applyWatermarks(idImageArray.value)
+})
 
 watch(selectedInvoiceType, (newType) => {
   if (newType === 'two-step') {
@@ -416,10 +379,8 @@ onMounted(() => {
   pmsSource.value = pms
   orderNumber.value = order_number
   removeLeadingZero()
-  applyWatermarks()
+  applyWatermarks(idImageArray.value)
 })
-
-watch([idImageArray, canvasRefs], applyWatermarks)
 
 // 姓名欄位可編輯
 const userNameInput = ref<HTMLInputElement | null>(null)
@@ -437,56 +398,10 @@ const showContact = ref<boolean>(false)
 const togglePrivacyPolicy = () => {
   showContact.value = !showContact.value
   if (!showContact.value) {
-    applyWatermarks()
+    applyWatermarks(idImageArray.value)
   }
 }
 
-// 驗證規則
-const rules = {
-  userName: { required },
-  email: {
-    required,
-    email: emailValidator
-  },
-  phone: {
-    required: (value: string) => !value || value.length === 9,
-    numeric: (value: string) => !value || /^\d+$/.test(value)
-  },
-  companyId: {
-    required: (value: string) => (selectedInvoiceType.value === 'three-step' ? !!value : true),
-    minLength: minLength(8)
-  },
-  cloudCarrier: {
-    minLength: minLength(8),
-    maxLength: maxLength(8),
-    startsWithSlash: (value: string) => {
-      return value ? value.startsWith('/') : true
-    }
-  },
-  companyName: {},
-  acceptTerms: {
-    required: (value: boolean) => value === true
-  }
-}
-
-const v$ = useVuelidate(rules, {
-  userName,
-  email,
-  phone,
-  cloudCarrier,
-  companyId,
-  companyName,
-  acceptTerms
-})
-
-watch(
-  () => v$.value.$invalid,
-  (isInvalid) => {
-    isDisabled.value = isInvalid
-  }
-)
-
-// 驗證-錯誤訊息
 const handleCheckboxChange = () => {
   if (acceptTerms.value) {
     hasBeenChecked.value = true
@@ -494,117 +409,6 @@ const handleCheckboxChange = () => {
   } else if (hasBeenChecked.value) {
     showErrorMessage.value = true
   }
-}
-
-const userNameErrorMessage = computed(() => {
-  if (!v$.value.userName.required.$response) return t('required')
-
-  return ''
-})
-
-const emailErrorMessage = computed(() => {
-  if (!v$.value.email.required.$response) return t('required')
-  if (!v$.value.email.email.$response) return t('pleaseEnterValidEmail')
-
-  return ''
-})
-
-const phoneErrorMessage = computed(() => {
-  if (!v$.value.phone.numeric.$response) return t('mobileNumberCanOnlyContainDigits')
-  if (!v$.value.phone.required.$response) return t('invalidPhoneNumber')
-
-  return ''
-})
-
-const cloudCarrierErrorMessage = computed(() => {
-  if (!v$.value.cloudCarrier.minLength.$response) return t('atLeast8CharactersRequired')
-  if (!v$.value.cloudCarrier.maxLength.$response) return t('upTo8CharactersAllowed')
-  if (!v$.value.cloudCarrier.startsWithSlash.$response) return `${t('firstCharacterMustBe')} /`
-
-  return ''
-})
-
-const companyIdErrorMessage = computed(() => {
-  if (!v$.value.companyId.required.$response) return t('required')
-  if (!v$.value.companyId.minLength.$response) return t('atLeast8CharactersRequired')
-
-  return ''
-})
-
-const companyNameErrorMessage = computed(() => {
-  return ''
-})
-
-const acceptTermsErrorMessage = computed(() => {
-  if (!v$.value.acceptTerms.required.$response) return t('required')
-
-  return ''
-})
-
-// API-回傳成功/錯誤訊息
-enum ErrorType {
-  UploadFailed, // 資料上傳失敗
-  SaveDataNotification, // 資料儲存
-  hasQRNotification, // 已有 pre-checkin 圖片
-  noOcrImage, // 沒有 OCR 資料
-  UnknownError // 未知錯誤
-}
-
-const setMemberDataErrorCodeMap: { [key: string]: ErrorType } = {
-  '1000': ErrorType.UploadFailed,
-  '1001': ErrorType.hasQRNotification,
-  '1002': ErrorType.UploadFailed,
-  '1003': ErrorType.noOcrImage,
-  '5003': ErrorType.UploadFailed,
-  '5004': ErrorType.UploadFailed
-}
-
-const errorTitle = ref<string>('')
-const errorContent = ref<Array<{ text: string; class?: string }>>([])
-const errorButtonText = ref<string>('')
-const errorClass = ref<string>('')
-const showExtraButton = ref<boolean>(false)
-const currentErrorType = ref<ErrorType | null>(null)
-
-function updateErrorMessages(type: ErrorType): void {
-  errorClass.value = ''
-  currentErrorType.value = type
-
-  switch (type) {
-    case ErrorType.UploadFailed:
-      errorTitle.value = t('dataUploadFailed')
-      errorContent.value = [{ text: t('networkCheckMessage') }, { text: t('tryAgain'), class: 'mt-20' }]
-      errorButtonText.value = t('reUpload')
-      break
-    case ErrorType.hasQRNotification:
-      errorTitle.value = t('dataUploadFailed')
-      errorContent.value = [{ text: t('qrcodeAlreadyClaimed') }]
-      errorButtonText.value = t('navigateToQrcodePage')
-      break
-    case ErrorType.noOcrImage:
-      errorTitle.value = t('dataUploadFailed')
-      errorContent.value = [{ text: t('pleaseCompleteDocumentVerificationFirst') }]
-      errorButtonText.value = t('returnToDocumentUpload')
-      break
-    case ErrorType.SaveDataNotification:
-      errorTitle.value = t('fetchDefaultData')
-      errorContent.value = [
-        { text: `${t('setThisDataAs')} ${userName.value} ${t('default')}` },
-        { text: `${email.value}`, class: 'fz-20 mt-20' },
-        { text: t('futureBookingsWithThisEmail'), class: 'fz-20 fc-p mt-20' }
-      ]
-      showExtraButton.value = true
-      errorButtonText.value = t('saveAsDefault')
-      errorClass.value = 'purple extra'
-      break
-    default:
-      errorTitle.value = t('unknownError')
-      errorContent.value = [{ text: t('unknownErrorOccurred') }, { text: t('pleaseTryAgainLater') }]
-      errorButtonText.value = t('close')
-      break
-  }
-
-  showError.value = true
 }
 
 const handleNextStep = () => {
@@ -617,12 +421,11 @@ const handleRetryUpload = (errorType: ErrorType | null) => {
     saveFormData()
   }
 
-  // 如果已經有qrcode自動跳轉 就不顯示按鈕
-  if (errorType === ErrorType.hasQRNotification) {
+  if (errorType === ErrorType.HasQRNotification) {
     router.push('/checkin')
   }
 
-  if (errorType === ErrorType.noOcrImage) {
+  if (errorType === ErrorType.NoOcrImage) {
     router.push('/upload')
   }
 
@@ -638,7 +441,7 @@ const handleExtraAction = () => {
 const handleBackAction = () => {
   if (showContact.value) {
     showContact.value = false
-    applyWatermarks()
+    applyWatermarks(idImageArray.value)
   } else {
     router.push('/upload')
   }
@@ -689,7 +492,6 @@ const saveFormData = async () => {
 }
 
 const submitFormData = async () => {
-  updateErrorMessages(ErrorType.SaveDataNotification)
+  updateErrorMessages(ErrorType.SaveDataNotification, userName.value, email.value)
 }
 </script>
-<style lang="scss" scoped></style>

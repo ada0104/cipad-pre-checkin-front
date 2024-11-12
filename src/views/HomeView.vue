@@ -52,6 +52,7 @@
     </div>
   </main>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Vue3Lottie } from 'vue3-lottie'
@@ -169,5 +170,3 @@ onMounted(async () => {
   await getOrderData()
 })
 </script>
-<style lang="scss" scoped>
-</style>
