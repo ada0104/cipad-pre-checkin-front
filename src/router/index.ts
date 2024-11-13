@@ -41,12 +41,12 @@ router.beforeEach((to, from, next) => {
   // 處理帶有 token 的路徑
   if (to.params.urlToken) {
     const urlToken = Array.isArray(to.params.urlToken)
-      ? to.params.urlToken[0]
-      : to.params.urlToken;
+    ? to.params.urlToken[0]
+    : to.params.urlToken;
     urlTokenStore.setUrlToken(urlToken);
+    localStorage.setItem('urlToken', urlToken);
   }
 
-  // 處理直接輸入的 URL
   if (!to.name && to.path !== '/') {
     const match = to.path.match(/\/([a-zA-Z0-9]+)$/);
     if (match) {
@@ -60,6 +60,10 @@ router.beforeEach((to, from, next) => {
 
   // 檢查訪問權限
   if (!hasUrlToken && !hasOrderData) {
+    if (to.name === 'home') {
+      const storedUrlToken = localStorage.getItem('urlToken');
+      return next({ path: `/${storedUrlToken}` });
+    }
     if (to.name !== 'home') {
       return next({ name: 'home' });
     }
