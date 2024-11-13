@@ -68,6 +68,7 @@ import {
 } from '@/api/api'
 
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
+import { useIdImageStore } from '@/stores/idimage'
 import { useMemberDataStore } from '@/stores/member'
 import { useRouter } from 'vue-router'
 import Header from '@/components/Header.vue'
@@ -84,6 +85,7 @@ const showNoUrlToken = ref<boolean>(false)
 
 const orderStore = useOrderStore()
 const urlTokenStore = useUrlTokenStore()
+const idImage = useIdImageStore();
 
 const memberDataStore = useMemberDataStore()
 const router = useRouter()
@@ -103,6 +105,9 @@ const prepareMemberDataRequest = (): DefaultMemberDataRequest => {
 
 const handleNextStep = async (isSameOne: boolean) => {
   if (!isSameOne) {
+    memberDataStore.clearStore()
+    idImage.clearStore()
+
     return router.push('/upload')
   }
 
