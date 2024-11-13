@@ -1,0 +1,282 @@
+<template>
+  <main class="test">
+    <div class="input-wrapper">
+      <div>
+        <label for="order-input" class="input-label">請輸入訂單號碼</label>
+      </div>
+      <div class="input-container">
+        <input
+          id="order-input"
+          type="text"
+          v-model="orderNumber"
+          class="input-field"
+        />
+      </div>
+    </div>
+    <button
+      class="btn primary-btn dodge-button"
+      :style="buttonStyle"
+      @mouseover="handleMouseOver"
+      @click="submitOrder()"
+    >
+      送出
+    </button>
+  </main>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const orderNumber = ref<string>('');
+const buttonPosition = ref({ x: 0, y: 0 });
+
+const buttonStyle = computed(() => ({
+  transform: `translate(${buttonPosition.value.x}px, ${buttonPosition.value.y}px)`,
+  transition: orderNumber.value ? 'transform 0.3s ease-out' : 'transform 0.2s ease-out',
+}));
+
+watch(orderNumber, (newVal) => {
+  if (newVal) {
+    buttonPosition.value = { x: 0, y: 0 };
+  }
+});
+
+const handleMouseOver = (event: MouseEvent) => {
+  if (orderNumber.value) return;
+
+  const button = event.target as HTMLElement;
+  const buttonRect = button.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  const randomX = (Math.random() - 0.5) * 300;
+  const randomY = (Math.random() - 0.5) * 300;
+
+  const newX = Math.max(
+    -viewportWidth / 2 + buttonRect.width,
+    Math.min(viewportWidth / 2 - buttonRect.width, buttonPosition.value.x + randomX)
+  );
+
+  const newY = Math.max(
+    -viewportHeight / 2 + buttonRect.height,
+    Math.min(viewportHeight / 2 - buttonRect.height, buttonPosition.value.y + randomY)
+  );
+
+  buttonPosition.value = { x: newX, y: newY };
+};
+
+const submitOrder = () => {
+  if (orderNumber.value) {
+    // 首先發送 get_order_data 請求
+    fetch(`/dunqian/pms/get_order_data?pms=mastripms&domain=dqhotel&order_number=${orderNumber.value}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (data.code === "0" && data.data && data.data.length > 0) {
+          const orderData = data.data[0];
+
+          // 構建需要發送的資料
+          const pciRequestData = {
+            pms: "mastripms",
+            domain: "dqhotel",
+            order_number: orderNumber.value,
+            email: orderData.email,
+            name: orderData.name,
+          };
+
+          // 發送 /pre_checkin/pci_url 請求
+          fetch('/dunqian/pre_checkin/pci_url', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(pciRequestData),
+          })
+          .then(async (pciRes) => {
+            const pciData = await pciRes.json();
+            if (pciData.code === "0" && pciData.url) {
+              // 跳轉到回傳的 URL
+              router.push(`/${pciData.url}`);
+            } else {
+              alert('錯誤: 無效的 URL 回傳');
+            }
+          })
+          .catch((error) => {
+            console.error('錯誤:', error);
+            alert('發送 /pre_checkin/pci_url 請求時發生錯誤');
+          });
+        } else {
+          alert('查詢訂單資料時發生錯誤');
+        }
+      })
+      .catch((error) => {
+        console.error('錯誤:', error);
+        alert('發送 /get_order_data 請求時發生錯誤');
+      });
+
+    alert(`訂單號碼 ${orderNumber.value} 提交成功！`);
+  } else {
+    alert('請輸入有效的訂單號碼！');
+  }
+};
+
+</script>
+
+<style lang="scss" scoped>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.test {
+  min-height: 100vh;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a192f, #112240);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.input-wrapper {
+  background: rgba(16, 36, 84, 0.7);
+  padding: 2.5rem;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(66, 211, 255, 0.3);
+}
+
+.input-label {
+  color: #64ffda;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.input-container {
+  position: relative;
+  margin-top: 1rem;
+}
+
+.input-field {
+  width: 300px;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #fff;
+  border: 1px solid rgba(66, 211, 255, 0.3);
+  border-radius: 0.5rem;
+  background: rgba(16, 36, 84, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    inset 0 0 10px rgba(66, 211, 255, 0.2),
+    0 0 10px rgba(66, 211, 255, 0.1);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #64ffda;
+  background: rgba(16, 36, 84, 0.7);
+  box-shadow:
+    0 0 20px rgba(100, 255, 218, 0.5),
+    inset 0 0 20px rgba(100, 255, 218, 0.2);
+}
+
+.input-field:active {
+  background: rgba(16, 36, 84, 0.8);
+  box-shadow:
+    0 0 30px rgba(100, 255, 218, 0.7),
+    inset 0 0 30px rgba(100, 255, 218, 0.5);
+}
+
+.input-field::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: inherit;
+  z-index: -2;
+  background: linear-gradient(
+    45deg,
+    rgba(66, 211, 255, 0) 0%,
+    rgba(66, 211, 255, 0.5) 50%,
+    rgba(66, 211, 255, 0) 100%
+  );
+  animation: borderGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.input-field::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(66, 211, 255, 0.2),
+    transparent
+  );
+  animation: scanLine 3s linear infinite;
+}
+
+@keyframes scanLine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease-out;
+}
+
+.primary-btn {
+  background: linear-gradient(45deg, #0a192f, #112240);
+  color: #64ffda;
+  border: 1px solid #64ffda;
+}
+
+.primary-btn:hover {
+  background: rgba(100, 255, 218, 0.1);
+  box-shadow:
+    0 0 30px rgba(100, 255, 218, 0.5),
+    inset 0 0 15px rgba(100, 255, 218, 0.3);
+}
+
+.dodge-button {
+  will-change: transform;
+}
+
+</style>

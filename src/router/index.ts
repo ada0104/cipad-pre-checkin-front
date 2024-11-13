@@ -25,6 +25,11 @@ const router = createRouter({
       path: '/checkin',
       name: 'checkin',
       component: () => import('@/views/CheckinCode.vue')
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: () => import('@/views/Test.vue')
     }
   ]
 })
@@ -56,6 +61,11 @@ router.beforeEach((to, from, next) => {
         return next({ path: `/${match[1]}` });
       }
     }
+  }
+
+  // 防止影響 /test 路徑
+  if (to.name === 'test') {
+    return next();
   }
 
   // 檢查訪問權限

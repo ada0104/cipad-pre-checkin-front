@@ -20,7 +20,8 @@ const proxyApiList = [
   'pre_checkin/upload_image',
   'pre_checkin/add_member_data',
   'pre_checkin/get_checkin_qr',
-  'pms/get_order_data'
+  'pms/get_order_data',
+  'pre_checkin/pci_url'
 ]
 // 使用 middleware 處理 JSON 格式的請求內容
 app.use(express.json());
