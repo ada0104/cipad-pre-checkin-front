@@ -85,14 +85,14 @@ const handleImageUpload = async (name: string, side: string, event: any) => {
     await saveToStore(name, side, base64String)
     event.target.value = ''
 
-    emit('imageChanged', true);
+    emit('imageChanged', true)
   } catch (error) {
     console.error('Error during image compression or upload:', error)
   }
 }
 
 const saveToStore = (name: string, side: string, base64String: string) => {
-  const existingImages = Object.keys(idImage.idImages)[0];
+  const existingImages = Object.keys(idImage.idImages)[0]
 
   if (existingImages !== name) {
     imageSrcs.value[existingImages] = {}
@@ -130,7 +130,7 @@ defineExpose({
 
 onMounted(() => {
   if (Object.keys(idImage.idImages).length > 0) {
-    imageSrcs.value = idImage.idImages;
+    imageSrcs.value = idImage.idImages
   }
-});
+})
 </script>

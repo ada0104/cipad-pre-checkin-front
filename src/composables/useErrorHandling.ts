@@ -3,13 +3,13 @@ import { useI18n } from 'vue-i18n'
 
 export enum ErrorType {
   RecognitionFailed, // 證件辨識失敗
-  UnsupportedFormat, // 證件格式錯誤
   MinorAccessDenied, // 未成年阻擋
   UnknownError, // 未知錯誤
   UploadFailed, // 資料上傳失敗
   SaveDataNotification, // 儲存資料通知
   HasQRNotification, // QR 已被領取
   NoOcrImage, // 未完成 OCR 驗證
+  RecognitionMismatch // 證件辨識失敗
 }
 
 export function useErrorHandling() {
@@ -38,22 +38,46 @@ export function useErrorHandling() {
     '1001': ErrorType.MinorAccessDenied,
     '1002': ErrorType.RecognitionFailed,
     '1003': ErrorType.RecognitionFailed,
-    '1004': ErrorType.RecognitionFailed,
+    '1004': ErrorType.RecognitionMismatch,
     '1005': ErrorType.RecognitionFailed,
     '5003': ErrorType.RecognitionFailed,
     '5004': ErrorType.RecognitionFailed
   }
 
-  const updateErrorMessages = (type: ErrorType, userName = '', email = ''): void => {
+  const updateErrorMessages = (
+    type: ErrorType,
+    documentSide?: string,
+    userName: string = '',
+    email: string = ''
+  ): void => {
     errorClass.value = ''
     errorSubText.value = ''
     showExtraButton.value = false
     currentErrorType.value = type
 
+    let additionalErrorMessage = '';
+
+    if (documentSide === 'BACK') {
+      additionalErrorMessage = t('uploadLabel.idBack');
+    } else if (documentSide === 'DOCUMENT') {
+      additionalErrorMessage = t('uploadLabel.idFront');
+    } else if (documentSide === 'UNRECOGNIZED_DOCUMENT') {
+      additionalErrorMessage = t('unrecognizedDocument');
+    }
+
     switch (type) {
       case ErrorType.RecognitionFailed:
         errorTitle.value = t('identificationFailed')
         errorContent.value = [{ text: t('documentImageCannotBeRecognized') }, { text: t('pleaseReselect') }]
+        errorButtonText.value = t('reUpload')
+        break
+      case ErrorType.RecognitionMismatch:
+        errorTitle.value = t('invalidDocumentFormat')
+        errorContent.value = [
+          ...(additionalErrorMessage ? [{ text: additionalErrorMessage }] : []),
+          { text: t('imageFormatDoesNotMatch') },
+          { text: t('reUpload') }
+        ]
         errorButtonText.value = t('reUpload')
         break
       case ErrorType.MinorAccessDenied:
@@ -66,15 +90,6 @@ export function useErrorHandling() {
         errorButtonText.value = t('iUnderstand')
         errorSubText.value = t('iAmOfLegalAgeTryAgain')
         errorClass.value = 'purple'
-        break
-      case ErrorType.UnsupportedFormat:
-        errorTitle.value = t('invalidDocumentFormat')
-        errorContent.value = [
-          { text: t('backOfIdCard') },
-          { text: t('imageFormatDoesNotMatch') },
-          { text: t('reUpload') }
-        ]
-        errorButtonText.value = t('reUpload')
         break
       case ErrorType.UploadFailed:
         errorTitle.value = t('dataUploadFailed')

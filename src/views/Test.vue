@@ -5,12 +5,7 @@
         <label for="order-input" class="input-label">請輸入訂單號碼</label>
       </div>
       <div class="input-container">
-        <input
-          id="order-input"
-          type="text"
-          v-model="orderNumber"
-          class="input-field"
-        />
+        <input id="order-input" type="text" v-model="orderNumber" class="input-field" />
       </div>
     </div>
     <button
@@ -23,11 +18,7 @@
     </button>
 
     <div class="grid-background">
-      <div
-        class="grid-item"
-        v-for="(item, index) in gridItems"
-        :key="index"
-      ></div>
+      <div class="grid-item" v-for="(item, index) in gridItems" :key="index"></div>
     </div>
   </main>
 </template>
@@ -42,7 +33,7 @@ const buttonPosition = ref({ x: 0, y: 0 })
 
 const buttonStyle = computed(() => ({
   transform: `translate(${buttonPosition.value.x}px, ${buttonPosition.value.y}px)`,
-  transition: orderNumber.value ? 'transform 0.3s ease-out' : 'transform 0.2s ease-out',
+  transition: orderNumber.value ? 'transform 0.3s ease-out' : 'transform 0.2s ease-out'
 }))
 
 watch(orderNumber, (newVal) => {
@@ -56,8 +47,8 @@ async function fetchToken() {
     body: new URLSearchParams({
       grant_type: 'password',
       username: 'admin@dunqian.com',
-      password: 'secret',
-    }),
+      password: 'secret'
+    })
   })
 
   const data = await response.json()
@@ -69,7 +60,9 @@ async function fetchToken() {
 }
 
 async function fetchOrderData(orderNumber: string) {
-  const response = await fetch(`/dunqian/pms/get_order_data?pms=mastripms&domain=dqhotel&order_number=${orderNumber}`)
+  const response = await fetch(
+    `/dunqian/pms/get_order_data?pms=mastripms&domain=dqhotel&order_number=${orderNumber}`
+  )
   const data = await response.json()
 
   if (data.code === '0' && data.data?.length) {
@@ -85,7 +78,7 @@ async function fetchPciUrl(accessToken: string, orderData: any) {
     domain: 'dqhotel',
     order_number: orderNumber.value,
     email: orderData.email,
-    name: orderData.name,
+    name: orderData.name
   }
 
   const response = await fetch('https://uat-dns-only.funcoin.tw/dunqian/pre_checkin/pci_url', {
@@ -94,7 +87,7 @@ async function fetchPciUrl(accessToken: string, orderData: any) {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${accessToken}`
     },
-    body: JSON.stringify(pciRequestData),
+    body: JSON.stringify(pciRequestData)
   })
 
   const data = await response.json()
@@ -241,7 +234,7 @@ body {
 }
 
 .btn {
-  padding: .8rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -283,8 +276,10 @@ body {
 
 .grid-item {
   background-color: rgba(0, 0, 0, 0.3);
-  border: .5px rgba(3, 37, 47, 0.907);
-  transition: background-color 0.3s, box-shadow 0.3s;
+  border: 0.5px rgba(3, 37, 47, 0.907);
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .grid-item:hover {

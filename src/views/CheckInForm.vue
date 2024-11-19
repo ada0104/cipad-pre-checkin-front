@@ -84,7 +84,9 @@
             <div class="input-wrapper">
               <div>
                 <label for="email-input" class="input-label">{{ $t('emailAddress') }}</label>
-                <label v-if="v$.email.$error" class="error-message">{{ errorMessages.email }}</label>
+                <label v-if="v$.email.$error" class="error-message">{{
+                  errorMessages.email
+                }}</label>
               </div>
               <div class="input-container">
                 <input
@@ -102,7 +104,9 @@
             <div class="input-wrapper">
               <div>
                 <label for="name-input" class="input-label">{{ $t('mobileNumber') }}</label>
-                <label v-if="v$.phone.$error" class="error-message">{{ errorMessages.phone }}</label>
+                <label v-if="v$.phone.$error" class="error-message">{{
+                  errorMessages.phone
+                }}</label>
                 <label v-else class="error-message phone-sub">{{
                   $t('validationPhoneNumberTaiwanOnly')
                 }}</label>
@@ -492,6 +496,6 @@ const saveFormData = async () => {
 }
 
 const submitFormData = async () => {
-  updateErrorMessages(ErrorType.SaveDataNotification, userName.value, email.value)
+  updateErrorMessages(ErrorType.SaveDataNotification, undefined, userName.value, email.value)
 }
 </script>

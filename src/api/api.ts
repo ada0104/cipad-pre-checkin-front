@@ -123,10 +123,16 @@ export interface OcrDataResponse {
   code: string;
   message: string;
   data: {
-    name: string;
-    age: string;
-    birthday: string;
-  };
+    name?: string;
+    age?: string;
+    birthday?: string;
+  } | Array<{
+    code: string;
+    description: string;
+    severity: string;
+    confidence: number;
+    decision: string;
+  }>;
 }
 
 export interface DefaultMemberDataResponse {

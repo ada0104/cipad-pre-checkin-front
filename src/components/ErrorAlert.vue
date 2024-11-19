@@ -1,30 +1,32 @@
 <template>
-<div>
-  <Teleport to="body">
-    <div v-if="show" class="error-alert-overlay">
-      <div :class="['error-alert', errorClass]" v-bind="$attrs">
-        <div class="alert-text">
-          <p class="alert-title">{{ title }}</p>
-          <div class="alert-content">
-            <div v-for="(line, index) in content" :key="index" :class="line.class">
-              {{ line.text }}
-              <br v-if="index < content.length - 1" />
+  <div>
+    <Teleport to="body">
+      <div v-if="show" class="error-alert-overlay">
+        <div :class="['error-alert', errorClass]" v-bind="$attrs">
+          <div class="alert-text">
+            <p class="alert-title">{{ title }}</p>
+            <div class="alert-content">
+              <div v-for="(line, index) in content" :key="index" :class="line.class">
+                {{ line.text }}
+                <br v-if="index < content.length - 1" />
+              </div>
+            </div>
+          </div>
+          <div class="alert-footer">
+            <div class="btn-group">
+              <slot name="extra-button"></slot>
+              <button class="alert-button" @click="handleButtonClick">
+                {{ buttonText }}
+              </button>
+            </div>
+            <div class="alert-subtext" v-if="subText" @click="handleSubTextClick">
+              {{ subText }}
             </div>
           </div>
         </div>
-        <div class="alert-footer">
-          <div class="btn-group">
-            <slot name="extra-button"></slot>
-            <button class="alert-button" @click="handleButtonClick">
-              {{ buttonText }}
-            </button>
-          </div>
-          <div class="alert-subtext" v-if="subText" @click="handleSubTextClick">{{ subText }}</div>
-        </div>
       </div>
-    </div>
-  </Teleport>
-</div>
+    </Teleport>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, withDefaults } from 'vue'
@@ -210,8 +212,7 @@ const closeAlert = (): void => {
 }
 
 @media (max-width: 792px) {
-
-  .error-alert-overlay .error-alert.extra .btn-group{
+  .error-alert-overlay .error-alert.extra .btn-group {
     width: calc(100% - 10px);
     flex-direction: column;
     height: auto;
