@@ -23,7 +23,9 @@
       </div>
     </div>
     <div class="card download">
-      <Button buttonClass="btn primary-btn" @click="handleDownload">{{ $t('downloadImage') }}</Button>
+      <Button buttonClass="btn primary-btn" @click="handleDownload">{{
+        $t('downloadImage')
+      }}</Button>
       <div class="svg-text">
         <SvgIcon name="email" class="email-icon" />
         <p class="email-text">{{ $t('sentToGuestsEmail') }}</p>
@@ -33,7 +35,10 @@
       <div>
         <p class="card-button-title">{{ $t('howToUse') }}</p>
         <span class="card-button-text"
-          >{{ $t('selectAtSelfCheckInKiosk') }} <span class="point">{{ $t('preCheckInFastTrack') }}</span> 』 <br />{{ $t('scanQRCodeCompletePaymentCollectRoomKey') }}
+          >{{ $t('selectAtSelfCheckInKiosk') }}
+          <span class="point">{{ $t('preCheckInFastTrack') }}</span> 』 <br />{{
+            $t('scanQRCodeCompletePaymentCollectRoomKey')
+          }}
         </span>
       </div>
       <SvgIcon name="icon" class="icon" />
@@ -59,7 +64,12 @@ import DownloadTemplate from '@/components/Download.vue'
 
 import { useMemberDataStore } from '@/stores/member'
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
-import { getQRcodeData, type QRcodeDataRequest, setSentEmailData, type SentEmailRequest } from '@/api/api'
+import {
+  getQRcodeData,
+  type QRcodeDataRequest,
+  setSentEmailData,
+  type SentEmailRequest
+} from '@/api/api'
 
 const isLoading = ref<boolean>(false)
 const orderDomain = ref<string>('')
@@ -114,13 +124,13 @@ const setSentEmail = async () => {
     domain: orderDomain.value,
     order_number: orderNumber.value,
     check_in_date: dayjs(orderCheckInDate.value).format('YYYY-M-D'),
-    check_out_date: dayjs(orderCheckOutDate.value).format('YYYY-M-D'),
+    check_out_date: dayjs(orderCheckOutDate.value).format('YYYY-M-D')
   }
 
   try {
     const sentEmailData = await setSentEmailData(sentEmailRequest)
     if (sentEmailData.code === '0') {
-      console.log('Email sent successfully');
+      console.log('Email sent successfully')
     } else {
       console.error('Failed to sent Email')
     }
@@ -143,7 +153,7 @@ const handleDownload = async () => {
 
     const canvas = await html2canvas(downloadTemplateRef.value?.$el as HTMLElement, {
       scale: 2,
-      logging: false,
+      logging: false
     })
 
     const imgUrl = canvas.toDataURL('image/jpeg', true)

@@ -34,7 +34,7 @@
   "iAmOfLegalAgeTryAgain": "我已成年，重新嘗試",
   "tryAgain": "重新嘗試",
   "invalidDocumentFormat": "證件格式錯誤",
-  "backOfIdCard": "{身分證反面}",
+  "unrecognizedDocument": "無法識別的文件",
   "imageFormatDoesNotMatch": "圖片格式不符",
   "unknownError": "未知錯誤",
   "unknownErrorOccurred": "發生未知錯誤",

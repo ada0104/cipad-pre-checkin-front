@@ -44,8 +44,12 @@
           <p class="card-title">{{ $t('buyer') }} - {{ orderName }}</p>
           <p class="card-title m-b-48">{{ $t('isThisGuestForThisStay') }}</p>
           <div class="btn-group">
-            <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">{{ $t('noDifferentPerson') }}</Button>
-            <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">{{ $t('yesSamePerson') }}</Button>
+            <Button buttonClass="btn secondary-btn" @click="handleNextStep(false)">{{
+              $t('noDifferentPerson')
+            }}</Button>
+            <Button buttonClass="btn primary-btn" @click="handleNextStep(true)">{{
+              $t('yesSamePerson')
+            }}</Button>
           </div>
         </div>
       </div>
@@ -85,7 +89,7 @@ const showNoUrlToken = ref<boolean>(false)
 
 const orderStore = useOrderStore()
 const urlTokenStore = useUrlTokenStore()
-const idImage = useIdImageStore();
+const idImage = useIdImageStore()
 
 const memberDataStore = useMemberDataStore()
 const router = useRouter()

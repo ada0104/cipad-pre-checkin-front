@@ -10,14 +10,14 @@
         class="no-underline back-route"
       >
         <SvgIcon name="back" class="back-icon" />
-        <span>{{$t('return')}}</span>
+        <span>{{ $t('return') }}</span>
       </router-link>
       <div class="title">
-        <p>{{$t('preCheckIn')}}</p>
+        <p>{{ $t('preCheckIn') }}</p>
       </div>
     </div>
     <div class="card">
-      <p class="card-title">{{$t('uploadPersonalIdentification')}}</p>
+      <p class="card-title">{{ $t('uploadPersonalIdentification') }}</p>
       <div class="card-content">
         <Select
           :selectedOption="selectedOption"
@@ -31,7 +31,7 @@
           @imageChanged="isImageChanged = true"
         />
         <Button buttonClass="btn primary-btn" :disabled="isDisabled" @click="handleNextStep">
-          {{$t('nextStep')}}
+          {{ $t('nextStep') }}
         </Button>
         <div v-if="isLoading" class="loading-animation">
           <LottieAnimation name="id_ocr" :lottie_text="$t('documentUnderReview')" />
@@ -59,11 +59,11 @@ import Button from '@/components/Button.vue'
 import Select from '@/components/Select.vue'
 import Upload from '@/components/Upload.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
-import LottieAnimation from '@/components/Lottie.vue';
+import LottieAnimation from '@/components/Lottie.vue'
 
 import { useIdImageStore } from '@/stores/idimage'
 import { useOrderStore, useUrlTokenStore } from '@/stores/order'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 
 import { useErrorHandling, ErrorType } from '@/composables/useErrorHandling'
 import { getOcrData, type OcrDataResponse, type OcrDataRequest } from '@/api/api'
@@ -81,9 +81,9 @@ interface UploadLabelMap {
 }
 
 const idImage = useIdImageStore()
-const urlTokenStore = useUrlTokenStore();
+const urlTokenStore = useUrlTokenStore()
 const router = useRouter()
-const { t } = useI18n();
+const { t } = useI18n()
 
 const uploadRef = ref<any>(null)
 const isLoading = ref<boolean>(false)
@@ -91,19 +91,19 @@ const isDisabled = ref<boolean>(true)
 const isImageChanged = ref<boolean>(false)
 
 interface SelectedOption {
-  name: string;
-  label: string;
+  name: string
+  label: string
 }
 
 const selectedOption = ref<SelectedOption>({
   name: 'id',
   label: t('identification.id')
-});
+})
 
 const options = ref([
   { name: 'id', label: t('identification.id') },
   { name: 'passport', label: t('identification.passport') }
-]);
+])
 
 const uploadLabelMap = computed(() => ({
   id: {
@@ -113,30 +113,30 @@ const uploadLabelMap = computed(() => ({
   passport: {
     front: t('uploadLabel.passportFront')
   }
-}));
+}))
 
 const computedLabels = computed(() => {
-  const selectedName = selectedOption.value?.name as 'id' | 'passport';
+  const selectedName = selectedOption.value?.name as 'id' | 'passport'
 
   return {
     name: selectedName,
     labels: uploadLabelMap.value[selectedName]
-  };
-});
+  }
+})
 
 const updateSelectedOption = (option: Option) => {
   selectedOption.value = option
 }
 
 const checkIfCanProceed = computed(() => {
-  const selectedName = selectedOption.value.name as 'id' | 'passport';
-  const requiredFields = Object.keys(uploadLabelMap.value[selectedName] || {});
-  const imageData = idImage.idImages[selectedName] || {};
+  const selectedName = selectedOption.value.name as 'id' | 'passport'
+  const requiredFields = Object.keys(uploadLabelMap.value[selectedName] || {})
+  const imageData = idImage.idImages[selectedName] || {}
 
-  const canProceed = requiredFields.every((field) => imageData[field]);
+  const canProceed = requiredFields.every((field) => imageData[field])
 
-  return canProceed;
-});
+  return canProceed
+})
 
 const handleNextStep = () => {
   if (!isDisabled.value) {
@@ -216,6 +216,26 @@ const getOcrImageData = async () => {
 
     if (ocrData.code !== '0') {
       const errorType = ocrErrorCodeMap[ocrData.code]
+
+      if (Array.isArray(ocrData.data)) {
+        console.log(ocrData.data[0].code)
+
+        const code = ocrData.data[0].code
+        const match = code.match(/_(\w+)_/)
+
+        if (code === 'UNRECOGNIZED_DOCUMENT') {
+          const documentSide = 'UNRECOGNIZED_DOCUMENT'
+          updateErrorMessages(errorType, documentSide)
+          return
+        }
+
+        if (match) {
+          const documentSide = match ? match[1] : undefined
+          updateErrorMessages(errorType, documentSide)
+          return
+        }
+      }
+
       updateErrorMessages(errorType)
     }
 

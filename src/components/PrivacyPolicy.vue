@@ -51,6 +51,4 @@ const currentPrivacyPolicy = computed(() => {
     @include text-style(400, 28px, var(--Primary));
   }
 }
-
-
 </style>

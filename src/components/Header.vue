@@ -6,17 +6,13 @@
 
     <div class="header-right header-right--desktop">
       <div class="lang">
-        <span
-          class="tw"
-          @click="changeLanguage('zh')"
-          :class="{ active: isActive('zh') }"
-        >{{ $t('chinese') }}</span>
+        <span class="tw" @click="changeLanguage('zh')" :class="{ active: isActive('zh') }">{{
+          $t('chinese')
+        }}</span>
         <span>/</span>
-        <span
-          class="en"
-          @click="changeLanguage('en')"
-          :class="{ active: isActive('en') }"
-        >{{ $t('english') }}</span>
+        <span class="en" @click="changeLanguage('en')" :class="{ active: isActive('en') }">{{
+          $t('english')
+        }}</span>
       </div>
       <ThemeToggle />
     </div>
@@ -63,16 +59,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import ThemeToggle from '@/components/ThemeToggle.vue';
-import Switch from '@/components/Switch.vue';
+import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import ThemeToggle from '@/components/ThemeToggle.vue'
+import Switch from '@/components/Switch.vue'
 import { useTheme } from '@/composables/useTheme'
 
-const { locale } = useI18n();
+const { locale } = useI18n()
 const { isDarkTheme, setTheme } = useTheme()
 
-const showSettings = ref<boolean>(false);
+const showSettings = ref<boolean>(false)
 
 const handleThemeChange = (value: boolean) => {
   setTheme(value)
@@ -80,24 +76,24 @@ const handleThemeChange = (value: boolean) => {
 
 const langCheckbox = computed({
   get: () => locale.value === 'en',
-  set: (value: boolean) => changeLanguage(value ? 'en' : 'zh'),
-});
+  set: (value: boolean) => changeLanguage(value ? 'en' : 'zh')
+})
 
 const toggleSettings = () => {
-  showSettings.value = !showSettings.value;
-};
+  showSettings.value = !showSettings.value
+}
 
 const changeLanguage = (lang: string) => {
-  locale.value = lang;
-};
+  locale.value = lang
+}
 
-const isActive = (lang: string) => locale.value === lang;
+const isActive = (lang: string) => locale.value === lang
 
 watch(showSettings, (newValue) => {
   if (newValue) {
-    langCheckbox.value = locale.value === 'en';
+    langCheckbox.value = locale.value === 'en'
   }
-});
+})
 </script>
 
 <style scoped lang="scss">
@@ -131,7 +127,8 @@ watch(showSettings, (newValue) => {
         display: flex;
         gap: 10px;
 
-        .tw, .en {
+        .tw,
+        .en {
           color: var(--Sec-Cont);
           cursor: pointer;
 
@@ -198,7 +195,6 @@ watch(showSettings, (newValue) => {
   gap: 41px;
 
   .setting-item {
-
     label {
       color: var(--On-Surface-Var);
       font-size: 14px;
