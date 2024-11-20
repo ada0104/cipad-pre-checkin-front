@@ -56,7 +56,6 @@ export function useErrorHandling() {
     currentErrorType.value = type
 
     let additionalErrorMessage = '';
-
     if (documentSide === 'BACK') {
       additionalErrorMessage = t('uploadLabel.idBack');
     } else if (documentSide === 'DOCUMENT') {
