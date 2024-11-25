@@ -203,21 +203,23 @@ const fetchOrderDetailData = async (orderDetailDataRequest: OrderDetailDataReque
 
 const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResponse> => {
   try {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
     // 再請後端改為json格式
-    const formData = new FormData();
-    formData.set('order_number', ocrRequestData.order_number);
-    formData.set('image_type', ocrRequestData.image_type);
-    formData.set('image1', ocrRequestData.image1);
-
+    const urlencoded = new URLSearchParams();
+    urlencoded.append("order_number", ocrRequestData.order_number);
+    urlencoded.append("image_type", ocrRequestData.image_type);
+    urlencoded.append("image1", ocrRequestData.image1);
     if(ocrRequestData.image2) {
-      formData.set('image2', ocrRequestData.image2);
+      urlencoded.append("image2", ocrRequestData.image2);
     }
 
     const postResponse = await fetch(
       '/dunqian/pre_checkin/upload_image',
       {
         method: 'POST',
-        body: formData,
+        headers: myHeaders,
+        body: urlencoded,
       }
     );
 
