@@ -44,6 +44,7 @@
   "invalidDocumentFormat": "證件格式錯誤",
   "invalidPhoneNumber": "手機號碼必須為9位數字",
   "invoiceFormat": "發票格式",
+  "invalidTaxId": "統一編號無效",
   "isThisGuestForThisStay": "是否為本次入住旅客？",
   "language": "語言",
   "light": "晨光",

@@ -7,6 +7,23 @@ export function useFormValidation(formData: any, selectedInvoiceType: any) {
   const { t } = useI18n()
   const isDisabled = ref(true)
 
+  function validTaxId(taxId: string): boolean {
+    const invalidList = ['00000000', '11111111'] // 黑名單
+    if (!/^\d{8}$/.test(taxId) || invalidList.includes(taxId)) return false
+
+    const validateOperator = [1, 2, 1, 2, 1, 2, 4, 1]
+    let sum = 0
+
+    for (let i = 0; i < validateOperator.length; i++) {
+      const digit = parseInt(taxId[i], 10)
+      const product = digit * validateOperator[i]
+      sum += Math.floor(product / 10) + (product % 10) // 個位數 + 十位數
+    }
+
+    // 驗證條件
+    return sum % 10 === 0 || (taxId[6] === '7' && (sum + 1) % 5 === 0)
+  }
+
   const rules = {
     userName: { required },
     email: {
@@ -19,7 +36,8 @@ export function useFormValidation(formData: any, selectedInvoiceType: any) {
     },
     companyId: {
       required: (value: string) => (selectedInvoiceType.value === 'three-step' ? !!value : true),
-      minLength: minLength(8)
+      validTaxId: (value: string) => !value || validTaxId(value),
+      minLength: minLength(8),
     },
     cloudCarrier: {
       minLength: minLength(8),
@@ -60,6 +78,8 @@ export function useFormValidation(formData: any, selectedInvoiceType: any) {
     companyId: computed(() => {
       if (!v$.value.companyId.required.$response) return t('required')
       if (!v$.value.companyId.minLength.$response) return t('atLeast8CharactersRequired')
+      if (!v$.value.companyId.validTaxId.$response) return t('invalidTaxId')
+
       return ''
     }),
     companyName: computed(() => ''),

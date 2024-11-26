@@ -44,6 +44,7 @@
   "invalidDocumentFormat": "Invalid Format",
   "invalidPhoneNumber": "Mobile number must contain 9 digits.",
   "invoiceFormat": "Receipt Details",
+  "invalidTaxId": "Invalid UBN",
   "isThisGuestForThisStay": "Is the orderer the guest for this stay?",
   "language": "Language",
   "light": "Light",
