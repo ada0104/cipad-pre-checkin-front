@@ -231,38 +231,44 @@ const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResp
 };
 
 const addMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promise<NewMemberDataResponse> => {
-  const formData = new FormData();
-  formData.set('source', newMemberDataRequest.source);
-  formData.set('country_codes', newMemberDataRequest.country_codes);
-  formData.set('name', newMemberDataRequest.name);
-  formData.set('email', newMemberDataRequest.email);
-  formData.set('birthday', newMemberDataRequest.birthday);
-  formData.set('order_number', newMemberDataRequest.order_number);
+
+  const myHeaders = new Headers();
+  // 再請後端改為json格式
+  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+  const urlencoded = new URLSearchParams();
+
+  urlencoded.append('source', newMemberDataRequest.source);
+  urlencoded.append('country_codes', newMemberDataRequest.country_codes);
+  urlencoded.append('name', newMemberDataRequest.name);
+  urlencoded.append('email', newMemberDataRequest.email);
+  urlencoded.append('birthday', newMemberDataRequest.birthday);
+  urlencoded.append('order_number', newMemberDataRequest.order_number);
 
   if (newMemberDataRequest.phone) {
-    formData.set('phone', newMemberDataRequest.phone);
+    urlencoded.append('phone', newMemberDataRequest.phone);
   }
 
   if (newMemberDataRequest.barcode) {
-    formData.set('barcode', newMemberDataRequest.barcode);
+    urlencoded.append('barcode', newMemberDataRequest.barcode);
   }
 
   if (newMemberDataRequest.compiled) {
-    formData.set('compiled', newMemberDataRequest.compiled);
+    urlencoded.append('compiled', newMemberDataRequest.compiled);
   }
 
   if (newMemberDataRequest.company) {
-    formData.set('company', newMemberDataRequest.company);
+    urlencoded.append('company', newMemberDataRequest.company);
   }
 
-  formData.set('is_default', String(newMemberDataRequest.is_default));
+  urlencoded.append('is_default', String(newMemberDataRequest.is_default));
 
   try {
     const postResponse = await fetch(
       '/dunqian/pre_checkin/add_member_data',
       {
         method: 'POST',
-        body: formData,
+        headers: myHeaders,
+        body: urlencoded,
       }
     );
 
