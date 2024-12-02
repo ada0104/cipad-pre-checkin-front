@@ -1,0 +1,25 @@
+# 第一階段產生dist資料夾
+FROM node:18.19.0 AS builder
+
+# 指定預設/工作資料夾
+WORKDIR /usr/app
+
+# COPY src src
+# 從當前目錄複製 package.json 和 package-lock.json 到工作資料夾
+COPY package*.json ./
+
+COPY ./ ./
+
+# 安裝dependencies
+RUN npm install -f
+
+
+# 指定建立build output資料夾，--prod為Production Mode
+RUN npm run build
+
+
+# pull nginx image
+FROM node:18.19.0-alpine
+
+# 從第一階段的檔案copy
+COPY --from=builder /usr/app/node_modules /usr/app/node_modules

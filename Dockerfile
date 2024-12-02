@@ -14,11 +14,14 @@ RUN npm run build
 # 第二階段：部署靜態檔案
 FROM nginx:alpine
 
-# 複製建置結果到 nginx 靜態檔案目錄
+# 複製自定義的 Nginx 配置文件到指定路徑
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 複製建置結果到 Nginx 靜態檔案目錄
 COPY --from=builder /usr/app/dist /usr/share/nginx/html
 
-# 暴露預設的 nginx port
+# 暴露 Nginx 的預設埠
 EXPOSE 80
 
-# 啟動 nginx
+# 啟動 Nginx
 CMD ["nginx", "-g", "daemon off;"]
