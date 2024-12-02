@@ -12,7 +12,7 @@ COPY ./ ./
 RUN npm run build
 
 # 第二階段：部署靜態檔案
-FROM nginx:alpine
+FROM nginx:1.23-alpine
 
 # 複製自定義的 Nginx 配置文件到指定路徑
 COPY nginx.conf /etc/nginx/conf.d/default.conf
