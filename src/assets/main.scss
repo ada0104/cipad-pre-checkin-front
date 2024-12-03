@@ -592,7 +592,7 @@ $spacing-small: 16px;
       width: 100%;
       position: relative;
       object-fit: cover;
-      transform: scale(3); 
+      transform: scale(3);
     }
   }
 }
@@ -1313,6 +1313,9 @@ $spacing-small: 16px;
 }
 
 @media (max-width: 768px) {
+  main {
+    margin-top: 114px;
+  }
   .home {
     .card {
       width: calc(100% - 40px);

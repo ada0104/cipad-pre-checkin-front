@@ -60,10 +60,10 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import Switch from '@/components/Switch.vue'
 import { useTheme } from '@/composables/useTheme'
+import { useI18n } from 'vue-i18n'
 
 const { locale } = useI18n()
 const { isDarkTheme, setTheme } = useTheme()
@@ -103,7 +103,6 @@ watch(showSettings, (newValue) => {
   align-items: center;
   height: 56px;
   padding: 44px 25px;
-  background-color: var(--bg-color);
   position: relative;
 
   .logo {
@@ -241,9 +240,12 @@ watch(showSettings, (newValue) => {
 
 @media (max-width: 767px) {
   .header {
-    margin: 56px 26px 28px 26px;
-    height: auto;
-    padding: 0;
+    position: fixed;
+    z-index: 3;
+    width: calc(100%);
+    top: 0px;
+    background: var(--Body-background);
+    padding: 56px 26px;
     .header-right {
       &--desktop {
         display: none;

@@ -84,6 +84,7 @@ const idImage = useIdImageStore()
 const urlTokenStore = useUrlTokenStore()
 const router = useRouter()
 const { t } = useI18n()
+const { locale } = useI18n()
 
 const uploadRef = ref<any>(null)
 const isLoading = ref<boolean>(false)
@@ -114,6 +115,14 @@ const uploadLabelMap = computed(() => ({
     front: t('uploadLabel.passportFront')
   }
 }))
+
+watch(() => locale.value, () => {
+  selectedOption.value.label = t(`identification.${selectedOption.value.name}`)
+  options.value = options.value.map(option => ({
+    ...option,
+    label: t(`identification.${option.name}`)
+  }))
+})
 
 const computedLabels = computed(() => {
   const selectedName = selectedOption.value?.name as 'id' | 'passport'
