@@ -1,3 +1,7 @@
+import mockData from '@/mockData.json';
+
+const USE_MOCK_DATA = true;
+
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   headers?: Record<string, string>;
@@ -173,6 +177,10 @@ export interface SentEmailResponse {
 }
 
 const fetchOrderData = async (orderDataRequest: OrderDataRequest): Promise<OrderDataResponse> => {
+  if (USE_MOCK_DATA) {
+    return mockData.orderData;
+  }
+
   try {
     const { url_token } = orderDataRequest;
 
@@ -188,6 +196,10 @@ const fetchOrderData = async (orderDataRequest: OrderDataRequest): Promise<Order
 };
 
 const fetchOrderDetailData = async (orderDetailDataRequest: OrderDetailDataRequest): Promise<OrderDetailDataResponse> => {
+  if (USE_MOCK_DATA) {
+    return mockData.orderDetailData;
+  }
+
   try {
     const queryParams = buildQueryParams(orderDetailDataRequest);
     const data = await fetchApi<OrderDetailDataResponse>(
@@ -202,6 +214,10 @@ const fetchOrderDetailData = async (orderDetailDataRequest: OrderDetailDataReque
 };
 
 const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResponse> => {
+  if (USE_MOCK_DATA) {
+    return mockData.ocrData;
+  }
+
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -231,6 +247,9 @@ const fetchOcrData = async (ocrRequestData: OcrDataRequest): Promise<OcrDataResp
 };
 
 const addMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promise<NewMemberDataResponse> => {
+  if (USE_MOCK_DATA) {
+    return mockData.newMemberData;
+  }
 
   const myHeaders = new Headers();
   // 再請後端改為json格式
@@ -280,6 +299,10 @@ const addMemberData = async (newMemberDataRequest: NewMemberDataRequest): Promis
 };
 
 const fetchMemberData = async (defaultMemberDataRequest: DefaultMemberDataRequest): Promise<DefaultMemberDataResponse> => {
+  if (USE_MOCK_DATA) {
+    return mockData.defaultMemberData;
+  }
+
   try {
     const queryParams = buildQueryParams(defaultMemberDataRequest);
     const data = await fetchApi<DefaultMemberDataResponse>(
@@ -294,6 +317,10 @@ const fetchMemberData = async (defaultMemberDataRequest: DefaultMemberDataReques
 };
 
 const fetchQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest): Promise<QRcodeDataResponse> => {
+  if (USE_MOCK_DATA) {
+    return mockData.qrcodeData;
+  }
+
   try {
 
     const queryParams = buildQueryParams(qrcodeDataRequest);
@@ -309,6 +336,10 @@ const fetchQRcodeData = async (qrcodeDataRequest:QRcodeDataRequest): Promise<QRc
 };
 
 const fetchSentEmail = async (sentEmailRequest: SentEmailRequest): Promise<SentEmailResponse> => {
+  if (USE_MOCK_DATA) {
+    return mockData.sentEmailData;
+  }
+
   try {
     const response = await fetchApi<SentEmailResponse>('/dunqian/pre_checkin/send_pci_mail', {
       method: 'POST',

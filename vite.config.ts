@@ -5,6 +5,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
 
+const USE_MOCK_DATA = true;
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
